@@ -6,7 +6,7 @@ import { apiFetch } from "@/lib/api";
 import { getAvailableStock } from "@/lib/stock";
 import type { Product, ProductCategory } from "@/types/product";
 import ProductImage from "@/components/ProductImage";
-import { getStandardizedDisplayPrice, getStandardizedDisplayTitle } from "@/lib/pricing";
+import { getStandardizedDisplayPrice, getStandardizedDisplayTitle, shouldShowOldPrice } from "@/lib/pricing";
 import { getVariantAttributes, getProductVariantMode } from "@/lib/variants";
 
 type VariantFilters = Record<string, string[]>;
@@ -330,7 +330,7 @@ export default function ShopIsland({
                       </h3>
                       <div className="flex items-baseline gap-2 mt-1">
                         <p className="text-[14px] md:text-[20px] font-semibold text-[#1f2f52]">{getStandardizedDisplayPrice(p)}</p>
-                        {p.old_price && (
+                        {shouldShowOldPrice(p.old_price, getStandardizedDisplayPrice(p)) && (
                           <p className="text-[12px] md:text-[14px] text-[#9aa6bc] line-through font-normal">
                             {p.old_price}
                           </p>

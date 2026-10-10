@@ -15,6 +15,7 @@ import {
     type FrontendVariantLayout,
 } from "@/lib/selectionTable";
 import type { VariantTableSection, VariantTableColumn } from "@/types/product";
+import { parseMoneyValue } from "@/lib/pricing";
 import {
     normalizeVariantStock,
     normalizeVariantCustomFields,
@@ -63,6 +64,14 @@ export default function AdminProducts() {
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
     const { sort, toggleSort } = useTableSort("name");
+    const oldPriceValue = parseMoneyValue(currentProduct?.old_price);
+    const hasPriceAboveOldPrice = oldPriceValue !== null && [
+        currentProduct?.price,
+        ...(currentProduct?.variants || []).map((variant: any) => variant?.price),
+    ].some((price) => {
+        const parsedPrice = parseMoneyValue(price);
+        return parsedPrice !== null && parsedPrice > oldPriceValue;
+    });
 
     useEffect(() => {
         loadProducts();
@@ -1513,6 +1522,11 @@ export default function AdminProducts() {
                                             onChange={(e) => setCurrentProduct({ ...currentProduct, old_price: e.target.value })}
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                                         />
+                                        {hasPriceAboveOldPrice && (
+                                            <p role="alert" className="mt-2 text-sm text-amber-700">
+                                                One or more prices are higher than the old price. The old price will not be shown to customers for those prices.
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="col-span-2">
                                         <ImageUpload

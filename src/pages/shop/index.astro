@@ -9,7 +9,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getApiBase } from '@/lib/api-base';
 import { fetchSettings, getPageTitle, getPageDescription } from '@/lib/settings';
 import { buildBreadcrumbJsonLd, buildItemListJsonLd } from '@/lib/seo';
-import { getStandardizedDisplayPrice, getStandardizedDisplayTitle } from '@/lib/pricing';
+import { getStandardizedDisplayPrice, getStandardizedDisplayTitle, shouldShowOldPrice } from '@/lib/pricing';
 import { getAvailableStock } from '@/lib/stock';
 import { normalizeMediaUrl } from '@/lib/media';
 import AdaptiveProductImage from '@/components/AdaptiveProductImage.astro';
@@ -180,7 +180,7 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
                   </h3>
                   <div class="flex items-baseline gap-2 mt-1">
                     <p class="text-[14px] md:text-[20px] font-semibold text-[#1f2f52]">{getStandardizedDisplayPrice(product)}</p>
-                    {product.old_price && (
+                    {shouldShowOldPrice(product.old_price, getStandardizedDisplayPrice(product)) && (
                       <p class="text-[12px] md:text-[14px] text-[#9aa6bc] line-through font-normal">{product.old_price}</p>
                     )}
                   </div>

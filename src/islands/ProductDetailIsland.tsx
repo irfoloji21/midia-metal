@@ -24,7 +24,7 @@ import { $customer } from "@/stores/auth";
 import { toast } from "sonner";
 import Breadcrumb from "@/components/Breadcrumb";
 import SelectionTableSection from "@/components/product/SelectionTableSection";
-import { formatMoneyValue, resolveSelectedVariantUnitPrice, getStandardizedDisplayPrice, getStandardizedDisplayTitle } from "@/lib/pricing";
+import { formatMoneyValue, resolveSelectedVariantUnitPrice, getStandardizedDisplayPrice, getStandardizedDisplayTitle, shouldShowOldPrice } from "@/lib/pricing";
 import { getAvailableStock, MAX_ORDER_QUANTITY } from "@/lib/stock";
 import {
   findMatchingCombinationVariant,
@@ -855,7 +855,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                   {formatMoneyValue(displayedUnitPrice)} each
                 </p>
               )}
-              {product.old_price && (
+              {shouldShowOldPrice(product.old_price, displayedUnitPrice) && (
                 <p className="text-[#9aa6bc] text-[20px] md:text-[24px] line-through font-normal">
                   {product.old_price}
                 </p>
@@ -1214,7 +1214,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
               <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div className="flex items-baseline gap-2">
                   <p className="text-[18px] md:text-[20px] leading-none font-semibold text-[#1f2f52]">{getStandardizedDisplayPrice(p)}</p>
-                  {p.old_price && (
+                  {shouldShowOldPrice(p.old_price, getStandardizedDisplayPrice(p)) && (
                     <p className="text-[14px] md:text-[16px] text-[#9aa6bc] line-through font-normal">
                       {p.old_price}
                     </p>

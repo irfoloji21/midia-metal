@@ -14,6 +14,12 @@ export const formatMoneyValue = (value: unknown): string => {
   return parsed === null ? String(value ?? "") : `£${parsed.toFixed(2)}`;
 };
 
+export const shouldShowOldPrice = (oldPrice: unknown, currentPrice: unknown): boolean => {
+  const old = parseMoneyValue(oldPrice);
+  const current = parseMoneyValue(currentPrice);
+  return old !== null && current !== null && old > current;
+};
+
 export const resolveSelectedVariantUnitPrice = (
   basePrice: unknown,
   selectedVariants?: Record<string, any> | null,
