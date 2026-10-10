@@ -95,6 +95,7 @@ export interface ProductReview {
 export interface Product extends ShippingDimensions {
   id: number;
   name: string;
+  product_code: string | null;
   show_variant_in_title: boolean;
   slug: string;
   variant_mode: VariantMode;

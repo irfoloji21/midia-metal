@@ -159,6 +159,7 @@ export default function AdminProducts() {
 
             return {
                 ...product,
+                product_code: product.product_code || "",
                 variant_mode: variantMode,
                 variant_options: variantMode === "combination" ? combinationOptionNames : [],
                 frontend_variant_layout: variantMode === "combination" ? normalizedFrontendLayout : "default",
@@ -182,6 +183,7 @@ export default function AdminProducts() {
         })() : null;
         const nextProduct = prod || {
                 name: "",
+                product_code: "",
                 variant_mode: "legacy",
                 variant_options: [],
                 frontend_variant_layout: "default" satisfies FrontendVariantLayout,
@@ -248,6 +250,7 @@ export default function AdminProducts() {
             }
 
             finalProduct.tags = tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean);
+            finalProduct.product_code = String(finalProduct.product_code ?? "").trim() || null;
 
             if (!String(finalProduct.price ?? "").trim()) {
                 const firstVariantPrice = (finalProduct.variants || []).find((variant: any) => String(variant?.price ?? "").trim())?.price;
@@ -1473,6 +1476,17 @@ export default function AdminProducts() {
                                             value={currentProduct.name}
                                             onChange={(e) => setCurrentProduct({ ...currentProduct, name: e.target.value })}
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                                        />
+                                    </div>
+                                    <div className="col-span-2 sm:col-span-1">
+                                        <label className="block text-sm font-medium text-gray-700">Product Code (Optional)</label>
+                                        <input
+                                            type="text"
+                                            maxLength={100}
+                                            value={currentProduct.product_code || ""}
+                                            onChange={(e) => setCurrentProduct({ ...currentProduct, product_code: e.target.value })}
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                                            placeholder="e.g. MM-1001"
                                         />
                                     </div>
                                     <div className="col-span-2">

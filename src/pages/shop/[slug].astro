@@ -63,7 +63,7 @@ const productJsonLd = buildProductJsonLd({
   name: productName,
   description: rawDescription,
   image: product?.image,
-  sku: product?.sku || String(product?.id || ''),
+  sku: product?.product_code || product?.sku,
   url: productUrl,
   price: numericPrice,
   availability: product?.stock > 0 || product?.in_stock !== false

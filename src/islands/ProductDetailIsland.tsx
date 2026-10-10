@@ -935,10 +935,12 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                     <span className="text-[#6e7a92]">{product.tags.join(", ")}</span>
                   </p>
                 )}
-                <p>
-                  <span className="font-semibold text-primary">Product ID:</span>{" "}
-                  <span className="text-[#6e7a92]">{product.id}</span>
-                </p>
+                {product.product_code && (
+                  <p>
+                    <span className="font-semibold text-primary">Product Code:</span>{" "}
+                    <span className="text-[#6e7a92]">{product.product_code}</span>
+                  </p>
+                )}
                 {!isSelectionTableMode &&
                   dedupeSpecEntries([
                     ...fixedVariantSummaryEntries,

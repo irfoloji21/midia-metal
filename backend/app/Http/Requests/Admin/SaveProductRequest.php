@@ -19,11 +19,20 @@ class SaveProductRequest extends FormRequest
         return true; // Auth handled by admin.only middleware
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('product_code')) {
+            $productCode = trim((string) $this->input('product_code', ''));
+            $this->merge(['product_code' => $productCode !== '' ? $productCode : null]);
+        }
+    }
+
     /** @return array<string, mixed> */
     public function rules(): array
     {
         return [
             'name' => 'required|string|max:255',
+            'product_code' => 'nullable|string|max:100',
             'show_variant_in_title' => 'boolean',
             'variant_mode' => 'nullable|string|in:legacy,combination',
             'variant_options' => 'nullable|array',
