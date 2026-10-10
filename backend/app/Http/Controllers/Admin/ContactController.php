@@ -5,11 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Jobs\RefundStripePayment;
 use App\Models\ContactMessage;
+use App\Services\CustomerOrderRequestNotificationService;
+use App\Services\CustomerOrderStatusNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
+    public function __construct(
+        private CustomerOrderRequestNotificationService $orderRequestNotifications,
+        private CustomerOrderStatusNotificationService $orderStatusNotifications,
+    ) {}
+
     public function index(Request $request)
     {
         $query = ContactMessage::query()->with('order:id,order_number');
@@ -69,12 +76,20 @@ class ContactController extends Controller
         }
 
         $order = $contactMessage->order;
+        $previousOrderStatus = $order?->status;
+        $statusChanged = $contactMessage->request_status !== $validated['request_status'];
+        $isBankTransfer = in_array(
+            strtolower(trim((string) ($order?->payment_method ?? ''))),
+            ['bank_transfer', 'direct bank transfer'],
+            true,
+        );
         if (
             $order &&
             $validated['request_status'] === 'approved' &&
             $contactMessage->request_type === 'cancel_refund' &&
             $order->payment_status === 'paid' &&
-            ! $order->stripe_payment_intent_id
+            ! $order->stripe_payment_intent_id &&
+            ! $isBankTransfer
         ) {
             return response()->json([
                 'message' => 'This paid order has no Stripe payment attached, so an automatic refund cannot be started.',
@@ -91,17 +106,32 @@ class ContactController extends Controller
             $order->status = 'cancelled';
 
             if ($contactMessage->request_type === 'cancel_refund' && $order->payment_status === 'paid') {
-                $order->payment_status = 'refund_pending';
+                $order->payment_status = $isBankTransfer ? 'manual_refund_pending' : 'refund_pending';
             }
 
             $order->save();
 
+            if ($order->status !== $previousOrderStatus) {
+                $this->orderStatusNotifications->send($order, (string) $previousOrderStatus);
+            }
+
             if (
                 $contactMessage->request_type === 'cancel_refund' &&
-                $order->payment_status === 'refund_pending'
+                $order->payment_status === 'refund_pending' &&
+                $order->stripe_payment_intent_id
             ) {
                 RefundStripePayment::dispatchAfterResponse($contactMessage->id);
             }
+        }
+
+        if ($statusChanged) {
+            $event = $validated['request_status'] === 'rejected'
+                ? 'request_rejected'
+                : ($contactMessage->request_type === 'cancel_refund'
+                    && $order?->payment_status === 'manual_refund_pending'
+                    ? 'manual_refund_pending'
+                    : 'request_approved');
+            $this->orderRequestNotifications->sendForRequest($contactMessage, $event);
         }
 
         return response()->json($contactMessage->load('order:id,order_number,status,payment_status'));

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\ContactMessage;
+use App\Services\CustomerOrderRequestNotificationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -23,7 +24,7 @@ class RefundStripePayment implements ShouldQueue
         public int $contactMessageId,
     ) {}
 
-    public function handle(): void
+    public function handle(CustomerOrderRequestNotificationService $notifications): void
     {
         $contactMessage = ContactMessage::with('order')->find($this->contactMessageId);
         if (! $contactMessage || $contactMessage->message_type !== 'order_request') {
@@ -52,11 +53,13 @@ class RefundStripePayment implements ShouldQueue
             ]);
 
             $order->update(['payment_status' => 'refunded']);
+            $notifications->sendForRequest($contactMessage, 'refund_completed');
         } catch (InvalidRequestException $exception) {
             $message = strtolower($exception->getMessage());
 
             if (str_contains($message, 'already been refunded')) {
                 $order->update(['payment_status' => 'refunded']);
+                $notifications->sendForRequest($contactMessage, 'refund_completed');
 
                 return;
             }
@@ -74,6 +77,10 @@ class RefundStripePayment implements ShouldQueue
         $contactMessage = ContactMessage::with('order')->find($this->contactMessageId);
         if ($contactMessage?->order) {
             $contactMessage->order->update(['payment_status' => 'refund_failed']);
+        }
+
+        if ($contactMessage) {
+            app(CustomerOrderRequestNotificationService::class)->sendForRequest($contactMessage, 'refund_failed');
         }
 
         Log::error('Stripe refund job failed', [

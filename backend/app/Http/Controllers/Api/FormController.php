@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\QuoteRequest;
 use App\Services\OrderService;
+use App\Services\CustomerOrderRequestNotificationService;
 use App\Services\PaymentVerificationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -18,7 +19,10 @@ use Illuminate\Support\Str;
 
 class FormController extends Controller
 {
-    public function __construct(private OrderService $orderService) {}
+    public function __construct(
+        private OrderService $orderService,
+        private CustomerOrderRequestNotificationService $orderRequestNotifications,
+    ) {}
 
     protected function getAdminNotificationEmail(): string
     {
@@ -132,7 +136,7 @@ class FormController extends Controller
             "Details:\n{$validated['details']}",
         ]);
 
-        ContactMessage::create([
+        $orderRequest = ContactMessage::create([
             'name' => $authenticatedCustomer->name,
             'email' => $authenticatedCustomer->email,
             'phone' => $authenticatedCustomer->phone,
@@ -145,6 +149,8 @@ class FormController extends Controller
             'details' => $validated['details'],
             'message' => $message,
         ]);
+
+        $this->orderRequestNotifications->sendForRequest($orderRequest, 'request_received');
 
         Mail::to($this->getAdminNotificationEmail())->send(new AdminNotification(
             $subject,

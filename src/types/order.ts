@@ -12,6 +12,7 @@ export type PaymentStatus =
   | "paid"
   | "refunded"
   | "refund_pending"
+  | "manual_refund_pending"
   | "failed"
   | "refund_failed"
   | "partially_refunded";

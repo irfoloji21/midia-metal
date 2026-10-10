@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Download, Eye, MapPin, RefreshCcw, RotateCcw, Truck, X, XCircle } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const MOCK_TRACKING_CODES = [
   "EZ1000000001",
@@ -27,10 +28,16 @@ const getRequestStatusLabel = (requestStatus?: string) => {
 const getPaymentStatusBadgeClass = (paymentStatus?: string) => {
   if (paymentStatus === "paid") return "bg-green-100 text-green-800";
   if (paymentStatus === "refunded") return "bg-slate-100 text-slate-700";
-  if (paymentStatus === "refund_pending") return "bg-blue-100 text-blue-700";
+  if (paymentStatus === "refund_pending" || paymentStatus === "manual_refund_pending") return "bg-blue-100 text-blue-700";
   if (paymentStatus === "failed" || paymentStatus === "refund_failed") return "bg-red-100 text-red-800";
   return "bg-yellow-100 text-yellow-800";
 };
+
+const getPaymentStatusLabel = (paymentStatus?: string) =>
+  paymentStatus === "manual_refund_pending" ? "Manual Refund Pending" : paymentStatus || "pending";
+
+const isBankTransferPayment = (paymentMethod?: string) =>
+  ["bank_transfer", "direct bank transfer"].includes(String(paymentMethod || "").trim().toLowerCase());
 
 const getFulfilmentMethod = (order?: any): "delivery" | "click_collect" =>
   (order?.shipping_metadata?.fulfilment_method === "click_collect"
@@ -49,6 +56,9 @@ export default function AdminOrders() {
   const { sort, toggleSort } = useTableSort("created_at", "desc");
   const [shippingBusy, setShippingBusy] = useState<"label" | "track" | "void" | null>(null);
   const [refunding, setRefunding] = useState(false);
+  const [bankRefundRequest, setBankRefundRequest] = useState<any>(null);
+  const [bankRefundAcknowledged, setBankRefundAcknowledged] = useState(false);
+  const [reviewingBankRefund, setReviewingBankRefund] = useState(false);
 
   useEffect(() => {
     loadOrders();
@@ -193,10 +203,23 @@ export default function AdminOrders() {
     }
   };
 
-  const handleReviewRequest = async (requestId: number, requestStatus: "approved" | "rejected") => {
+  const handleReviewRequest = async (requestId: number, requestStatus: "approved" | "rejected", acknowledgeBankRefund = false) => {
     if (!viewingOrder) return;
 
+    const request = viewingOrder.customer_requests?.find((item: any) => item.id === requestId);
+    const requiresManualRefundAcknowledgement = requestStatus === "approved"
+      && request?.request_type === "cancel_refund"
+      && viewingOrder.payment_status === "paid"
+      && isBankTransferPayment(viewingOrder.payment_method);
+
+    if (requiresManualRefundAcknowledgement && !acknowledgeBankRefund) {
+      setBankRefundRequest(request);
+      setBankRefundAcknowledged(false);
+      return;
+    }
+
     try {
+      if (requiresManualRefundAcknowledgement) setReviewingBankRefund(true);
       await apiFetch(`/admin/messages/${requestId}/request-status`, {
         method: "PUT",
         body: JSON.stringify({ request_status: requestStatus }),
@@ -206,8 +229,14 @@ export default function AdminOrders() {
       setViewingOrder(updatedOrder);
       await loadOrders();
       toast.success(requestStatus === "approved" ? "Cancellation request approved" : "Cancellation request rejected");
+      if (requiresManualRefundAcknowledgement) {
+        setBankRefundRequest(null);
+        setBankRefundAcknowledged(false);
+      }
     } catch (error: any) {
       toast.error(error?.message || "Failed to review request");
+    } finally {
+      if (requiresManualRefundAcknowledgement) setReviewingBankRefund(false);
     }
   };
 
@@ -318,7 +347,7 @@ export default function AdminOrders() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getPaymentStatusBadgeClass(order.payment_status)}`}>
-                      {order.payment_status || "pending"}
+                      {getPaymentStatusLabel(order.payment_status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -444,6 +473,7 @@ export default function AdminOrders() {
                           <option value="pending">Pending</option>
                           <option value="paid">Paid</option>
                           <option value="refund_pending">Refund Pending</option>
+                          <option value="manual_refund_pending">Manual Refund Pending</option>
                           <option value="failed">Failed</option>
                           <option value="refund_failed">Refund Failed</option>
                           <option value="refunded">Refunded</option>
@@ -723,6 +753,66 @@ export default function AdminOrders() {
           </div>
         </div>
       )}
+      <Dialog
+        open={Boolean(bankRefundRequest)}
+        onOpenChange={(open) => {
+          if (open) return;
+          if (bankRefundAcknowledged && !reviewingBankRefund) {
+            setBankRefundRequest(null);
+            setBankRefundAcknowledged(false);
+          }
+        }}
+      >
+        <DialogContent
+          hideCloseButton
+          overlayClassName="z-[110]"
+          className="z-[120] max-w-md p-5"
+          onEscapeKeyDown={(event) => {
+            if (!bankRefundAcknowledged || reviewingBankRefund) event.preventDefault();
+          }}
+          onPointerDownOutside={(event) => {
+            if (!bankRefundAcknowledged || reviewingBankRefund) event.preventDefault();
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>Manual Bank Transfer Refund</DialogTitle>
+            <DialogDescription>
+              Order {viewingOrder?.order_number} was paid by bank transfer. The refund cannot be processed automatically. Please send the money back to the customer yourself, then manually change the payment status to “Refunded” in the admin panel.
+            </DialogDescription>
+          </DialogHeader>
+          <label className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-gray-800">
+            <input
+              type="checkbox"
+              checked={bankRefundAcknowledged}
+              onChange={(event) => setBankRefundAcknowledged(event.target.checked)}
+              disabled={reviewingBankRefund}
+              className="mt-0.5 h-4 w-4 accent-orange"
+            />
+            <span>I have read and understood that I must refund the customer manually and update the payment status afterward.</span>
+          </label>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => {
+                setBankRefundRequest(null);
+                setBankRefundAcknowledged(false);
+              }}
+              disabled={!bankRefundAcknowledged || reviewingBankRefund}
+              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => bankRefundRequest && handleReviewRequest(bankRefundRequest.id, "approved", true)}
+              disabled={!bankRefundAcknowledged || reviewingBankRefund}
+              className="rounded-md bg-orange px-4 py-2 text-sm font-semibold text-white hover:bg-orange-hover disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {reviewingBankRefund ? "Approving..." : "Acknowledge & Approve"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

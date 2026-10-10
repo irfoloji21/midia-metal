@@ -67,6 +67,7 @@ const PAYMENT_STATUS_LABELS: Record<string, string> = {
     paid: "Paid",
     failed: "Failed",
     refund_pending: "Refund in Progress",
+    manual_refund_pending: "Manual Refund Pending",
     refunded: "Refunded",
     refund_failed: "Refund Failed",
 };

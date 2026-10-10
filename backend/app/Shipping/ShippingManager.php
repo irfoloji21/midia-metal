@@ -3,12 +3,14 @@
 namespace App\Shipping;
 
 use App\Models\Order;
+use App\Services\CustomerOrderStatusNotificationService;
 
 class ShippingManager
 {
     public function __construct(
         private ParcelBuilder $parcelBuilder,
         private ShippingGateway $gateway,
+        private CustomerOrderStatusNotificationService $orderStatusNotifications,
     ) {}
 
     public function gateway(): ShippingGateway
@@ -67,6 +69,7 @@ class ShippingManager
 
     private function persist(Order $order, array $payload): Order
     {
+        $previousOrderStatus = $order->status;
         $trackingStatus = $payload['shipping_status'] ?? $order->shipping_status;
         $nextOrderStatus = $this->mapTrackingStatusToOrderStatus((string) $trackingStatus, (string) $order->status);
         $existingMetadata = is_array($order->shipping_metadata) ? $order->shipping_metadata : [];
@@ -86,7 +89,12 @@ class ShippingManager
             'status' => $nextOrderStatus,
         ], static fn ($value) => $value !== null));
 
-        return $order->fresh('items');
+        $updatedOrder = $order->fresh('items');
+        if ($updatedOrder && $updatedOrder->status !== $previousOrderStatus) {
+            $this->orderStatusNotifications->send($updatedOrder, $previousOrderStatus);
+        }
+
+        return $updatedOrder;
     }
 
     private function mapTrackingStatusToOrderStatus(string $shippingStatus, string $currentOrderStatus): string

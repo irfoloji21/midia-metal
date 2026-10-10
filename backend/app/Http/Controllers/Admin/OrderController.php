@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\CustomerOrderRequestNotificationService;
+use App\Services\CustomerOrderStatusNotificationService;
 use App\Shipping\ShippingManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +15,11 @@ use Stripe\Stripe;
 
 class OrderController extends Controller
 {
-    public function __construct(private ShippingManager $shippingManager) {}
+    public function __construct(
+        private ShippingManager $shippingManager,
+        private CustomerOrderRequestNotificationService $orderRequestNotifications,
+        private CustomerOrderStatusNotificationService $orderStatusNotifications,
+    ) {}
 
     public function index(Request $request)
     {
@@ -43,11 +49,32 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'status' => 'nullable|in:pending,processing,shipped,delivered,cancelled',
-            'payment_status' => 'nullable|in:pending,paid,failed,refund_pending,refunded,partially_refunded,refund_failed',
+            'payment_status' => 'nullable|in:pending,paid,failed,refund_pending,manual_refund_pending,refunded,partially_refunded,refund_failed',
             'notes' => 'nullable|string',
             'tracking_number' => 'nullable|string|max:255',
         ]);
+        $previousOrderStatus = $order->status;
+        $previousPaymentStatus = $order->payment_status;
         $order->update($validated);
+
+        if (isset($validated['status']) && $validated['status'] !== $previousOrderStatus) {
+            $this->orderStatusNotifications->send($order, $previousOrderStatus);
+        }
+
+        if (isset($validated['payment_status']) && $validated['payment_status'] !== $previousPaymentStatus) {
+            $event = match ($validated['payment_status']) {
+                'refund_pending' => 'refund_processing',
+                'manual_refund_pending' => 'manual_refund_pending',
+                'refunded' => 'refund_completed',
+                'partially_refunded' => 'partial_refund_completed',
+                'refund_failed' => 'refund_failed',
+                default => null,
+            };
+
+            if ($event) {
+                $this->orderRequestNotifications->sendLatestForOrder($order, $event);
+            }
+        }
 
         return response()->json($order->load(['items', 'customerRequests']));
     }
@@ -90,11 +117,19 @@ class OrderController extends Controller
             if ($refund->status === 'succeeded' || $refund->status === 'pending') {
                 $isFullRefund = ! isset($validated['amount']) || round($validated['amount'], 2) >= round($order->total, 2);
                 $newStatus = $isFullRefund ? 'refunded' : 'partially_refunded';
+                $previousOrderStatus = $order->status;
 
                 $order->update([
                     'payment_status' => $newStatus,
                     'status' => $isFullRefund ? 'cancelled' : $order->status,
                 ]);
+                if ($order->status !== $previousOrderStatus) {
+                    $this->orderStatusNotifications->send($order, $previousOrderStatus);
+                }
+                $this->orderRequestNotifications->sendLatestForOrder(
+                    $order,
+                    $isFullRefund ? 'refund_completed' : 'partial_refund_completed',
+                );
 
                 // Void the shipping label on full refund
                 if ($isFullRefund && ($order->shipping_shipment_id || ! empty(data_get($order->shipping_metadata, 'shipments')))) {
