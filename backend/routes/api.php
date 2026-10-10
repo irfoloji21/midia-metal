@@ -179,7 +179,7 @@ Route::prefix('admin')->group(function () {
         Route::apiResource('/faqs', Admin\FaqController::class);
 
         // Product Reviews
-        Route::apiResource('/product-reviews', Admin\ProductReviewController::class)->only(['index', 'destroy']);
+        Route::apiResource('/product-reviews', Admin\ProductReviewController::class)->only(['index']);
 
         // Customers
         Route::get('/customers', [Admin\CustomerController::class, 'index']);

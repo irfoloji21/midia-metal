@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
-import { Trash2, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
@@ -24,17 +24,6 @@ export default function AdminProductReviews() {
             toast.error("Failed to load reviews");
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleDelete = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this review?")) return;
-        try {
-            await apiFetch(`/admin/product-reviews/${id}`, { method: "DELETE" });
-            toast.success("Review deleted successfully");
-            loadReviews();
-        } catch (e) {
-            toast.error("Failed to delete review");
         }
     };
 
@@ -85,13 +74,12 @@ export default function AdminProductReviews() {
                             <SortableTableHeader label="Customer" sortKey="customer.name" sort={sort} onSort={toggleSort} />
                             <SortableTableHeader label="Rating & Comment" sortKey="rating" sort={sort} onSort={toggleSort} />
                             <SortableTableHeader label="Date" sortKey="created_at" sort={sort} onSort={toggleSort} />
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {filteredReviews.length === 0 ? (
                             <tr>
-                                <td colSpan={5} className="px-6 py-10 text-center text-sm text-gray-500">
+                                <td colSpan={4} className="px-6 py-10 text-center text-sm text-gray-500">
                                     No reviews found.
                                 </td>
                             </tr>
@@ -126,11 +114,6 @@ export default function AdminProductReviews() {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {new Date(review.created_at).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button onClick={() => handleDelete(review.id)} className="text-red-600 hover:text-red-900">
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
                                     </td>
                                 </tr>
                             ))
