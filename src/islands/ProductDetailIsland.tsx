@@ -923,18 +923,22 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
 
             <div className="space-y-2 text-[12px] md:text-[14px]">
               <>
-                {product.category?.name && (
-                  <p>
-                    <span className="font-semibold text-primary">Category:</span>{" "}
-                    <span className="text-[#6e7a92]">{product.category.name}</span>
-                  </p>
-                )}
                 {Array.isArray(product.tags) && product.tags.length > 0 && (
-                  <p>
-                    <span className="font-semibold text-primary">Tags:</span>{" "}
-                    <span className="text-[#6e7a92]">{product.tags.join(", ")}</span>
-                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {product.tags.map((tag: string, index: number) => (
+                      <span
+                        key={`${tag}-${index}`}
+                        className="inline-flex items-center rounded-full border border-[#d7e0eb] bg-white/70 px-3 py-1 text-[11px] font-medium text-[#6e7a92] md:text-xs"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 )}
+                <p>
+                  <span className="font-semibold text-primary">SKU:</span>{" "}
+                  <span className="text-[#6e7a92]">{product.id}</span>
+                </p>
                 {product.product_code && (
                   <p>
                     <span className="font-semibold text-primary">Product Code:</span>{" "}
