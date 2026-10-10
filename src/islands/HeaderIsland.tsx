@@ -251,9 +251,9 @@ export default function HeaderIsland({ initialSettings }: HeaderIslandProps) {
                   <span className="text-[30px] xl:text-[34px] leading-[1.05] font-semibold tracking-tight whitespace-nowrap">{t('contact_phone', '07545888522')}</span>
                 </a>
               </div>
-              <a href={`mailto:${t('contact_email', 'info@midiammetal.com')}`} className="flex items-center gap-3 text-[18px] text-[#6f7c95] hover:text-orange transition-colors">
+              <a href={`mailto:${t('contact_email', 'softwaredevelopment2181@gmail.com')}`} className="flex items-center gap-3 text-[18px] text-[#6f7c95] hover:text-orange transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#2f9cea] flex-shrink-0"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
-                {t('contact_email', 'info@midiammetal.com')}
+                {t('contact_email', 'softwaredevelopment2181@gmail.com')}
               </a>
             </div>
           </aside>

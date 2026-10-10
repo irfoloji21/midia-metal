@@ -11,6 +11,8 @@ import { fetchSettings, getPageTitle, getPageDescription } from '@/lib/settings'
 import { buildBreadcrumbJsonLd, buildItemListJsonLd } from '@/lib/seo';
 import { getStandardizedDisplayPrice, getStandardizedDisplayTitle } from '@/lib/pricing';
 import { getAvailableStock } from '@/lib/stock';
+import { normalizeMediaUrl } from '@/lib/media';
+import AdaptiveProductImage from '@/components/AdaptiveProductImage.astro';
 
 const DEFAULT_PRICE_RANGE: [number, number] = [0, 5000];
 const INITIAL_VISIBLE_COUNT = 18;
@@ -19,15 +21,6 @@ const LOAD_MORE_COUNT = 9;
 const parsePriceValue = (price: unknown): number => {
   if (typeof price === 'number') return price;
   return parseFloat(String(price ?? '').replace(/[^\d.]/g, '')) || 0;
-};
-
-const normalizeImage = (value: unknown, fallback = '/logo.png') => {
-  if (typeof value !== 'string' || value.trim().length === 0) return fallback;
-  const trimmed = value.trim();
-  if (trimmed.startsWith('/uploads/')) return `/storage${trimmed}`;
-  if (trimmed.startsWith('uploads/')) return `/storage/${trimmed}`;
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/')) return trimmed;
-  return `/${trimmed}`;
 };
 
 const siteUrl = import.meta.env.SITE;
@@ -172,14 +165,14 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
                     style={index >= INITIAL_VISIBLE_COUNT ? 'display: none;' : undefined}
                   >
                   <div class="bg-[#f7f8fa] mb-4">
-                    <img
-                      src={normalizeImage(product.image)}
+                    <AdaptiveProductImage
+                      src={normalizeMediaUrl(product.image)}
                       alt={product.name}
-                      width="400"
-                      height="400"
+                      class="w-full aspect-square"
+                      imageClass="transition-transform duration-300 group-hover:scale-[1.02]"
+                      width={400}
+                      height={400}
                       loading="lazy"
-                      decoding="async"
-                      class="w-full aspect-square object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                     />
                   </div>
                   <h3 class="font-sans text-[16px] md:text-[20px] leading-tight font-semibold text-orange transition-colors">

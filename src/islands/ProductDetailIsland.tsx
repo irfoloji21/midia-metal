@@ -15,6 +15,7 @@ import {
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { normalizeMediaUrl } from "@/lib/media";
+import ProductImage from "@/components/ProductImage";
 import { useStore } from "@nanostores/react";
 import { addToCart } from "@/stores/cart";
 import withErrorBoundary from "@/lib/withErrorBoundary";
@@ -800,7 +801,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
         <div className="grid grid-cols-1 xl:grid-cols-[45%_55%] gap-10 xl:gap-12 items-start">
           <div className="flex flex-col gap-4 max-w-[550px]">
             <div className="relative group bg-white border border-[#e1e5eb] p-8 flex items-center justify-center">
-              <img src={allImages[mainImageIndex]} alt={product.name} className="w-full aspect-square object-contain" />
+              <ProductImage src={allImages[mainImageIndex]} alt={product.name} className="w-full aspect-square" />
               <button
                 onClick={() => {
                   setLightboxIndex(mainImageIndex);
@@ -819,7 +820,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                     onClick={() => setMainImageIndex(idx)}
                     className={`border-2 transition-colors overflow-hidden bg-white ${idx === mainImageIndex ? 'border-orange' : 'border-[#e1e5eb] hover:border-[#cad4e4]'}`}
                   >
-                    <img src={img} alt={idx === 0 ? product.name : `${product.name} - image ${idx + 1}`} className="w-full aspect-square object-cover" />
+                    <ProductImage src={img} alt={idx === 0 ? product.name : `${product.name} - image ${idx + 1}`} className="w-full aspect-square" />
                   </button>
                 ))}
               </div>
@@ -1199,7 +1200,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
               className="group"
             >
               <div className="mb-5 bg-[#f7f8fa] border border-[#d5deea]">
-                      <img src={normalizeMediaUrl(p.image)} alt={p.name} className="w-full aspect-[1.02] object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
+                      <ProductImage src={p.image} alt={p.name} className="w-full aspect-[1.02]" imageClassName="transition-transform duration-300 group-hover:scale-[1.02]" />
               </div>
               <h3 className="font-sans text-[18px] md:text-[20px] leading-tight font-semibold text-orange">
                 {getStandardizedDisplayTitle(p)}

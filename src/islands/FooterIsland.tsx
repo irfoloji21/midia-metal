@@ -46,10 +46,10 @@ export default function FooterIsland({ initialSettings }: FooterIslandProps) {
               </p>
               <div className="pt-2">
                 <a
-                  href={`mailto:${t('contact_email', 'info@midiammetal.com')}`}
+                  href={`mailto:${t('contact_email', 'softwaredevelopment2181@gmail.com')}`}
                   className="text-white text-sm underline decoration-white/40 hover:decoration-white transition-all"
                 >
-                  {t('contact_email', 'info@midiammetal.com')}
+                  {t('contact_email', 'softwaredevelopment2181@gmail.com')}
                 </a>
               </div>
               <div className="pt-4">

@@ -3,6 +3,7 @@ import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X, Copy, ChevronDown, ChevronRight } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
+import ProductImage from "@/components/ProductImage";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import VariantColumnManager from "@/components/admin/VariantColumnManager";
 import {
@@ -1403,7 +1404,7 @@ export default function AdminProducts() {
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
                                             <div className="h-10 w-10 flex-shrink-0">
-                                                <img className="h-10 w-10 rounded-full object-cover" src={product.image} alt="" />
+                                                <ProductImage className="h-10 w-10 rounded-full" src={product.image} alt={product.name} />
                                             </div>
                                             <div className="ml-4">
                                                 <div className="text-sm font-medium text-gray-900">{product.name}</div>
@@ -1509,6 +1510,7 @@ export default function AdminProducts() {
                                             label="Product Image"
                                             value={currentProduct.image}
                                             onChange={(url) => setCurrentProduct({ ...currentProduct, image: url })}
+                                            adaptiveBackground
                                         />
                                     </div>
                                     <div className="col-span-2">
@@ -1516,7 +1518,7 @@ export default function AdminProducts() {
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-3">
                                             {(currentProduct.gallery || []).map((url: string, index: number) => (
                                                 <div key={index} className="relative group rounded-md border border-gray-200 overflow-hidden aspect-square">
-                                                    <img src={url} className="w-full h-full object-cover" alt={`Gallery ${index}`} />
+                                                    <ProductImage src={url} className="h-full w-full" alt={`Gallery ${index}`} />
                                                     <button
                                                         type="button"
                                                         onClick={() => {

@@ -43,7 +43,7 @@ The root `/.env` file is committed to version control. It contains the Stripe te
 **Resolved:** Removed `env()` fallback; controller now requires the config value to be set. Commit `bfa73e3`.
 
 ### 1.5 Hardcoded admin notification email — **P1** ✅ FIXED
-`backend/app/Http/Controllers/Api/ProductReviewController.php:77` hardcodes `mahmutmese.uk@gmail.com`. The `getAdminNotificationEmail()` helper exists in `FormController` but isn't reused here.
+`FormController` and `OrderService` use `softwaredevelopment2181@gmail.com` as a final fallback. `ProductReviewController` has a separate fallback and duplicates the recipient lookup instead of reusing the shared helper.
 
 **Fix:** Extract `getAdminNotificationEmail()` to a shared service or helper, use it everywhere.
 **Resolved:** `ProductReviewController` now uses a `SiteSetting` lookup chain (`contact_email` → `config('mail.from.address')` → fallback), consistent with `FormController`. Commit `bfa73e3`.

@@ -2,6 +2,8 @@
 
 return [
 
+    'business_notification_email' => env('BUSINESS_NOTIFICATION_EMAIL', 'softwaredevelopment2181@gmail.com'),
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -45,7 +47,7 @@ return [
         'mock' => env('SHIPPING_MOCK', true),
         'from_name' => env('SHIPPING_FROM_NAME', env('APP_NAME', 'Midia Metal')),
         'from_company' => env('SHIPPING_FROM_COMPANY', 'Midia Metal'),
-        'from_email' => env('SHIPPING_FROM_EMAIL', 'info@midia-metal.com'),
+        'from_email' => env('SHIPPING_FROM_EMAIL', 'softwaredevelopment2181@gmail.com'),
         'from_phone' => env('SHIPPING_FROM_PHONE', '+44 123 456 7890'),
         'from_address_line1' => env('SHIPPING_FROM_ADDRESS_LINE1', 'Unit 8A Cromwell Centre'),
         'from_address_line2' => env('SHIPPING_FROM_ADDRESS_LINE2', 'Roebuck Road, Hainault Business Park'),

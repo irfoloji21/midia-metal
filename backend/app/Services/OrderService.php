@@ -175,7 +175,7 @@ class OrderService
     {
         $adminEmail = (string) (SiteSetting::where('key', 'contact_email')->value('value')
             ?: config('mail.from.address')
-            ?: 'mahmutmese.uk@gmail.com');
+            ?: 'softwaredevelopment2181@gmail.com');
 
         Mail::to($adminEmail)->send(new AdminNotification(
             'New Order Received: '.$order->order_number,

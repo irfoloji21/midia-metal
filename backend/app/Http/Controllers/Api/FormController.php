@@ -9,7 +9,6 @@ use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\QuoteRequest;
-use App\Models\SiteSetting;
 use App\Services\OrderService;
 use App\Services\PaymentVerificationException;
 use Illuminate\Http\Request;
@@ -23,9 +22,7 @@ class FormController extends Controller
 
     protected function getAdminNotificationEmail(): string
     {
-        return (string) (SiteSetting::where('key', 'contact_email')->value('value')
-            ?: config('mail.from.address')
-            ?: 'mahmutmese.uk@gmail.com');
+        return (string) config('services.business_notification_email', 'softwaredevelopment2181@gmail.com');
     }
 
     public function contact(Request $request)

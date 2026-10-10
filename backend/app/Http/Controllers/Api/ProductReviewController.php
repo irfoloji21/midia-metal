@@ -78,7 +78,7 @@ class ProductReviewController extends Controller
 
         $adminEmail = (string) (SiteSetting::where('key', 'contact_email')->value('value')
             ?: config('mail.from.address')
-            ?: 'info@midia-metal.com');
+            ?: 'softwaredevelopment2181@gmail.com');
 
         Mail::to($adminEmail)->send(new AdminNotification(
             'New Product Review',

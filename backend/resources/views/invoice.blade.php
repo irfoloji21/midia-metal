@@ -138,7 +138,7 @@
             <div><strong>Midia M Metal Ltd</strong></div>
             <div>123 Metal Street</div>
             <div>Industrial Zone, London, UK</div>
-            <div>info@midia-metal.com</div>
+            <div>softwaredevelopment2181@gmail.com</div>
         </div>
     </div>
 
@@ -202,7 +202,7 @@
     </div>
 
     <div class="footer">
-        Thank you for your business! If you have any questions, please contact info@midia-metal.com
+        Thank you for your business! If you have any questions, please contact softwaredevelopment2181@gmail.com
     </div>
 </body>
 

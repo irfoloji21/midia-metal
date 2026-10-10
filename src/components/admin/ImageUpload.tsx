@@ -2,18 +2,20 @@ import React, { useRef, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Upload, X, Loader2 } from "lucide-react";
+import ProductImage from "@/components/ProductImage";
 
 interface ImageUploadProps {
     value: string;
     onChange: (url: string) => void;
     label?: string;
     hidePreview?: boolean;
+    adaptiveBackground?: boolean;
 }
 
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 const MAX_IMAGE_SIZE_LABEL = "2MB";
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label, hidePreview = false }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label, hidePreview = false, adaptiveBackground = false }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -62,7 +64,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label, hideP
                     <div className="relative group w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50 bg-[#F9FBFC]">
                         {value ? (
                             <>
-                                <img src={value} alt="Preview" className="w-full h-full object-cover" />
+                                {adaptiveBackground ? (
+                                    <ProductImage src={value} alt="Preview" className="h-full w-full" />
+                                ) : (
+                                    <img src={value} alt="Preview" className="w-full h-full object-cover" />
+                                )}
                                 <button
                                     type="button"
                                     onClick={handleRemove}

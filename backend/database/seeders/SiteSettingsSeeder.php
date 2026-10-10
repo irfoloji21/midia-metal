@@ -89,7 +89,7 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'contact_form_button_label', 'value' => 'Get in Touch', 'type' => 'text', 'group' => 'contact'],
             ['key' => 'contact_address', 'value' => '123 Metal Street, Industrial Zone, London, UK', 'type' => 'text', 'group' => 'contact'],
             ['key' => 'contact_phone', 'value' => '+44 123 456 7890', 'type' => 'text', 'group' => 'contact'],
-            ['key' => 'contact_email', 'value' => 'info@midia-metal.com', 'type' => 'text', 'group' => 'contact'],
+            ['key' => 'contact_email', 'value' => 'softwaredevelopment2181@gmail.com', 'type' => 'text', 'group' => 'contact'],
             ['key' => 'contact_map_url', 'value' => 'https://www.google.com/maps/embed?pb=...', 'type' => 'url', 'group' => 'contact'],
 
             // Services Page
@@ -167,7 +167,7 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'footer_label_info', 'value' => 'Information', 'type' => 'text', 'group' => 'footer'],
             ['key' => 'contact_address', 'value' => 'Unit 8A Cromwell Centre, Hainaut Business Park, ILFORD, IG6 3UG', 'type' => 'textarea', 'group' => 'footer'],
             ['key' => 'contact_phone', 'value' => '07545888522', 'type' => 'text', 'group' => 'footer'],
-            ['key' => 'contact_email', 'value' => 'info@midiammetal.com', 'type' => 'text', 'group' => 'footer'],
+            ['key' => 'contact_email', 'value' => 'softwaredevelopment2181@gmail.com', 'type' => 'text', 'group' => 'footer'],
             ['key' => 'social_facebook', 'value' => '#', 'type' => 'url', 'group' => 'footer'],
             ['key' => 'social_twitter', 'value' => '#', 'type' => 'url', 'group' => 'footer'],
             ['key' => 'social_dribbble', 'value' => '#', 'type' => 'url', 'group' => 'footer'],

@@ -5,7 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { apiFetch } from "@/lib/api";
 import { getAvailableStock } from "@/lib/stock";
 import type { Product, ProductCategory } from "@/types/product";
-import { normalizeMediaUrl } from "@/lib/media";
+import ProductImage from "@/components/ProductImage";
 import { getStandardizedDisplayPrice, getStandardizedDisplayTitle } from "@/lib/pricing";
 import { getVariantAttributes, getProductVariantMode } from "@/lib/variants";
 
@@ -323,7 +323,7 @@ export default function ShopIsland({
                   {products.map((p) => (
                     <a href={`/shop/${p.slug}`} key={p.id} className="group">
                       <div className="bg-[#f7f8fa] mb-4">
-                        <img src={normalizeMediaUrl(p.image)} alt={p.name} className="w-full aspect-square object-contain transition-transform duration-300 group-hover:scale-[1.02]" />
+                        <ProductImage src={p.image} alt={p.name} className="w-full aspect-square" imageClassName="transition-transform duration-300 group-hover:scale-[1.02]" />
                       </div>
                       <h3 className="font-sans text-[16px] md:text-[20px] leading-tight font-semibold text-orange transition-colors">
                         {getStandardizedDisplayTitle(p)}

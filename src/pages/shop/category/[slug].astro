@@ -10,6 +10,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getApiBase } from '@/lib/api-base';
 import { getStandardizedDisplayPrice, getStandardizedDisplayTitle } from '@/lib/pricing';
 import { buildBreadcrumbJsonLd, buildItemListJsonLd } from '@/lib/seo';
+import { normalizeMediaUrl } from '@/lib/media';
+import AdaptiveProductImage from '@/components/AdaptiveProductImage.astro';
 
 const siteUrl = import.meta.env.SITE;
 const API = `${getApiBase()}/v1`;
@@ -39,15 +41,7 @@ if (!category) {
 
 const pageTitle = category?.name || 'Category';
 const pageDescription = category?.description || `Browse ${pageTitle} products from Midia M Metal.`;
-const normalizeImage = (value: unknown, fallback = '/logo.png') => {
-  if (typeof value !== 'string' || value.trim().length === 0) return fallback;
-  const trimmed = value.trim();
-  if (trimmed.startsWith('/uploads/')) return `/storage${trimmed}`;
-  if (trimmed.startsWith('uploads/')) return `/storage/${trimmed}`;
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/')) return trimmed;
-  return `/${trimmed}`;
-};
-const categoryImage = normalizeImage(category?.image, '/logo.png');
+const categoryImage = normalizeMediaUrl(category?.image, '/logo.png');
 
 // Cache headers: CDN caches for 5 min
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
@@ -123,14 +117,14 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
           {products.map((product: any) => (
             <a href={`/shop/${product.slug || product.id}`} class="group">
               <div class="bg-[#f7f8fa] mb-4">
-                <img
-                  src={normalizeImage(product.image)}
+                <AdaptiveProductImage
+                  src={normalizeMediaUrl(product.image)}
                   alt={product.name}
-                  width="400"
-                  height="400"
+                  class="w-full aspect-square"
+                  imageClass="transition-transform duration-300 group-hover:scale-[1.02]"
+                  width={400}
+                  height={400}
                   loading="lazy"
-                  decoding="async"
-                  class="w-full aspect-square object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                 />
               </div>
               <h4 class="font-sans text-[18px] md:text-[20px] leading-tight font-semibold text-primary group-hover:text-orange transition-colors">

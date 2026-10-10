@@ -1,0 +1,78 @@
+---
+import { normalizeMediaUrl } from '@/lib/media';
+
+interface Props {
+  src: unknown;
+  alt: string;
+  class?: string;
+  imageClass?: string;
+  fit?: 'contain' | 'cover';
+  width?: number;
+  height?: number;
+  loading?: 'eager' | 'lazy';
+}
+
+const {
+  src,
+  alt,
+  class: wrapperClass = '',
+  imageClass = '',
+  fit = 'contain',
+  width,
+  height,
+  loading = 'lazy',
+} = Astro.props;
+const imageSrc = normalizeMediaUrl(src);
+const objectFitClass = fit === 'cover' ? 'object-cover' : 'object-contain';
+---
+
+<div class={`adaptive-product-image relative isolate overflow-hidden ${wrapperClass}`} style="background-color: #f3f5f7" data-adaptive-product-frame>
+  <img
+    src={imageSrc}
+    alt=""
+    aria-hidden="true"
+    loading={loading}
+    class="adaptive-product-image__backdrop absolute inset-0 h-full w-full scale-110 object-cover blur-2xl opacity-50"
+  />
+  <img
+    src={imageSrc}
+    alt={alt}
+    width={width}
+    height={height}
+    loading={loading}
+    decoding="async"
+    data-adaptive-product-source
+    class={`relative z-[1] block h-full w-full ${objectFitClass} ${imageClass}`}
+  />
+</div>
+
+<script>
+  import { sampleImageEdgeColor } from '@/lib/image-color';
+
+  const initializeAdaptiveProductImages = () => {
+    document.querySelectorAll<HTMLImageElement>('img[data-adaptive-product-source]:not([data-color-listener])').forEach((image) => {
+      image.dataset.colorListener = 'true';
+      const applySampledColor = () => {
+        const color = sampleImageEdgeColor(image);
+        if (!color) return;
+
+        const frame = image.closest<HTMLElement>('[data-adaptive-product-frame]');
+        if (!frame) return;
+
+        frame.style.backgroundColor = color;
+        frame.dataset.sampledColor = 'true';
+        const backdrop = frame.querySelector<HTMLElement>('.adaptive-product-image__backdrop');
+        if (backdrop) backdrop.style.opacity = '0';
+      };
+
+      if (image.complete && image.naturalWidth > 0) {
+        applySampledColor();
+      } else {
+        image.addEventListener('load', applySampledColor, { once: true });
+      }
+    });
+  };
+
+  initializeAdaptiveProductImages();
+  document.addEventListener('astro:page-load', initializeAdaptiveProductImages);
+</script>
