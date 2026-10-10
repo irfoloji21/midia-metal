@@ -32,15 +32,10 @@ const API_BASE = getApiBase();
 const settings = await fetchSettings();
 
 let services: any[] = [];
-let testimonials: any[] = [];
 
 try {
-  const [servicesRes, testimonialsRes] = await Promise.all([
-    fetch(`${API_BASE}/v1/services`).then(r => r.ok ? r.json() : []),
-    fetch(`${API_BASE}/v1/testimonials`).then(r => r.ok ? r.json() : []),
-  ]);
+  const servicesRes = await fetch(`${API_BASE}/v1/services`).then(r => r.ok ? r.json() : []);
   services = servicesRes || [];
-  testimonials = testimonialsRes || [];
 } catch (err) {
   console.error('Failed to load services data at build time:', err);
 }
@@ -226,43 +221,5 @@ const itemListJsonLd = services.length > 0
       </div>
     </section>
 
-    <!-- Testimonials -->
-    <section class="py-16 md:py-24">
-      <div class="container mx-auto px-4 lg:px-8">
-        <p class="text-center text-[10px] font-bold tracking-[0.24em] text-muted-foreground uppercase mb-3">PEOPLE SAY ABOUT US</p>
-        <h2 class="text-center font-sans text-[48px] md:text-[68px] leading-[0.95] font-semibold text-[#10275c] mb-12">Our customers say</h2>
-      </div>
-      {testimonials.length > 0 ? (
-        <>
-          <div class="container mx-auto px-4 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
-              {testimonials.map((item: any) => (
-                <div class="w-full max-w-[420px] bg-[#f4f5f7] p-8">
-                  <div class="flex gap-1 mb-4">
-                    {Array.from({ length: item.rating || 0 }).map(() => (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    ))}
-                  </div>
-                  <p class="text-sm text-[#58657f] leading-7 mb-6">{item.content}</p>
-                  <p class="font-sans font-semibold text-[21px] text-primary">{item.name}</p>
-                  <p class="text-xs text-muted-foreground">{item.company}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div class="flex justify-center gap-2 mt-8">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
-            <span class="w-1.5 h-1.5 rounded-full bg-[#c7cfdb]"></span>
-            <span class="w-1.5 h-1.5 rounded-full bg-[#c7cfdb]"></span>
-            <span class="w-1.5 h-1.5 rounded-full bg-[#c7cfdb]"></span>
-            <span class="w-1.5 h-1.5 rounded-full bg-[#c7cfdb]"></span>
-          </div>
-        </>
-      ) : (
-        <div class="container mx-auto px-4 lg:px-8">
-          <p class="text-center text-[#7b879f] text-sm">Testimonials will appear here soon.</p>
-        </div>
-      )}
-    </section>
   </div>
 </BaseLayout>

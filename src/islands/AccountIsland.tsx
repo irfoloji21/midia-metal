@@ -500,7 +500,7 @@ function AccountIsland() {
                                                                                     </p>
                                                                                 ))}
                                                                             </div>
-                                                                            <span className="text-primary font-semibold">£{item.product_price}</span>
+                                                                            <span className="text-primary font-semibold">{item.product_price}</span>
                                                                         </div>
                                                                     ))}
                                                                 </div>
