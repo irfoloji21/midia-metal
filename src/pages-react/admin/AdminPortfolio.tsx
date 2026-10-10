@@ -267,9 +267,9 @@ export default function AdminPortfolio() {
                                     />
                                 </div>
                                 <div className="col-span-1">
-                                    <label className="block text-sm font-medium text-gray-700">Customer Number</label>
+                                    <label className="block text-sm font-medium text-gray-700">Client Phone</label>
                                     <input
-                                        type="text"
+                                        type="tel"
                                         value={currentProject.customer_number || ""}
                                         onChange={(e) => setCurrentProject({ ...currentProject, customer_number: e.target.value })}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
