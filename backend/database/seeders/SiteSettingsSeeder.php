@@ -17,12 +17,6 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'home_comfort_title', 'value' => 'Our products bring comfort to your home', 'type' => 'text', 'group' => 'home'],
             ['key' => 'home_comfort_desc', 'value' => 'Quality fabrication that enhances your living and working environments.', 'type' => 'textarea', 'group' => 'home'],
             ['key' => 'home_comfort_image', 'value' => '/images/air-conditioner.jpg', 'type' => 'image', 'group' => 'home'],
-            // Home Page
-            ['key' => 'home_brand_1', 'value' => 'ELEVATE', 'type' => 'text', 'group' => 'home'],
-            ['key' => 'home_brand_2', 'value' => 'AXION', 'type' => 'text', 'group' => 'home'],
-            ['key' => 'home_brand_3', 'value' => 'SPLENDOR', 'type' => 'text', 'group' => 'home'],
-            ['key' => 'home_brand_4', 'value' => 'DELT', 'type' => 'text', 'group' => 'home'],
-
             ['key' => 'home_gallery_1', 'value' => '/images/welding.jpg', 'type' => 'image', 'group' => 'home'],
             ['key' => 'home_gallery_2', 'value' => '/images/air-conditioner.jpg', 'type' => 'image', 'group' => 'home'],
             ['key' => 'home_gallery_3', 'value' => '/images/hero-kitchen.jpg', 'type' => 'image', 'group' => 'home'],
@@ -43,7 +37,6 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'home_view_more_label', 'value' => 'View More Products', 'type' => 'text', 'group' => 'home'],
             ['key' => 'home_request_quote_label', 'value' => 'Request a Quote', 'type' => 'text', 'group' => 'home'],
             ['key' => 'home_learn_more_label', 'value' => 'Learn More', 'type' => 'text', 'group' => 'home'],
-            ['key' => 'home_brands_title', 'value' => 'We work with the best brands', 'type' => 'text', 'group' => 'home'],
             ['key' => 'home_welding_label', 'value' => 'Metal welding services', 'type' => 'text', 'group' => 'home'],
             ['key' => 'home_welding_title', 'value' => 'Metal welding & bespoke fabrication', 'type' => 'text', 'group' => 'home'],
             ['key' => 'home_welding_desc', 'value' => 'Custom stainless steel builds, repair work, on-site modifications, and workshop welding for commercial kitchens, industrial spaces, and made-to-order metalwork.', 'type' => 'textarea', 'group' => 'home'],

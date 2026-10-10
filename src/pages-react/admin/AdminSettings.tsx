@@ -72,18 +72,6 @@ const HOME_SECTIONS: SettingsSection[] = [
         ],
     },
     {
-        id: "brands",
-        title: "Brands",
-        description: "The brand strip section near the bottom of the homepage.",
-        keys: [
-            "home_brand_1",
-            "home_brand_2",
-            "home_brand_3",
-            "home_brand_4",
-            "home_brands_title",
-        ],
-    },
-    {
         id: "gallery",
         title: "Gallery Strip",
         description: "The image strip above the footer.",
@@ -134,6 +122,11 @@ const HIDDEN_SETTING_KEYS = new Set([
     "shipping_rate",
     "shipping_flat_rate",
     "shipping_type",
+    "home_brand_1",
+    "home_brand_2",
+    "home_brand_3",
+    "home_brand_4",
+    "home_brands_title",
 ]);
 
 const LABEL_OVERRIDES: Record<string, string> = {
