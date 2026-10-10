@@ -58,6 +58,21 @@ class ContactController extends Controller
         return response()->json($contactMessage->load('order:id,order_number'));
     }
 
+    public function updateMessageStatus(Request $request, ContactMessage $contactMessage): JsonResponse
+    {
+        if ($contactMessage->message_type === 'order_request') {
+            return response()->json(['message' => 'Order requests use the request review workflow.'], 422);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:pending,in_progress,resolved',
+        ]);
+
+        $contactMessage->update(['request_status' => $validated['status']]);
+
+        return response()->json($contactMessage->load('order:id,order_number'));
+    }
+
     public function destroy(ContactMessage $contactMessage)
     {
         $contactMessage->delete();

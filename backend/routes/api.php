@@ -161,6 +161,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/messages', [Admin\ContactController::class, 'index']);
         Route::get('/messages/{contactMessage}', [Admin\ContactController::class, 'show']);
         Route::put('/messages/{contactMessage}/read', [Admin\ContactController::class, 'markRead']);
+        Route::put('/messages/{contactMessage}/status', [Admin\ContactController::class, 'updateMessageStatus']);
         Route::put('/messages/{contactMessage}/request-status', [Admin\ContactController::class, 'updateRequestStatus']);
         Route::delete('/messages/{contactMessage}', [Admin\ContactController::class, 'destroy']);
 

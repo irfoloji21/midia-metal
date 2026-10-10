@@ -15,6 +15,12 @@ const getRequestStatusLabel = (requestStatus?: string) => {
     return "Under Review";
 };
 
+const MESSAGE_STATUS_LABELS: Record<string, string> = {
+    pending: "Under Review",
+    in_progress: "In Progress",
+    resolved: "Resolved",
+};
+
 export default function AdminMessages() {
     const [messages, setMessages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -50,6 +56,21 @@ export default function AdminMessages() {
             }
         } catch (e) {
             toast.error("Failed to update message status");
+        }
+    };
+
+    const handleMessageStatusChange = async (id: number, status: string) => {
+        try {
+            const updated = await apiFetch<any>(`/admin/messages/${id}/status`, {
+                method: "PUT",
+                body: JSON.stringify({ status }),
+            });
+            const updatedMessage = { ...updated, request_status: updated.request_status || status };
+            setMessages((current) => current.map((message) => message.id === id ? { ...message, ...updatedMessage } : message));
+            setSelectedMessage((current: any) => current?.id === id ? { ...current, ...updatedMessage } : current);
+            toast.success("Message status updated");
+        } catch (e: any) {
+            toast.error(e?.message || "Failed to update message status");
         }
     };
 
@@ -146,11 +167,15 @@ export default function AdminMessages() {
                                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${msg.message_type === "order_request" ? "bg-orange-100 text-orange" : "bg-slate-100 text-slate-600"}`}>
                                                 {getMessageTypeLabel(msg.message_type)}
                                             </span>
-                                            {msg.request_status && (
+                                            {msg.message_type === "order_request" && msg.request_status ? (
                                                 <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${msg.request_status === "approved" ? "bg-green-100 text-green-700" : msg.request_status === "rejected" ? "bg-slate-200 text-slate-700" : "bg-yellow-100 text-yellow-700"}`}>
                                                     {getRequestStatusLabel(msg.request_status)}
                                                 </span>
-                                            )}
+                                            ) : msg.message_type !== "order_request" ? (
+                                                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${msg.status === "resolved" ? "bg-green-100 text-green-700" : msg.status === "in_progress" ? "bg-blue-100 text-blue-700" : "bg-yellow-100 text-yellow-700"}`}>
+                                                    {MESSAGE_STATUS_LABELS[msg.request_status] || "Under Review"}
+                                                </span>
+                                            ) : null}
                                         </div>
                                         <p className="text-xs text-gray-500 truncate">{msg.subject || msg.email}</p>
                                         {msg.order?.order_number && (
@@ -203,11 +228,15 @@ export default function AdminMessages() {
                                             {getRequestTypeLabel(selectedMessage.request_type)}
                                         </span>
                                     )}
-                                    {selectedMessage.request_status && (
+                                    {selectedMessage.message_type === "order_request" && selectedMessage.request_status ? (
                                         <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${selectedMessage.request_status === "approved" ? "bg-green-100 text-green-700" : selectedMessage.request_status === "rejected" ? "bg-slate-200 text-slate-700" : "bg-yellow-100 text-yellow-700"}`}>
                                             {getRequestStatusLabel(selectedMessage.request_status)}
                                         </span>
-                                    )}
+                                    ) : selectedMessage.message_type !== "order_request" ? (
+                                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${selectedMessage.status === "resolved" ? "bg-green-100 text-green-700" : selectedMessage.status === "in_progress" ? "bg-blue-100 text-blue-700" : "bg-yellow-100 text-yellow-700"}`}>
+                                            {MESSAGE_STATUS_LABELS[selectedMessage.request_status] || "Under Review"}
+                                        </span>
+                                    ) : null}
                                 </div>
                                 <div>
                                     <label className="text-xs font-bold uppercase tracking-wider text-gray-400">Subject</label>
@@ -225,6 +254,20 @@ export default function AdminMessages() {
                                         <div className="mt-2 rounded-lg bg-orange-50 p-4 text-sm text-[#4b5563] leading-relaxed whitespace-pre-wrap">
                                             {selectedMessage.details}
                                         </div>
+                                    </div>
+                                )}
+                                {selectedMessage.message_type !== "order_request" && (
+                                    <div>
+                                        <label className="text-xs font-bold uppercase tracking-wider text-gray-400">Message Status</label>
+                                        <select
+                                            value={selectedMessage.request_status || "pending"}
+                                            onChange={(event) => handleMessageStatusChange(selectedMessage.id, event.target.value)}
+                                            className="mt-2 block w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-[#10275c] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                        >
+                                            <option value="pending">Under Review</option>
+                                            <option value="in_progress">In Progress</option>
+                                            <option value="resolved">Resolved</option>
+                                        </select>
                                     </div>
                                 )}
                                 <div>
