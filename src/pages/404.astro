@@ -1,29 +1,65 @@
 ---
 export const prerender = true;
-/**
- * 404.astro — Reference conversion: STATIC PAGE (no API, no interactivity)
- *
- * Pattern: Pure Astro markup. No React islands needed.
- * Original: src/pages-react/NotFound.tsx
- *
- * This is the simplest conversion type — static HTML wrapped in BaseLayout.
- * The bulk-converter agent should follow this exact pattern for similar pages.
- */
+
 import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
-  title="404 Not Found"
-  description="The page you requested could not be found."
+  title="Page not found"
+  description="The page you are looking for may have moved or no longer exists. Find your way back to Midia M Metal."
   noindex
 >
-  <div class="flex min-h-[60vh] items-center justify-center bg-muted">
-    <div class="text-center">
-      <h1 class="mb-4 text-4xl font-bold">404</h1>
-      <p class="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-      <a href="/" class="text-primary underline hover:text-primary/90">
-        Return to Home
-      </a>
+  <section class="relative isolate flex min-h-[68vh] items-center overflow-hidden bg-[#eaf0f3] px-4 py-20 md:min-h-[72vh]">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute -right-24 -top-32 h-96 w-96 rounded-full bg-[#2f9cea]/10 blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-[#10275c]/10 blur-3xl"></div>
+      <div class="absolute inset-0 opacity-[0.16]" style="background-image: linear-gradient(rgba(16,39,92,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(16,39,92,.12) 1px, transparent 1px); background-size: 48px 48px;"></div>
     </div>
-  </div>
+
+    <div class="mx-auto w-full max-w-4xl text-center">
+      <div class="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#10275c]/10 bg-white/80 text-[#2f9cea] shadow-lg shadow-[#10275c]/5">
+        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v2" />
+          <path d="M12 19v2" />
+          <path d="m4.93 4.93 1.42 1.42" />
+          <path d="m17.65 17.65 1.42 1.42" />
+          <path d="M3 12h2" />
+          <path d="M19 12h2" />
+          <path d="m4.93 19.07 1.42-1.42" />
+          <path d="m17.65 6.35 1.42-1.42" />
+          <circle cx="12" cy="12" r="5" />
+          <path d="m10 10 4 4m0-4-4 4" />
+        </svg>
+      </div>
+
+      <p class="mb-4 text-xs font-bold uppercase tracking-[0.24em] text-[#2f9cea]">Midia M Metal</p>
+      <h1 class="font-sans text-[clamp(7rem,24vw,15rem)] font-semibold leading-[0.78] tracking-[-0.09em] text-[#10275c]">
+        4<span class="text-[#2f9cea]">0</span>4
+      </h1>
+      <h2 class="mt-8 font-sans text-2xl font-semibold text-[#10275c] md:text-3xl">This page is off the radar.</h2>
+      <p class="mx-auto mt-4 max-w-lg text-base leading-7 text-[#58657f] md:text-lg">
+        The page you’re looking for may have moved, or the address may be incorrect. Let’s get you back on track.
+      </p>
+
+      <div class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <a
+          href="/"
+          class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#10275c] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#10275c]/15 transition hover:bg-[#193875] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2f9cea] sm:w-auto"
+        >
+          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M9 21v-7h6v7"/></svg>
+          Back to home
+        </a>
+        <a
+          href="/shop"
+          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-[#10275c]/15 bg-white/70 px-6 py-3 text-sm font-semibold text-[#10275c] transition hover:border-[#2f9cea]/50 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2f9cea] sm:w-auto"
+        >
+          Explore our products
+        </a>
+      </div>
+
+      <p class="mt-8 text-sm text-[#58657f]">
+        Need a hand? <a href="/contact" class="font-semibold text-[#10275c] underline decoration-[#2f9cea] decoration-2 underline-offset-4 hover:text-[#2f9cea]">Contact our team</a>
+      </p>
+    </div>
+  </section>
 </BaseLayout>
