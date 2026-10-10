@@ -3,6 +3,7 @@ import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 export default function AdminPortfolio() {
     const [projects, setProjects] = useState<any[]>([]);
@@ -14,8 +15,7 @@ export default function AdminPortfolio() {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
-    const [sortBy, setSortBy] = useState("title");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const { sort, toggleSort } = useTableSort("title");
 
     useEffect(() => {
         loadProjects();
@@ -121,7 +121,7 @@ export default function AdminPortfolio() {
         }));
     };
 
-    const filteredProjects = projects
+    const filteredProjects = sortRows(projects
         .filter((p) => {
             const matchesSearch =
                 p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -129,18 +129,7 @@ export default function AdminPortfolio() {
                 (p.customer_number || "").toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = categoryFilter === "all" || p.portfolio_category_id?.toString() === categoryFilter;
             return matchesSearch && matchesCategory;
-        })
-        .sort((a, b) => {
-            let valA = a[sortBy];
-            let valB = b[sortBy];
-
-            valA = valA?.toString().toLowerCase() || "";
-            valB = valB?.toString().toLowerCase() || "";
-
-            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-            return 0;
-        });
+        }), sort.key, sort.direction);
 
     if (loading) return <div>Loading...</div>;
 
@@ -175,25 +164,6 @@ export default function AdminPortfolio() {
                             <option key={c.id} value={c.id.toString()}>{c.name}</option>
                         ))}
                     </select>
-                    <div className="flex items-center gap-2 flex-1 sm:flex-none">
-                        <span className="text-sm text-gray-500 whitespace-nowrap">Sort by:</span>
-                        <select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white flex-1 sm:flex-none"
-                        >
-                            <option value="title">Title</option>
-                            <option value="year">Year</option>
-                            <option value="client">Client</option>
-                            <option value="customer_number">Customer Number</option>
-                        </select>
-                        <button
-                            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                            className="h-10 px-3 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-                        >
-                            {sortOrder === "asc" ? "↑" : "↓"}
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -201,10 +171,10 @@ export default function AdminPortfolio() {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer No.</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <SortableTableHeader label="Project" sortKey="title" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Customer No." sortKey="customer_number" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Category" sortKey="portfolio_category.name" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Status" sortKey="active" sort={sort} onSort={toggleSort} />
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>

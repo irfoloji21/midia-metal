@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 export default function AdminBlog() {
     const [posts, setPosts] = useState<any[]>([]);
@@ -14,8 +15,7 @@ export default function AdminBlog() {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
-    const [sortBy, setSortBy] = useState("published_at");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+    const { sort, toggleSort } = useTableSort("published_at", "desc");
 
     useEffect(() => {
         loadPosts();
@@ -82,30 +82,14 @@ export default function AdminBlog() {
         }
     };
 
-    const filteredPosts = posts
+    const filteredPosts = sortRows(posts
         .filter((p) => {
             const matchesSearch =
                 p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (p.author || "").toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = categoryFilter === "all" || p.category === categoryFilter;
             return matchesSearch && matchesCategory;
-        })
-        .sort((a, b) => {
-            let valA = a[sortBy];
-            let valB = b[sortBy];
-
-            if (sortBy === "published_at") {
-                valA = new Date(valA).getTime();
-                valB = new Date(valB).getTime();
-            } else {
-                valA = valA?.toString().toLowerCase() || "";
-                valB = valB?.toString().toLowerCase() || "";
-            }
-
-            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-            return 0;
-        });
+        }), sort.key, sort.direction);
 
     const uniqueCategories = Array.from(new Set(posts.map(p => p.category).filter(Boolean)));
 
@@ -142,24 +126,6 @@ export default function AdminBlog() {
                             <option key={c} value={c}>{c}</option>
                         ))}
                     </select>
-                    <div className="flex items-center gap-2 flex-1 sm:flex-none">
-                        <span className="text-sm text-gray-500 whitespace-nowrap">Sort by:</span>
-                        <select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white flex-1 sm:flex-none"
-                        >
-                            <option value="published_at">Date</option>
-                            <option value="title">Title</option>
-                            <option value="author">Author</option>
-                        </select>
-                        <button
-                            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                            className="h-10 px-3 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-                        >
-                            {sortOrder === "asc" ? "↑" : "↓"}
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -167,9 +133,9 @@ export default function AdminBlog() {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Post</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <SortableTableHeader label="Post" sortKey="title" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Category" sortKey="category" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Date" sortKey="published_at" sort={sort} onSort={toggleSort} />
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>

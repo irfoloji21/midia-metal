@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X } from "lucide-react";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 export default function AdminPortfolioCategories() {
     const [categories, setCategories] = useState<any[]>([]);
@@ -11,8 +12,7 @@ export default function AdminPortfolioCategories() {
     const [currentCategory, setCurrentCategory] = useState<any>(null);
 
     const [searchTerm, setSearchTerm] = useState("");
-    const [sortBy, setSortBy] = useState("name");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const { sort, toggleSort } = useTableSort("name");
 
     useEffect(() => {
         loadCategories();
@@ -72,24 +72,11 @@ export default function AdminPortfolioCategories() {
         }
     };
 
-    const filteredCategories = categories
-        .filter((c) => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
-        .sort((a, b) => {
-            let valA = a[sortBy];
-            let valB = b[sortBy];
-
-            if (sortBy === "projects_count") {
-                valA = parseInt(valA) || 0;
-                valB = parseInt(valB) || 0;
-            } else {
-                valA = valA?.toString().toLowerCase() || "";
-                valB = valB?.toString().toLowerCase() || "";
-            }
-
-            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-            return 0;
-        });
+    const filteredCategories = sortRows(
+        categories.filter((c) => c.name.toLowerCase().includes(searchTerm.toLowerCase())),
+        sort.key,
+        sort.direction,
+    );
 
     if (loading) return <div>Loading...</div>;
 
@@ -113,32 +100,15 @@ export default function AdminPortfolioCategories() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-full lg:w-80 text-sm"
                 />
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 whitespace-nowrap">Sort by:</span>
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white"
-                    >
-                        <option value="name">Name</option>
-                        <option value="projects_count">Projects #</option>
-                    </select>
-                    <button
-                        onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                        className="h-10 px-3 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-                    >
-                        {sortOrder === "asc" ? "↑" : "↓"}
-                    </button>
-                </div>
             </div>
 
             <div className="rounded-lg bg-white shadow overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Projects #</th>
+                            <SortableTableHeader label="Name" sortKey="name" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Slug" sortKey="slug" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Projects #" sortKey="projects_count" sort={sort} onSort={toggleSort} />
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>

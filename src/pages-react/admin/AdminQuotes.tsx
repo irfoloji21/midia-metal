@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Eye, Trash2, X, MessageSquare, Clock, Reply, Send } from "lucide-react";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
     new: { label: "New", color: "bg-blue-100 text-blue-800", icon: MessageSquare },
@@ -15,6 +16,7 @@ export default function AdminQuotes() {
     const [viewing, setViewing] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
+    const { sort, toggleSort } = useTableSort("created_at", "desc");
 
     useEffect(() => { loadQuotes(); }, []);
 
@@ -65,7 +67,7 @@ export default function AdminQuotes() {
         }
     };
 
-    const filteredQuotes = quotes
+    const filteredQuotes = sortRows(quotes
         .filter((q) => {
             const matchesSearch =
                 q.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -73,8 +75,7 @@ export default function AdminQuotes() {
                 (q.service || "").toLowerCase().includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === "all" || q.status === statusFilter;
             return matchesSearch && matchesStatus;
-        })
-        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        }), sort.key, sort.direction);
 
     if (loading) return <div className="p-8">Loading...</div>;
 
@@ -109,9 +110,11 @@ export default function AdminQuotes() {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            {["Name", "Service", "Date", "Status", "Actions"].map(h => (
-                                <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
-                            ))}
+                            <SortableTableHeader label="Name" sortKey="name" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Service" sortKey="service" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Date" sortKey="created_at" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Status" sortKey="status" sort={sort} onSort={toggleSort} />
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">

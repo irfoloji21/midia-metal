@@ -3,12 +3,14 @@ import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Trash2, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 export default function AdminProductReviews() {
     const [reviews, setReviews] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [ratingFilter, setRatingFilter] = useState("all");
+    const { sort, toggleSort } = useTableSort("created_at", "desc");
 
     useEffect(() => {
         loadReviews();
@@ -36,15 +38,14 @@ export default function AdminProductReviews() {
         }
     };
 
-    const filteredReviews = reviews
+    const filteredReviews = sortRows(reviews
         .filter((r) => {
             const matchesSearch =
                 (r.product?.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (r.customer?.name || "").toLowerCase().includes(searchTerm.toLowerCase());
             const matchesRating = ratingFilter === "all" || r.rating.toString() === ratingFilter;
             return matchesSearch && matchesRating;
-        })
-        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        }), sort.key, sort.direction);
 
     if (loading) return <div>Loading...</div>;
 
@@ -80,10 +81,10 @@ export default function AdminProductReviews() {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating & Comment</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <SortableTableHeader label="Product" sortKey="product.name" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Customer" sortKey="customer.name" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Rating & Comment" sortKey="rating" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Date" sortKey="created_at" sort={sort} onSort={toggleSort} />
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>

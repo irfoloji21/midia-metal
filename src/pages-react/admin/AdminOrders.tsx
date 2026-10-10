@@ -3,6 +3,7 @@ import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Download, Eye, MapPin, RefreshCcw, RotateCcw, Truck, X, XCircle } from "lucide-react";
 import { API_URL } from "@/lib/api";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 const MOCK_TRACKING_CODES = [
   "EZ1000000001",
@@ -45,7 +46,7 @@ export default function AdminOrders() {
   const [viewingOrder, setViewingOrder] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const { sort, toggleSort } = useTableSort("created_at", "desc");
   const [shippingBusy, setShippingBusy] = useState<"label" | "track" | "void" | null>(null);
   const [refunding, setRefunding] = useState(false);
 
@@ -210,7 +211,7 @@ export default function AdminOrders() {
     }
   };
 
-  const filteredOrders = orders
+  const filteredOrders = sortRows(orders
     .filter((order) => {
       const matchesSearch =
         order.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -218,12 +219,7 @@ export default function AdminOrders() {
         order.customer_email.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === "all" || order.status === statusFilter;
       return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime();
-      const dateB = new Date(b.created_at).getTime();
-      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-    });
+    }), sort.key, sort.direction);
 
   const currentFulfilmentMethod = getFulfilmentMethod(viewingOrder);
   const isClickCollectOrder = currentFulfilmentMethod === "click_collect";
@@ -257,14 +253,6 @@ export default function AdminOrders() {
             <option value="delivered">Delivered</option>
             <option value="cancelled">Cancelled</option>
           </select>
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-            className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white flex-1 sm:flex-none"
-          >
-            <option value="desc">Newest First</option>
-            <option value="asc">Oldest First</option>
-          </select>
         </div>
       </div>
 
@@ -272,12 +260,12 @@ export default function AdminOrders() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
+              <SortableTableHeader label="Order ID" sortKey="order_number" sort={sort} onSort={toggleSort} />
+              <SortableTableHeader label="Customer" sortKey="customer_name" sort={sort} onSort={toggleSort} />
+              <SortableTableHeader label="Date" sortKey="created_at" sort={sort} onSort={toggleSort} />
+              <SortableTableHeader label="Total" sortKey="total" sort={sort} onSort={toggleSort} />
+              <SortableTableHeader label="Status" sortKey="status" sort={sort} onSort={toggleSort} />
+              <SortableTableHeader label="Payment" sortKey="payment_status" sort={sort} onSort={toggleSort} />
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>

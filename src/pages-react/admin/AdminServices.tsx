@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 export default function AdminServices() {
     const [services, setServices] = useState<any[]>([]);
@@ -13,8 +14,7 @@ export default function AdminServices() {
     const [currentService, setCurrentService] = useState<any>(null);
 
     const [searchTerm, setSearchTerm] = useState("");
-    const [sortBy, setSortBy] = useState("title");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const { sort, toggleSort } = useTableSort("title");
 
     useEffect(() => {
         loadServices();
@@ -80,19 +80,11 @@ export default function AdminServices() {
         }
     };
 
-    const filteredServices = services
-        .filter((s) => s.title.toLowerCase().includes(searchTerm.toLowerCase()))
-        .sort((a, b) => {
-            let valA = a[sortBy];
-            let valB = b[sortBy];
-
-            valA = valA?.toString().toLowerCase() || "";
-            valB = valB?.toString().toLowerCase() || "";
-
-            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-            return 0;
-        });
+    const filteredServices = sortRows(
+        services.filter((s) => s.title.toLowerCase().includes(searchTerm.toLowerCase())),
+        sort.key,
+        sort.direction,
+    );
 
     if (loading) return <div>Loading...</div>;
 
@@ -116,30 +108,14 @@ export default function AdminServices() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-full lg:w-80 text-sm"
                 />
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 whitespace-nowrap">Sort by:</span>
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white"
-                    >
-                        <option value="title">Title</option>
-                    </select>
-                    <button
-                        onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                        className="h-10 px-3 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-                    >
-                        {sortOrder === "asc" ? "↑" : "↓"}
-                    </button>
-                </div>
             </div>
 
             <div className="rounded-lg bg-white shadow overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <SortableTableHeader label="Service" sortKey="title" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Status" sortKey="active" sort={sort} onSort={toggleSort} />
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>

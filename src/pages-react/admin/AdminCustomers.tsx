@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Users, Search, Trash2, Eye, X, ShoppingBag } from "lucide-react";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 export default function AdminCustomers() {
     const [customers, setCustomers] = useState<any[]>([]);
@@ -9,8 +10,7 @@ export default function AdminCustomers() {
     const [search, setSearch] = useState("");
     const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
 
-    const [sortBy, setSortBy] = useState("name");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const { sort, toggleSort } = useTableSort("name");
 
     useEffect(() => {
         loadCustomers();
@@ -27,23 +27,7 @@ export default function AdminCustomers() {
         }
     };
 
-    const sortedCustomers = [...customers].sort((a, b) => {
-        let valA, valB;
-        if (sortBy === "name") {
-            valA = a.name.toLowerCase();
-            valB = b.name.toLowerCase();
-        } else if (sortBy === "orders") {
-            valA = a.orders_count || 0;
-            valB = b.orders_count || 0;
-        } else if (sortBy === "spent") {
-            valA = parseFloat(a.orders_sum_total || 0);
-            valB = parseFloat(b.orders_sum_total || 0);
-        }
-
-        if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-        if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-        return 0;
-    });
+    const sortedCustomers = sortRows(customers, sort.key === "orders" ? "orders_count" : sort.key === "spent" ? "orders_sum_total" : sort.key, sort.direction);
 
     const handleDelete = async (id: number) => {
         if (!confirm("Are you sure you want to delete this customer? This will NOT delete their orders but will remove their account access.")) return;
@@ -70,24 +54,6 @@ export default function AdminCustomers() {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <h1 className="text-3xl font-bold font-sans text-[#10275c]">Customers</h1>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500 whitespace-nowrap">Sort:</span>
-                        <select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white flex-1"
-                        >
-                            <option value="name">Name</option>
-                            <option value="orders">Orders</option>
-                            <option value="spent">Total Spent</option>
-                        </select>
-                        <button
-                            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                            className="h-10 px-3 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-                        >
-                            {sortOrder === "asc" ? "↑" : "↓"}
-                        </button>
-                    </div>
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <input
@@ -105,10 +71,10 @@ export default function AdminCustomers() {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Spent</th>
+                            <SortableTableHeader label="Name" sortKey="name" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Email" sortKey="email" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Orders" sortKey="orders" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Total Spent" sortKey="spent" sort={sort} onSort={toggleSort} />
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>

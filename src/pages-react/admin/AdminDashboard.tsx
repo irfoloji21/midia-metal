@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { Copy, Users, ShoppingCart, DollarSign, Activity, Package } from "lucide-react";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 export default function AdminDashboard() {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     const [topProducts, setTopProducts] = useState<any[]>([]);
+    const { sort, toggleSort } = useTableSort("total_revenue", "desc");
 
     useEffect(() => {
         async function loadStats() {
@@ -35,6 +37,7 @@ export default function AdminDashboard() {
         { name: "Pending Orders", value: data.stats.pending_orders, icon: ShoppingCart },
         { name: "Unread Messages", value: data.stats.unread_messages, icon: Activity },
     ];
+    const sortedTopProducts = sortRows(topProducts, sort.key, sort.direction);
 
     return (
         <div className="space-y-6">
@@ -129,9 +132,9 @@ export default function AdminDashboard() {
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product Name</th>
-                                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Units Sold</th>
-                                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Revenue</th>
+                                <SortableTableHeader label="Product Name" sortKey="product_name" sort={sort} onSort={toggleSort} className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" />
+                                <SortableTableHeader label="Units Sold" sortKey="total_sold" sort={sort} onSort={toggleSort} className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider" buttonClassName="justify-center w-full" />
+                                <SortableTableHeader label="Revenue" sortKey="total_revenue" sort={sort} onSort={toggleSort} className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider" buttonClassName="justify-end w-full" />
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
@@ -140,7 +143,7 @@ export default function AdminDashboard() {
                                     <td colSpan={3} className="px-6 py-10 text-center text-sm text-gray-500 italic">No sales data available yet.</td>
                                 </tr>
                             ) : (
-                                topProducts.map((p: any, idx) => (
+                                sortedTopProducts.map((p: any, idx) => (
                                     <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-[#10275c]">{p.product_name}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-[#22a3e6] font-medium">{p.total_sold}</td>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Plus, Trash2, Edit2, X, Check } from "lucide-react";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 const EMPTY = { code: "", type: "percentage" as "percentage" | "fixed", value: "", min_order_amount: "", max_uses: "", expires_at: "", active: true };
 
@@ -13,8 +14,7 @@ export default function AdminCoupons() {
     const [showForm, setShowForm] = useState(false);
 
     const [searchTerm, setSearchTerm] = useState("");
-    const [sortBy, setSortBy] = useState("code");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const { sort, toggleSort } = useTableSort("code");
 
     useEffect(() => { loadCoupons(); }, []);
 
@@ -63,27 +63,11 @@ export default function AdminCoupons() {
         } catch { toast.error("Failed to delete"); }
     };
 
-    const filteredCoupons = coupons
-        .filter((c) => c.code.toLowerCase().includes(searchTerm.toLowerCase()))
-        .sort((a, b) => {
-            let valA = a[sortBy];
-            let valB = b[sortBy];
-
-            if (sortBy === "value" || sortBy === "min_order_amount") {
-                valA = parseFloat(valA) || 0;
-                valB = parseFloat(valB) || 0;
-            } else if (sortBy === "expires_at") {
-                valA = valA ? new Date(valA).getTime() : 0;
-                valB = valB ? new Date(valB).getTime() : 0;
-            } else {
-                valA = valA?.toString().toLowerCase() || "";
-                valB = valB?.toString().toLowerCase() || "";
-            }
-
-            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-            return 0;
-        });
+    const filteredCoupons = sortRows(
+        coupons.filter((c) => c.code.toLowerCase().includes(searchTerm.toLowerCase())),
+        sort.key,
+        sort.direction,
+    );
 
     if (loading) return <div className="p-8">Loading...</div>;
 
@@ -104,34 +88,20 @@ export default function AdminCoupons() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-full lg:w-80 text-sm"
                 />
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 whitespace-nowrap">Sort by:</span>
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white"
-                    >
-                        <option value="code">Code</option>
-                        <option value="value">Value</option>
-                        <option value="min_order_amount">Min Order</option>
-                        <option value="expires_at">Expiry</option>
-                    </select>
-                    <button
-                        onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                        className="h-10 px-3 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-                    >
-                        {sortOrder === "asc" ? "↑" : "↓"}
-                    </button>
-                </div>
             </div>
 
             <div className="rounded-lg bg-white shadow overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            {["Code", "Type", "Value", "Min Order", "Uses", "Expires", "Active", "Actions"].map(h => (
-                                <th key={h} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
-                            ))}
+                            <SortableTableHeader label="Code" sortKey="code" sort={sort} onSort={toggleSort} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
+                            <SortableTableHeader label="Type" sortKey="type" sort={sort} onSort={toggleSort} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
+                            <SortableTableHeader label="Value" sortKey="value" sort={sort} onSort={toggleSort} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
+                            <SortableTableHeader label="Min Order" sortKey="min_order_amount" sort={sort} onSort={toggleSort} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
+                            <SortableTableHeader label="Uses" sortKey="used_count" sort={sort} onSort={toggleSort} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
+                            <SortableTableHeader label="Expires" sortKey="expires_at" sort={sort} onSort={toggleSort} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
+                            <SortableTableHeader label="Active" sortKey="active" sort={sort} onSort={toggleSort} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">

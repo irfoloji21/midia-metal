@@ -6,6 +6,7 @@ import ImageUpload from "@/components/admin/ImageUpload";
 import ProductImage from "@/components/ProductImage";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import VariantColumnManager from "@/components/admin/VariantColumnManager";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 import {
     getSelectionTableSourceValues,
     getSelectionTableTabValues,
@@ -59,8 +60,9 @@ export default function AdminProducts() {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
-    const [sortBy, setSortBy] = useState("name");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
+    const { sort, toggleSort } = useTableSort("name");
 
     useEffect(() => {
         loadProducts();
@@ -348,28 +350,18 @@ export default function AdminProducts() {
         }
     };
 
-    const filteredProducts = products
+    const filteredProducts = sortRows(products
         .filter((p) => {
             const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = categoryFilter === "all" || p.product_category_id?.toString() === categoryFilter;
-            return matchesSearch && matchesCategory;
-        })
-        .sort((a, b) => {
-            let valA = a[sortBy];
-            let valB = b[sortBy];
-
-            if (sortBy === "price") {
-                valA = parseFloat(valA.toString().replace(/[£,]/g, "")) || 0;
-                valB = parseFloat(valB.toString().replace(/[£,]/g, "")) || 0;
-            } else {
-                valA = valA?.toString().toLowerCase();
-                valB = valB?.toString().toLowerCase();
-            }
-
-            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-            return 0;
-        });
+            const price = Number.parseFloat(String(p.price ?? "").replace(/[£,]/g, "").trim());
+            const min = minPrice.trim() === "" ? null : Number(minPrice);
+            const max = maxPrice.trim() === "" ? null : Number(maxPrice);
+            const matchesPrice = Number.isFinite(price)
+                ? (min === null || price >= min) && (max === null || price <= max)
+                : min === null && max === null;
+            return matchesSearch && matchesCategory && matchesPrice;
+        }), sort.key, sort.direction);
 
     const updateVariantTableColumn = (
         section: VariantTableSection,
@@ -1365,23 +1357,26 @@ export default function AdminProducts() {
                             <option key={c.id} value={c.id.toString()}>{c.name}</option>
                         ))}
                     </select>
-                    <div className="flex items-center gap-2 flex-1 sm:flex-none">
-                        <span className="text-sm text-gray-500 whitespace-nowrap">Sort by:</span>
-                        <select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white flex-1 sm:flex-none"
-                        >
-                            <option value="name">Name</option>
-                            <option value="price">Price</option>
-                        </select>
-                        <button
-                            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                            className="h-10 px-3 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-                        >
-                            {sortOrder === "asc" ? "↑" : "↓"}
-                        </button>
-                    </div>
+                    <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        aria-label="Minimum price"
+                        placeholder="Min price (£)"
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(e.target.value)}
+                        className="h-10 w-full sm:w-36 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        aria-label="Maximum price"
+                        placeholder="Max price (£)"
+                        value={maxPrice}
+                        onChange={(e) => setMaxPrice(e.target.value)}
+                        className="h-10 w-full sm:w-36 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
                 </div>
             </div>
 
@@ -1389,10 +1384,10 @@ export default function AdminProducts() {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <SortableTableHeader label="Product" sortKey="name" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Category" sortKey="category.name" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Price" sortKey="price" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Status" sortKey="active" sort={sort} onSort={toggleSort} />
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>

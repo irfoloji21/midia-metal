@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X } from "lucide-react";
+import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 export default function AdminFaq() {
     const [faqs, setFaqs] = useState<any[]>([]);
@@ -11,8 +12,7 @@ export default function AdminFaq() {
     const [currentFaq, setCurrentFaq] = useState<any>(null);
 
     const [searchTerm, setSearchTerm] = useState("");
-    const [sortBy, setSortBy] = useState("order");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const { sort, toggleSort } = useTableSort("order");
 
     useEffect(() => {
         loadFaqs();
@@ -75,19 +75,11 @@ export default function AdminFaq() {
         }
     };
 
-    const filteredFaqs = faqs
-        .filter((f) => f.question.toLowerCase().includes(searchTerm.toLowerCase()))
-        .sort((a, b) => {
-            let valA = a[sortBy];
-            let valB = b[sortBy];
-
-            if (typeof valA === 'string') valA = valA.toLowerCase();
-            if (typeof valB === 'string') valB = valB.toLowerCase();
-
-            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-            return 0;
-        });
+    const filteredFaqs = sortRows(
+        faqs.filter((f) => f.question.toLowerCase().includes(searchTerm.toLowerCase())),
+        sort.key,
+        sort.direction,
+    );
 
     if (loading) return <div>Loading...</div>;
 
@@ -111,32 +103,15 @@ export default function AdminFaq() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-full lg:w-80 text-sm"
                 />
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 whitespace-nowrap">Sort by:</span>
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white"
-                    >
-                        <option value="order">Order</option>
-                        <option value="question">Question</option>
-                    </select>
-                    <button
-                        onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                        className="h-10 px-3 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-                    >
-                        {sortOrder === "asc" ? "↑" : "↓"}
-                    </button>
-                </div>
             </div>
 
             <div className="rounded-lg bg-white shadow overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <SortableTableHeader label="Order" sortKey="order" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Question" sortKey="question" sort={sort} onSort={toggleSort} />
+                            <SortableTableHeader label="Status" sortKey="active" sort={sort} onSort={toggleSort} />
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
