@@ -4,6 +4,18 @@ import { toast } from "sonner";
 import { Eye, Trash2, X, MessageSquare, Clock, Reply, Send } from "lucide-react";
 import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
+const getQuoteFileName = (file: string) => {
+    const path = file.split(/[?#]/)[0];
+    return path.split("/").pop() || "Attached file";
+};
+
+const getQuoteFilePreviewType = (file: string): "image" | "pdf" | "other" => {
+    const path = file.split(/[?#]/)[0].toLowerCase();
+    if (/\.(jpe?g|png|gif|svg|webp)$/.test(path)) return "image";
+    if (/\.pdf$/.test(path)) return "pdf";
+    return "other";
+};
+
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
     new: { label: "New", color: "bg-blue-100 text-blue-800", icon: MessageSquare },
     reviewing: { label: "Reviewing", color: "bg-yellow-100 text-yellow-800", icon: Clock },
@@ -148,7 +160,7 @@ export default function AdminQuotes() {
             {/* Detail Modal */}
             {viewing && (
                 <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
                             <h2 className="text-xl font-bold text-[#10275c]">Quote from {viewing.name}</h2>
                             <button onClick={() => setViewing(null)}><X className="h-6 w-6 text-gray-400" /></button>
@@ -167,10 +179,33 @@ export default function AdminQuotes() {
                             {viewing.files?.length > 0 && (
                                 <div>
                                     <span className="font-medium text-gray-500 text-sm">Attached Files:</span>
-                                    <div className="mt-2 space-y-1">
-                                        {viewing.files.map((f: string, i: number) => (
-                                            <a key={i} href={f} target="_blank" rel="noreferrer" className="block text-sm text-indigo-600 hover:underline">{f}</a>
-                                        ))}
+                                    <div className="mt-3 grid grid-cols-1 gap-4">
+                                        {viewing.files.map((f: string, i: number) => {
+                                            const previewType = getQuoteFilePreviewType(f);
+                                            return (
+                                                <div key={`${f}-${i}`} className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                                                    <div className="flex items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-3">
+                                                        <span className="truncate text-sm font-medium text-gray-700">{getQuoteFileName(f)}</span>
+                                                        <a href={f} target="_blank" rel="noreferrer" className="shrink-0 text-sm font-medium text-indigo-600 hover:underline">
+                                                            Open file
+                                                        </a>
+                                                    </div>
+                                                    {previewType === "image" ? (
+                                                        <div className="flex max-h-[480px] items-center justify-center bg-white p-3">
+                                                            <img src={f} alt={getQuoteFileName(f)} className="max-h-[450px] max-w-full object-contain" />
+                                                        </div>
+                                                    ) : previewType === "pdf" ? (
+                                                        <iframe
+                                                            src={`${f}#toolbar=1&navpanes=0`}
+                                                            title={`Preview of ${getQuoteFileName(f)}`}
+                                                            className="h-[480px] w-full bg-white"
+                                                        />
+                                                    ) : (
+                                                        <p className="px-4 py-5 text-sm text-gray-500">Preview is not available for this file type. Use “Open file” to view or download it.</p>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             )}
