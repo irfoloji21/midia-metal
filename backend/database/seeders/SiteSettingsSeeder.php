@@ -17,13 +17,6 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'home_comfort_title', 'value' => 'Our products bring comfort to your home', 'type' => 'text', 'group' => 'home'],
             ['key' => 'home_comfort_desc', 'value' => 'Quality fabrication that enhances your living and working environments.', 'type' => 'textarea', 'group' => 'home'],
             ['key' => 'home_comfort_image', 'value' => '/images/air-conditioner.jpg', 'type' => 'image', 'group' => 'home'],
-            ['key' => 'home_gallery_1', 'value' => '/images/welding.jpg', 'type' => 'image', 'group' => 'home'],
-            ['key' => 'home_gallery_2', 'value' => '/images/air-conditioner.jpg', 'type' => 'image', 'group' => 'home'],
-            ['key' => 'home_gallery_3', 'value' => '/images/hero-kitchen.jpg', 'type' => 'image', 'group' => 'home'],
-            ['key' => 'home_gallery_4', 'value' => '/images/installation-service.jpg', 'type' => 'image', 'group' => 'home'],
-            ['key' => 'home_gallery_5', 'value' => '/images/workshop.jpg', 'type' => 'image', 'group' => 'home'],
-            ['key' => 'home_gallery_6', 'value' => '/images/mesh-filter.jpg', 'type' => 'image', 'group' => 'home'],
-
             ['key' => 'home_reward_title', 'value' => 'Reward program', 'type' => 'text', 'group' => 'home'],
             ['key' => 'home_reward_desc', 'value' => 'Exclusive benefits for our repeat customers.', 'type' => 'text', 'group' => 'home'],
             ['key' => 'home_discount_title', 'value' => 'Special discounts', 'type' => 'text', 'group' => 'home'],

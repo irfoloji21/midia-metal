@@ -42,8 +42,8 @@ try {
 
 const t = (key: string, def: string) => settings[key] || def;
 
-const weldingPrimaryImage = t("home_welding_image", t("home_gallery_1", "/images/welding.jpg"));
-const weldingSecondaryImage = t("home_welding_secondary_image", t("home_gallery_5", "/images/workshop.jpg"));
+const weldingPrimaryImage = t("home_welding_image", "/images/welding.jpg");
+const weldingSecondaryImage = t("home_welding_secondary_image", "/images/workshop.jpg");
 const weldingServiceSlug = (t("home_welding_service_slug", "custom-fabrication") || "custom-fabrication").trim();
 const weldingServicePath = `/services/${encodeURIComponent(weldingServiceSlug || "custom-fabrication")}`;
 const kitchenSystemsCtaLabel = t("home_learn_more_label", "Explore Kitchen Systems");
@@ -297,20 +297,5 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
       </div>
     </section>
 
-    <!-- Gallery Strip -->
-    <section class="grid grid-cols-2 md:grid-cols-6 overflow-hidden">
-      {[
-        t("home_gallery_1", "/images/welding.jpg"),
-        t("home_gallery_2", "/images/air-conditioner.jpg"),
-        t("home_gallery_3", "/images/hero-kitchen.jpg"),
-        t("home_gallery_4", "/images/installation-service.jpg"),
-        t("home_gallery_5", "/images/workshop.jpg"),
-        t("home_gallery_6", "/images/mesh-filter.jpg"),
-      ].map((img) => (
-        <div class="overflow-hidden h-28 md:h-56">
-          <img src={img} alt="" width="400" height="224" loading="lazy" decoding="async" class="w-full h-full object-cover" />
-        </div>
-      ))}
-    </section>
   </div>
 </BaseLayout>

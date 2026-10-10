@@ -71,19 +71,6 @@ const HOME_SECTIONS: SettingsSection[] = [
             "home_learn_more_label",
         ],
     },
-    {
-        id: "gallery",
-        title: "Gallery Strip",
-        description: "The image strip above the footer.",
-        keys: [
-            "home_gallery_1",
-            "home_gallery_2",
-            "home_gallery_3",
-            "home_gallery_4",
-            "home_gallery_5",
-            "home_gallery_6",
-        ],
-    },
 ];
 
 const SHIPPING_TAX_KEYS = new Set([
@@ -127,6 +114,12 @@ const HIDDEN_SETTING_KEYS = new Set([
     "home_brand_3",
     "home_brand_4",
     "home_brands_title",
+    "home_gallery_1",
+    "home_gallery_2",
+    "home_gallery_3",
+    "home_gallery_4",
+    "home_gallery_5",
+    "home_gallery_6",
 ]);
 
 const LABEL_OVERRIDES: Record<string, string> = {
