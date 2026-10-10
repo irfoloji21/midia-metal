@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Orchestrates order placement: calculates totals, creates the order + items
@@ -39,6 +40,34 @@ class OrderService
      */
     public function place(array $validated, ?Customer $authenticatedCustomer = null): Order
     {
+        $bankTransferDetails = null;
+        $paymentMethod = strtolower((string) ($validated['payment_method'] ?? 'bank_transfer'));
+        if (in_array($paymentMethod, ['bank_transfer', 'direct bank transfer'], true)) {
+            $accounts = json_decode((string) SiteSetting::where('key', 'bank_transfer_accounts')->value('value'), true);
+            $selectedAccount = collect(is_array($accounts) ? $accounts : [])
+                ->firstWhere('id', $validated['bank_account_id'] ?? null);
+
+            if (! $selectedAccount
+                || empty(trim((string) ($selectedAccount['bank_name'] ?? '')))
+                || empty(trim((string) ($selectedAccount['account_name'] ?? '')))
+                || empty(trim((string) ($selectedAccount['sort_code'] ?? '')))
+                || empty(trim((string) ($selectedAccount['account_number'] ?? '')))) {
+                throw ValidationException::withMessages([
+                    'bank_account_id' => 'Choose a valid bank account for the transfer.',
+                ]);
+            }
+
+            $bankTransferDetails = [
+                'id' => $selectedAccount['id'],
+                'bank_name' => $selectedAccount['bank_name'],
+                'account_name' => $selectedAccount['account_name'],
+                'sort_code' => $selectedAccount['sort_code'],
+                'account_number' => $selectedAccount['account_number'],
+                'iban' => $selectedAccount['iban'] ?? null,
+                'bic_swift' => $selectedAccount['bic_swift'] ?? null,
+            ];
+        }
+
         // 1. Calculate totals via CheckoutCalculator
         $totals = $this->checkoutCalculator->calculate(
             $validated['items'],
@@ -71,7 +100,7 @@ class OrderService
         // 4. Create order + items in a transaction
         $order = DB::transaction(function () use (
             $validated, $totals, $orderNumber, $subtotal, $shipping,
-            $discountAmount, $taxAmount, $total, $paymentStatus, $authenticatedCustomer, $receiptUrl
+            $discountAmount, $taxAmount, $total, $paymentStatus, $authenticatedCustomer, $receiptUrl, $bankTransferDetails
         ) {
             if ($totals['coupon']) {
                 $totals['coupon']->increment('used_count');
@@ -97,6 +126,7 @@ class OrderService
                 'billing_county' => $validated['billing_county'] ?? null,
                 'billing_country' => $validated['billing_country'] ?? null,
                 'payment_method' => $validated['payment_method'] ?? 'bank_transfer',
+                'bank_transfer_details' => $bankTransferDetails,
                 'notes' => $validated['notes'] ?? null,
                 'shipping_metadata' => [
                     'fulfilment_method' => $validated['fulfilment_method'] ?? 'delivery',
@@ -177,9 +207,16 @@ class OrderService
             ?: config('mail.from.address')
             ?: 'softwaredevelopment2181@gmail.com');
 
+        $bankDetails = $order->bank_transfer_details;
+        $bankSummary = $bankDetails
+            ? "\n\nSelected Bank: {$bankDetails['bank_name']}\nAccount Name: {$bankDetails['account_name']}\nSort Code: {$bankDetails['sort_code']}\nAccount Number: {$bankDetails['account_number']}"
+                .(! empty($bankDetails['iban']) ? "\nIBAN: {$bankDetails['iban']}" : '')
+                .(! empty($bankDetails['bic_swift']) ? "\nBIC / SWIFT: {$bankDetails['bic_swift']}" : '')
+            : '';
+
         Mail::to($adminEmail)->send(new AdminNotification(
             'New Order Received: '.$order->order_number,
-            "A new order has been placed by {$order->customer_name} ({$order->customer_email}).\n\nOrder Number: {$order->order_number}\nTotal: £".number_format($order->total, 2)."\n\nCheck the admin panel for more details."
+            "A new order has been placed by {$order->customer_name} ({$order->customer_email}).\n\nOrder Number: {$order->order_number}\nTotal: £".number_format($order->total, 2).$bankSummary."\n\nCheck the admin panel for more details."
         ));
     }
 

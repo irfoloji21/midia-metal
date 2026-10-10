@@ -224,6 +224,7 @@ class FormController extends Controller
                     }
                 },
             ],
+            'bank_account_id' => 'nullable|string|max:64',
             'fulfilment_method' => 'nullable|in:delivery,click_collect',
             'shipping_option_token' => 'nullable|string',
             'notes' => 'nullable|string',

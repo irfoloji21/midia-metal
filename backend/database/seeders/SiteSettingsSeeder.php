@@ -10,6 +10,9 @@ class SiteSettingsSeeder extends Seeder
     public function run(): void
     {
         $settings = [
+            // Payment
+            ['key' => 'bank_transfer_accounts', 'value' => '[]', 'type' => 'json', 'group' => 'payment'],
+
             // Home Page
             // Home Page
             ['key' => 'home_installation_title', 'value' => 'Installation services', 'type' => 'text', 'group' => 'home'],

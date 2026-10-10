@@ -34,6 +34,7 @@ class Order extends Model
         'shipping',
         'total',
         'payment_method',
+        'bank_transfer_details',
         'payment_status',
         'stripe_payment_intent_id',
         'stripe_receipt_url',
@@ -58,6 +59,7 @@ class Order extends Model
 
     protected $casts = [
         'shipping_metadata' => 'array',
+        'bank_transfer_details' => 'array',
     ];
 
     public function customer()

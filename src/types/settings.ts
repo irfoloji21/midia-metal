@@ -26,6 +26,7 @@ export type SettingsGroup =
   | "home"
   | "legal"
   | "shipping-freight"
+  | "payment"
   | "nav";
 
 /** A hero slide record managed in admin settings. */

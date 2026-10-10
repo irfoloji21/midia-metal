@@ -495,6 +495,20 @@ export default function AdminOrders() {
                 </div>
               </div>
 
+              {viewingOrder.bank_transfer_details && (
+                <section className="rounded-xl border border-[#fed7aa] bg-[#fff7ed] p-6">
+                  <h3 className="text-lg font-semibold text-[#10275c] mb-3">Selected Bank Account</h3>
+                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div><dt className="text-gray-500">Bank</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.bank_name}</dd></div>
+                    <div><dt className="text-gray-500">Account Name</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.account_name}</dd></div>
+                    <div><dt className="text-gray-500">Sort Code</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.sort_code}</dd></div>
+                    <div><dt className="text-gray-500">Account Number</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.account_number}</dd></div>
+                    {viewingOrder.bank_transfer_details.iban && <div><dt className="text-gray-500">IBAN</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.iban}</dd></div>}
+                    {viewingOrder.bank_transfer_details.bic_swift && <div><dt className="text-gray-500">BIC / SWIFT</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.bic_swift}</dd></div>}
+                  </dl>
+                </section>
+              )}
+
               {viewingOrder.customer_requests?.length > 0 && (
                 <section className="rounded-xl border border-[#fed7aa] bg-[#fff7ed] p-6 space-y-5">
                   <div className="flex items-start gap-3">

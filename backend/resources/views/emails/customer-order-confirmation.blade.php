@@ -50,6 +50,27 @@
                                 </tr>
                             </table>
 
+                            @if($order->bank_transfer_details)
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff7ed;border:1px solid #fed7aa;border-radius:6px;margin-bottom:30px;">
+                                <tr>
+                                    <td style="padding:20px;">
+                                        <h2 style="color:#10275c;font-size:16px;margin:0 0 12px;">Bank Transfer Details</h2>
+                                        <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>Bank:</strong> {{ $order->bank_transfer_details['bank_name'] }}</p>
+                                        <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>Account Name:</strong> {{ $order->bank_transfer_details['account_name'] }}</p>
+                                        <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>Sort Code:</strong> {{ $order->bank_transfer_details['sort_code'] }}</p>
+                                        <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>Account Number:</strong> {{ $order->bank_transfer_details['account_number'] }}</p>
+                                        @if(!empty($order->bank_transfer_details['iban']))
+                                        <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>IBAN:</strong> {{ $order->bank_transfer_details['iban'] }}</p>
+                                        @endif
+                                        @if(!empty($order->bank_transfer_details['bic_swift']))
+                                        <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>BIC / SWIFT:</strong> {{ $order->bank_transfer_details['bic_swift'] }}</p>
+                                        @endif
+                                        <p style="color:#555555;font-size:13px;margin:14px 0 0;">Please use {{ $order->order_number }} as your payment reference.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            @endif
+
                             <!-- Order Items -->
                             <h2 style="color:#10275c;font-size:16px;margin:0 0 15px;">Items Ordered</h2>
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">

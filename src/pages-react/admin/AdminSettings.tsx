@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import type { SiteSetting, HeroSlide, SettingsSection } from "@/types/settings";
@@ -9,7 +9,26 @@ import type { SiteSetting, HeroSlide, SettingsSection } from "@/types/settings";
 type SettingRecord = SiteSetting;
 type HeroSlideRecord = HeroSlide;
 
-const GROUP_ORDER = ["header", "footer", "general", "shipping-tax", "shipping-freight", "home", "about", "contact", "services", "portfolio", "blog", "legal", "seo", "hero-slides"];
+const GROUP_ORDER = ["header", "footer", "general", "shipping-tax", "shipping-freight", "payment", "home", "about", "contact", "services", "portfolio", "blog", "legal", "seo", "hero-slides"];
+
+interface BankTransferAccount {
+    id: string;
+    bank_name: string;
+    account_name: string;
+    sort_code: string;
+    account_number: string;
+    iban: string;
+    bic_swift: string;
+}
+
+const parseBankTransferAccounts = (value?: string): BankTransferAccount[] => {
+    try {
+        const parsed = JSON.parse(value || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+};
 
 const HOME_SECTIONS: SettingsSection[] = [
     {
@@ -188,6 +207,8 @@ const normalizeSettingsForDisplay = (settings: SettingRecord[]) => {
 export default function AdminSettings() {
     const [settings, setSettings] = useState<SettingRecord[]>([]);
     const [heroSlides, setHeroSlides] = useState<HeroSlideRecord[]>([]);
+    const [bankAccounts, setBankAccounts] = useState<BankTransferAccount[]>([]);
+    const [expandedBankAccountIds, setExpandedBankAccountIds] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("general");
     const [saving, setSaving] = useState(false);
@@ -200,6 +221,9 @@ export default function AdminSettings() {
                     apiFetch<HeroSlide[]>("/admin/hero-slides"),
                 ]);
                 setSettings(settingsRes);
+                setBankAccounts(parseBankTransferAccounts(
+                    settingsRes.find((setting) => setting.key === "bank_transfer_accounts")?.value,
+                ));
                 setHeroSlides(slidesRes);
             } catch {
                 toast.error("Failed to load settings");
@@ -241,6 +265,40 @@ export default function AdminSettings() {
     const updateSetting = (key: string, value: string) => {
         setSettings((prev) => prev.map((setting) => (
             setting.key === key ? { ...setting, value } : setting
+        )));
+    };
+
+    const updateBankAccounts = (nextAccounts: BankTransferAccount[]) => {
+        setBankAccounts(nextAccounts);
+        setExpandedBankAccountIds((current) => current.filter((id) => nextAccounts.some((account) => account.id === id)));
+        updateSetting("bank_transfer_accounts", JSON.stringify(nextAccounts));
+    };
+
+    const addBankAccount = () => {
+        const id = typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : `bank-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        updateBankAccounts([...bankAccounts, {
+            id,
+            bank_name: "",
+            account_name: "",
+            sort_code: "",
+            account_number: "",
+            iban: "",
+            bic_swift: "",
+        }]);
+        setExpandedBankAccountIds((current) => [...current, id]);
+    };
+
+    const toggleBankAccount = (id: string) => {
+        setExpandedBankAccountIds((current) => current.includes(id)
+            ? current.filter((accountId) => accountId !== id)
+            : [...current, id]);
+    };
+
+    const updateBankAccount = (id: string, key: keyof Omit<BankTransferAccount, "id">, value: string) => {
+        updateBankAccounts(bankAccounts.map((account) => (
+            account.id === id ? { ...account, [key]: value } : account
         )));
     };
 
@@ -404,6 +462,15 @@ export default function AdminSettings() {
         <div className="space-y-6 max-w-6xl">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold font-sans text-[#10275c]">Site Management</h1>
+                {activeTab === "payment" && (
+                    <button
+                        type="button"
+                        onClick={addBankAccount}
+                        className="inline-flex items-center gap-2 rounded-md bg-orange px-4 py-2 text-sm font-semibold text-white hover:bg-orange-hover"
+                    >
+                        <Plus className="h-4 w-4" /> Add Bank Account
+                    </button>
+                )}
                 {activeTab === "hero-slides" && (
                     <button
                         type="button"
@@ -510,7 +577,70 @@ export default function AdminSettings() {
                 <div className="rounded-lg bg-white shadow p-8">
                     <form onSubmit={handleSaveSettings} className="space-y-8">
                         <div className="grid grid-cols-1 gap-8">
-                            {filteredSettings.length === 0 ? (
+                            {activeTab === "payment" ? (
+                                bankAccounts.length === 0 ? (
+                                    <div className="rounded-md border border-dashed border-gray-300 p-8 text-center text-sm text-gray-500">
+                                        No bank accounts yet. Add an account, enter its details, then save the settings.
+                                    </div>
+                                ) : (
+                                    <div className="space-y-5">
+                                        <p className="text-sm text-gray-600">
+                                            Add as many transfer accounts as needed. Customers will be able to choose one during checkout.
+                                        </p>
+                                        {bankAccounts.map((account, index) => (
+                                            <section key={account.id} className="rounded-lg border border-gray-200 bg-[#f8fafc] p-4">
+                                                <div className="flex items-center justify-between gap-4">
+                                                    <button
+                                                        type="button"
+                                                        aria-expanded={expandedBankAccountIds.includes(account.id)}
+                                                        aria-controls={`bank-account-fields-${account.id}`}
+                                                        onClick={() => toggleBankAccount(account.id)}
+                                                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                                                    >
+                                                        {expandedBankAccountIds.includes(account.id)
+                                                            ? <ChevronDown className="h-5 w-5 flex-shrink-0 text-[#10275c]" />
+                                                            : <ChevronRight className="h-5 w-5 flex-shrink-0 text-[#10275c]" />}
+                                                        <span className="truncate text-base font-semibold text-[#10275c]">
+                                                            {account.bank_name.trim() || `Bank Account ${index + 1}`}
+                                                            {account.bank_name.trim() && account.account_name.trim() ? ` - ${account.account_name}` : ""}
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => updateBankAccounts(bankAccounts.filter((item) => item.id !== account.id))}
+                                                        className="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" /> Remove
+                                                    </button>
+                                                </div>
+                                                {expandedBankAccountIds.includes(account.id) && (
+                                                <div id={`bank-account-fields-${account.id}`} className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-5">
+                                                    {([
+                                                        ["bank_name", "Bank Name", true],
+                                                        ["account_name", "Account Name", true],
+                                                        ["sort_code", "Sort Code", true],
+                                                        ["account_number", "Account Number", true],
+                                                        ["iban", "IBAN (optional)", false],
+                                                        ["bic_swift", "BIC / SWIFT (optional)", false],
+                                                    ] as const).map(([key, label, required]) => (
+                                                        <label key={key} className="block space-y-2">
+                                                            <span className="text-sm font-bold text-[#10275c]">{label}</span>
+                                                            <input
+                                                                type="text"
+                                                                value={account[key]}
+                                                                required={required}
+                                                                onChange={(event) => updateBankAccount(account.id, key, event.target.value)}
+                                                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#eb5c10] focus:ring-[#eb5c10] sm:text-sm p-3 border"
+                                                            />
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                                )}
+                                            </section>
+                                        ))}
+                                    </div>
+                                )
+                            ) : filteredSettings.length === 0 ? (
                                 <div className="text-sm text-gray-500">No settings in this section.</div>
                             ) : (
                                 activeTab === "home" ? (

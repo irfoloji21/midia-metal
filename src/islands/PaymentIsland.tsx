@@ -11,7 +11,7 @@
  *   - Kept Stripe Elements, useCart, useCustomerAuth as-is
  */
 import { useState, useEffect } from "react";
-import { CreditCard, Building2, Lock, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, CreditCard, Building2, Lock, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import type { SiteSetting } from "@/types/settings";
@@ -30,6 +30,32 @@ import {
 
 const stripePromise = loadStripe(import.meta.env.PUBLIC_STRIPE_KEY as string);
 import withErrorBoundary from "@/lib/withErrorBoundary";
+
+interface BankTransferAccount {
+  id: string;
+  bank_name: string;
+  account_name: string;
+  sort_code: string;
+  account_number: string;
+  iban?: string;
+  bic_swift?: string;
+}
+
+const parseBankTransferAccounts = (value?: string): BankTransferAccount[] => {
+  try {
+    const parsed = JSON.parse(value || "[]");
+    return Array.isArray(parsed) ? parsed.filter((account) => (
+      account
+      && typeof account.id === "string"
+      && typeof account.bank_name === "string"
+      && typeof account.account_name === "string"
+      && typeof account.sort_code === "string"
+      && typeof account.account_number === "string"
+    )) : [];
+  } catch {
+    return [];
+  }
+};
 
 // Astro-compatible CheckoutSteps (inline, no react-router)
 function CheckoutSteps({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
@@ -215,33 +241,32 @@ function PaymentIsland() {
   const [savedCards, setSavedCards] = useState<any[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string>("new");
 
-  // Bank transfer details — loaded from site settings
-  const [bankDetails, setBankDetails] = useState<{
-    account_name: string;
-    sort_code: string;
-    account_number: string;
-  } | null>(null);
+  // Bank transfer accounts — loaded from site settings
+  const [bankAccounts, setBankAccounts] = useState<BankTransferAccount[]>([]);
+  const [selectedBankAccountId, setSelectedBankAccountId] = useState("");
+  const [expandedBankAccountId, setExpandedBankAccountId] = useState<string | null>(null);
 
   useEffect(() => {
     apiFetch<SiteSetting[]>("/v1/settings")
       .then((data) => {
-        const lookup = (key: string) =>
-          data?.find?.((s) => s.key === key)?.value ?? "";
-        const acctName = lookup("bank_account_name");
-        const sortCode = lookup("bank_sort_code");
-        const acctNum = lookup("bank_account_number");
-        if (acctName || sortCode || acctNum) {
-          setBankDetails({
-            account_name: acctName || "Midia Metal Ltd",
-            sort_code: sortCode,
-            account_number: acctNum,
-          });
-        }
+        const accounts = parseBankTransferAccounts(
+          data?.find?.((setting) => setting.key === "bank_transfer_accounts")?.value,
+        );
+        setBankAccounts(accounts);
+        setSelectedBankAccountId(accounts[0]?.id ?? "");
       })
       .catch(() => {
         /* settings unavailable — bank section will show warning */
       });
   }, []);
+
+  const selectedBankAccount = bankAccounts.find((account) => account.id === selectedBankAccountId) ?? null;
+  const hasValidBankAccount = Boolean(
+    selectedBankAccount
+    && selectedBankAccount.account_name.trim()
+    && selectedBankAccount.sort_code.trim()
+    && selectedBankAccount.account_number.trim(),
+  );
 
   const fulfilmentMethod = checkoutForm?.fulfillmentMethod === "click_collect" ? "click_collect" : "delivery";
   const selectedShippingOption = checkoutForm?.selectedShippingOption ?? null;
@@ -366,6 +391,7 @@ function PaymentIsland() {
             selected_variants: item.selected_variants ?? null,
           })),
           payment_method: method === "card" ? "Credit / Debit Card" : "Direct Bank Transfer",
+          bank_account_id: method === "bank" ? selectedBankAccountId : null,
         }),
       });
 
@@ -566,12 +592,58 @@ function PaymentIsland() {
                 {method === "bank" && (
                   <div className="border border-[#cad4e4] bg-[#f0f3f7] p-6 mb-6">
                     <h3 className="font-semibold text-primary mb-3">Bank Transfer Details</h3>
-                    {bankDetails && bankDetails.sort_code && bankDetails.account_number ? (
-                      <div className="text-sm text-primary space-y-1">
-                        <p><span className="text-[#6e7a92]">Account Name:</span> {bankDetails.account_name}</p>
-                        <p><span className="text-[#6e7a92]">Sort Code:</span> {bankDetails.sort_code}</p>
-                        <p><span className="text-[#6e7a92]">Account Number:</span> {bankDetails.account_number}</p>
-                        <p className="mt-2 text-[#7f8aa2] text-xs">Please use your order number as reference once you receive your confirmation email.</p>
+                    {bankAccounts.length > 0 ? (
+                      <div className="space-y-4">
+                        <fieldset className="space-y-3">
+                          <legend className="mb-2 text-sm font-semibold text-primary">Choose a bank account</legend>
+                          {bankAccounts.map((account) => (
+                            <div
+                              key={account.id}
+                              className={`border bg-white ${selectedBankAccountId === account.id ? "border-orange ring-1 ring-orange/40" : "border-[#cad4e4]"}`}
+                            >
+                              <div className="flex items-center gap-3 p-4">
+                                <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 text-sm text-primary">
+                                  <input
+                                    type="radio"
+                                    name="bankAccount"
+                                    value={account.id}
+                                    checked={selectedBankAccountId === account.id}
+                                    onChange={() => {
+                                      setSelectedBankAccountId(account.id);
+                                      setExpandedBankAccountId(account.id);
+                                    }}
+                                    className="accent-orange"
+                                  />
+                                  <span className="truncate font-semibold">{account.bank_name} - {account.account_name}</span>
+                                </label>
+                                <button
+                                  type="button"
+                                  aria-label={`${expandedBankAccountId === account.id ? "Hide" : "Show"} ${account.bank_name} account details`}
+                                  aria-expanded={expandedBankAccountId === account.id}
+                                  aria-controls={`checkout-bank-account-${account.id}`}
+                                  onClick={() => setExpandedBankAccountId((current) => current === account.id ? null : account.id)}
+                                  className="rounded p-1 text-primary hover:bg-gray-100"
+                                >
+                                  {expandedBankAccountId === account.id
+                                    ? <ChevronDown className="h-5 w-5" />
+                                    : <ChevronRight className="h-5 w-5" />}
+                                </button>
+                              </div>
+                              {expandedBankAccountId === account.id && (
+                                <div id={`checkout-bank-account-${account.id}`} className="space-y-1 px-11 pb-4 text-sm text-primary">
+                                  <p><span className="text-[#6e7a92]">Account Name:</span> {account.account_name}</p>
+                                  <p><span className="text-[#6e7a92]">Sort Code:</span> {account.sort_code}</p>
+                                  <p><span className="text-[#6e7a92]">Account Number:</span> {account.account_number}</p>
+                                  {account.iban && <p><span className="text-[#6e7a92]">IBAN:</span> {account.iban}</p>}
+                                  {account.bic_swift && <p><span className="text-[#6e7a92]">BIC / SWIFT:</span> {account.bic_swift}</p>}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </fieldset>
+                        {hasValidBankAccount && (
+                          <p className="text-[#7f8aa2] text-xs">Please use your order number as the payment reference.</p>
+                        )}
                       </div>
                     ) : (
                       <p className="text-sm text-red-600 font-medium">
@@ -582,7 +654,7 @@ function PaymentIsland() {
                 )}
                 <button
                   type="submit"
-                  disabled={isSubmitting || cart.length === 0 || (method === "bank" && (!bankDetails?.sort_code || !bankDetails?.account_number))}
+                  disabled={isSubmitting || cart.length === 0 || (method === "bank" && !hasValidBankAccount)}
                   className="w-full h-14 bg-orange text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-orange-hover transition-colors disabled:opacity-50"
                 >
                   {isSubmitting ? "Placing Order…" : "Place Order"}
