@@ -23,12 +23,13 @@ import {
 
 type Tab = "orders" | "wishlist" | "quotes" | "profile" | "addresses" | "payment-methods" | "security";
 
-const STATUS_STEPS = ["pending", "processing", "shipped", "delivered"];
 const STATUS_LABELS: Record<string, string> = {
     pending: "Pending",
     processing: "Processing",
     shipped: "Shipped",
     delivered: "Delivered",
+    ready_for_collection: "Ready for Collection",
+    collected: "Collected",
     cancelled: "Cancelled",
 };
 const QUOTE_STATUS_LABELS: Record<string, string> = {
@@ -375,7 +376,10 @@ function AccountIsland() {
         { id: "security", icon: Lock, label: "Security" },
     ];
 
-    const getStatusIndex = (status: string) => STATUS_STEPS.indexOf(status.toLowerCase());
+    const getStatusSteps = (order: any) =>
+        order?.shipping_metadata?.fulfilment_method === "click_collect" || order?.shipping_metadata?.fulfillment_method === "click_collect"
+            ? ["pending", "processing", "ready_for_collection", "collected"]
+            : ["pending", "processing", "shipped", "delivered"];
 
     return (
         <>
@@ -424,7 +428,8 @@ function AccountIsland() {
                                 <div className="space-y-4">
                                     {orders.map(order => {
                                         const isExpanded = expandedOrder === order.id;
-                                        const statusIdx = getStatusIndex(order.status);
+                                        const statusSteps = getStatusSteps(order);
+                                        const statusIdx = statusSteps.indexOf(String(order.status).toLowerCase());
                                         const latestOrderRequest = getLatestOrderRequest(order);
                                         const orderRequestSubmitted = hasOrderRequest(order);
                                         const orderRequestStatusLabel = getCustomerOrderRequestStatusLabel(
@@ -446,7 +451,7 @@ function AccountIsland() {
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-3 flex-wrap">
-                                                        <span className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : order.status === 'shipped' ? 'bg-blue-100 text-blue-700' : order.status === 'cancelled' ? 'bg-red-100 text-red-600' : 'bg-[#eaf0f3] text-primary'}`}>
+                                                        <span className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider ${['delivered', 'collected'].includes(order.status) ? 'bg-green-100 text-green-700' : ['shipped', 'ready_for_collection'].includes(order.status) ? 'bg-blue-100 text-blue-700' : order.status === 'cancelled' ? 'bg-red-100 text-red-600' : 'bg-[#eaf0f3] text-primary'}`}>
                                                             {STATUS_LABELS[order.status?.toLowerCase()] || order.status}
                                                         </span>
                                                         {orderRequestSubmitted && (
@@ -469,16 +474,16 @@ function AccountIsland() {
                                                                     <div className="absolute top-4 left-0 right-0 h-0.5 bg-[#cad4e4] z-0" />
                                                                     <div
                                                                         className="absolute top-4 left-0 h-0.5 bg-orange z-0 transition-all duration-500"
-                                                                        style={{ width: `${statusIdx >= 0 ? (statusIdx / (STATUS_STEPS.length - 1)) * 100 : 0}%` }}
+                                                                        style={{ width: `${statusIdx >= 0 ? (statusIdx / (statusSteps.length - 1)) * 100 : 0}%` }}
                                                                     />
-                                                                    {STATUS_STEPS.map((step, idx) => {
+                                                                    {statusSteps.map((step, idx) => {
                                                                         const isDone = statusIdx >= idx;
                                                                         return (
                                                                             <div key={step} className="flex flex-col items-center gap-1 z-10">
                                                                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${isDone ? 'bg-orange border-orange' : 'bg-white border-[#cad4e4]'}`}>
                                                                                     {isDone ? <CheckCheck className="w-4 h-4 text-white" /> : <Clock className="w-4 h-4 text-[#cad4e4]" />}
                                                                                 </div>
-                                                                                <span className={`text-[10px] font-semibold uppercase ${isDone ? 'text-orange' : 'text-[#9ba8bf]'}`}>{step}</span>
+                                                                                <span className={`text-[10px] font-semibold uppercase ${isDone ? 'text-orange' : 'text-[#9ba8bf]'}`}>{STATUS_LABELS[step] || step}</span>
                                                                             </div>
                                                                         );
                                                                     })}

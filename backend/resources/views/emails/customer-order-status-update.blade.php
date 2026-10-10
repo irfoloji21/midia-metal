@@ -12,6 +12,8 @@
             'processing' => 'Processing',
             'shipped' => 'Shipped',
             'delivered' => 'Delivered',
+            'ready_for_collection' => 'Ready for Collection',
+            'collected' => 'Collected',
             'cancelled' => 'Cancelled',
         ];
         $statusLabel = $statusLabels[$order->status] ?? ucfirst(str_replace('_', ' ', $order->status));
@@ -20,6 +22,8 @@
             'processing' => 'Your order is now being prepared.',
             'shipped' => 'Your order has been dispatched. Use the tracking details provided by the store to follow its progress.',
             'delivered' => 'Your order has been marked as delivered.',
+            'ready_for_collection' => 'Your order is ready for collection. Please contact or visit the store to arrange collection.',
+            'collected' => 'Your order has been collected. Thank you for shopping with us.',
             'cancelled' => 'Your order has been cancelled.',
             default => 'There has been an update to your order.',
         };

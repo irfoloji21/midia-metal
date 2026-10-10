@@ -45,6 +45,38 @@ const getFulfilmentMethod = (order?: any): "delivery" | "click_collect" =>
     ? "click_collect"
     : "delivery";
 
+const getOrderStatusOptions = (order?: any) => {
+  const options = getFulfilmentMethod(order) === "click_collect"
+    ? [
+      { value: "pending", label: "Pending" },
+      { value: "processing", label: "Processing" },
+      { value: "ready_for_collection", label: "Ready for Collection" },
+      { value: "collected", label: "Collected" },
+      { value: "cancelled", label: "Cancelled" },
+    ]
+  : [
+      { value: "pending", label: "Pending" },
+      { value: "processing", label: "Processing" },
+      { value: "shipped", label: "Shipped" },
+      { value: "delivered", label: "Delivered" },
+      { value: "cancelled", label: "Cancelled" },
+    ];
+  if (order?.status && !options.some(({ value }) => value === order.status)) {
+    options.push({ value: order.status, label: `${getOrderStatusLabel(order.status)} (current)` });
+  }
+  return options;
+};
+
+const getOrderStatusLabel = (status?: string) => ({
+  pending: "Pending",
+  processing: "Processing",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  ready_for_collection: "Ready for Collection",
+  collected: "Collected",
+  cancelled: "Cancelled",
+}[status || ""] || status || "Pending");
+
 export default function AdminOrders() {
   type AdminOrder = Record<string, any>;
 
@@ -280,6 +312,8 @@ export default function AdminOrders() {
             <option value="processing">Processing</option>
             <option value="shipped">Shipped</option>
             <option value="delivered">Delivered</option>
+            <option value="ready_for_collection">Ready for Collection</option>
+            <option value="collected">Collected</option>
             <option value="cancelled">Cancelled</option>
           </select>
         </div>
@@ -341,8 +375,8 @@ export default function AdminOrders() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">£{order.total}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === "delivered" ? "bg-green-100 text-green-800" : order.status === "shipped" ? "bg-blue-100 text-blue-800" : order.status === "cancelled" ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800"}`}>
-                      {order.status}
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${["delivered", "collected"].includes(order.status) ? "bg-green-100 text-green-800" : ["shipped", "ready_for_collection"].includes(order.status) ? "bg-blue-100 text-blue-800" : order.status === "cancelled" ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800"}`}>
+                      {getOrderStatusLabel(order.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -454,11 +488,9 @@ export default function AdminOrders() {
                         onChange={(e) => updateOrder(viewingOrder.id, { status: e.target.value }, "Order status updated", "Failed to update status")}
                         className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm border"
                       >
-                        <option value="pending">Pending</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
+                        {getOrderStatusOptions(viewingOrder).map(({ value, label }) => (
+                          <option key={value} value={value}>{label}</option>
+                        ))}
                       </select>
                     </div>
 

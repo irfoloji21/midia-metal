@@ -4,7 +4,7 @@
 // ---------------------------------------------------------------------------
 
 /** Order lifecycle status. */
-export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "ready_for_collection" | "collected" | "cancelled";
 
 /** Payment lifecycle status. */
 export type PaymentStatus =

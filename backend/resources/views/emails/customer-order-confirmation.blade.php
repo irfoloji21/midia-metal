@@ -121,10 +121,16 @@
                                 </tr>
                             </table>
 
-                            <!-- Shipping Address -->
+                            @php
+                                $fulfilmentMethod = data_get($order->shipping_metadata, 'fulfilment_method', data_get($order->shipping_metadata, 'fulfillment_method', 'delivery'));
+                                $isClickCollect = $fulfilmentMethod === 'click_collect';
+                                $addressHeading = $isClickCollect ? 'Billing Address' : 'Shipping Address';
+                                $displayAddress = $isClickCollect ? $order->billing_address : $order->shipping_address;
+                            @endphp
+                            <!-- Order Address -->
                             <div style="margin-top:30px;padding:20px;background-color:#f8f9fa;border-radius:6px;">
-                                <h3 style="color:#10275c;font-size:14px;margin:0 0 10px;">Shipping Address</h3>
-                                <p style="color:#555555;font-size:13px;margin:0;line-height:1.6;">{{ $order->shipping_address }}</p>
+                                <h3 style="color:#10275c;font-size:14px;margin:0 0 10px;">{{ $addressHeading }}</h3>
+                                <p style="color:#555555;font-size:13px;margin:0;line-height:1.6;">{{ $displayAddress }}</p>
                             </div>
 
                             <p style="color:#555555;font-size:14px;margin:30px 0 0;">

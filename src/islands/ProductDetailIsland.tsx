@@ -1093,7 +1093,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                     </p>
                   ) : canReviewStatus === "not_delivered" ? (
                     <p className="text-[#6e7a92] bg-[#f4f5f7] p-4 text-sm">
-                      You can write a review once your order has been delivered.
+                      You can write a review once your order has been delivered or collected.
                     </p>
                   ) : canReviewStatus === "already_reviewed" ? (
                     <p className="text-[#6e7a92] bg-[#eaf0f3] p-4 text-sm font-medium">

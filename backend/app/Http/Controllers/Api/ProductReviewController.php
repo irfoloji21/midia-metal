@@ -21,7 +21,7 @@ class ProductReviewController extends Controller
         $customerId = $request->user()->id;
 
         $hasPurchased = Order::where('customer_id', $customerId)
-            ->where('status', 'delivered')
+            ->whereIn('status', ['delivered', 'collected'])
             ->whereHas('items', function ($query) use ($productId) {
                 $query->where('product_id', $productId);
             })->exists();
@@ -50,15 +50,15 @@ class ProductReviewController extends Controller
 
         $customerId = $request->user()->id;
 
-        // Check if customer has purchased this product and it was delivered
+        // A completed delivery or collection makes the order eligible for review.
         $hasPurchased = Order::where('customer_id', $customerId)
-            ->where('status', 'delivered')
+            ->whereIn('status', ['delivered', 'collected'])
             ->whereHas('items', function ($query) use ($productId) {
                 $query->where('product_id', $productId);
             })->exists();
 
         if (! $hasPurchased) {
-            return response()->json(['message' => 'You can only review products after they have been delivered.'], 403);
+            return response()->json(['message' => 'You can only review products after your order has been delivered or collected.'], 403);
         }
 
         // Check if already reviewed
