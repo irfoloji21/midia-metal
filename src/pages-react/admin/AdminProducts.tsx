@@ -45,6 +45,38 @@ import {
     createEmptySizeVariant,
 } from "@/lib/adminProductUtils";
 
+function CombinationAttributeInput({
+    value,
+    optionName,
+    onCommit,
+}: {
+    value: string;
+    optionName: string;
+    onCommit: (value: string) => void;
+}) {
+    const [draft, setDraft] = useState(value);
+
+    useEffect(() => {
+        setDraft(value);
+    }, [value]);
+
+    return (
+        <input
+            type="text"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onBlur={() => {
+                if (draft !== value) onCommit(draft);
+            }}
+            onKeyDown={(event) => {
+                if (event.key === "Enter") event.currentTarget.blur();
+            }}
+            className="w-28 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none"
+            placeholder={optionName}
+        />
+    );
+}
+
 export default function AdminProducts() {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -1991,12 +2023,10 @@ export default function AdminProducts() {
                                                                                         <tr key={index} className="hover:bg-gray-50 transition-colors align-top">
                                                                                             {combinationOptionNames.filter((optionName) => optionName.toLowerCase() !== "tab").map((optionName) => (
                                                                                                 <td key={optionName} className="px-2 py-2">
-                                                                                                    <input
-                                                                                                        type="text"
-                                                                                                        value={variant.attributes?.[optionName] ?? ""}
-                                                                                                        onChange={(event) => updateCombinationVariantAttribute(index, optionName, event.target.value)}
-                                                                                                        className="w-28 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none"
-                                                                                                        placeholder={optionName}
+                                                                                                    <CombinationAttributeInput
+                                                                                                        value={String(variant.attributes?.[optionName] ?? "")}
+                                                                                                        optionName={optionName}
+                                                                                                        onCommit={(value) => updateCombinationVariantAttribute(index, optionName, value)}
                                                                                                     />
                                                                                                 </td>
                                                                                             ))}
