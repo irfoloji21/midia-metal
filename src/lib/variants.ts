@@ -37,6 +37,25 @@ export const getVariantAttributes = (variant: VariantRecord | null | undefined):
   );
 };
 
+export const buildVariantSizeSummary = (variant: VariantRecord | null | undefined): string => {
+  const length = Number(variant?.shipping_length_cm ?? 0);
+  const width = Number(variant?.shipping_width_cm ?? 0);
+  const height = Number(variant?.shipping_height_cm ?? 0);
+
+  if (length <= 0 || width <= 0 || height <= 0) {
+    return "";
+  }
+
+  const widthMm = Math.round(length * 10);
+  const heightMm = Math.round(width * 10);
+  const depthMm = Math.round(height * 10);
+  const widthInches = Math.round(widthMm / 25);
+  const heightInches = Math.round(heightMm / 25);
+  const depthInches = Math.round(depthMm / 25);
+
+  return `H ${heightMm} x W ${widthMm} x D ${depthMm}mm (${heightInches}" x ${widthInches}" x ${depthInches}")`;
+};
+
 export const isCombinationVariant = (variant: VariantRecord | null | undefined): boolean =>
   Object.keys(getVariantAttributes(variant)).length > 0;
 

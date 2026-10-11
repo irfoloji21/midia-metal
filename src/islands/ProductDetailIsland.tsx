@@ -27,6 +27,7 @@ import SelectionTableSection from "@/components/product/SelectionTableSection";
 import { formatMoneyValue, resolveSelectedVariantUnitPrice, getStandardizedDisplayPrice, getStandardizedDisplayTitle, shouldShowOldPrice } from "@/lib/pricing";
 import { getAvailableStock, MAX_ORDER_QUANTITY } from "@/lib/stock";
 import {
+  buildVariantSizeSummary,
   findMatchingCombinationVariant,
   getVariantAttributes,
   getProductVariantMode,
@@ -71,25 +72,6 @@ const stripVariantLabelPrefix = (value: unknown, label: string): string => {
 
   const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return text.replace(new RegExp(`^${escapedLabel}\\s*:?\\s*`, "i"), "").trim() || text;
-};
-
-const buildVariantSizeSummary = (variant: Record<string, any> | null | undefined): string => {
-  const length = Number(variant?.shipping_length_cm ?? 0);
-  const width = Number(variant?.shipping_width_cm ?? 0);
-  const height = Number(variant?.shipping_height_cm ?? 0);
-
-  if (length <= 0 || width <= 0 || height <= 0) {
-    return "";
-  }
-
-  const widthMm = Math.round(length * 10);
-  const heightMm = Math.round(width * 10);
-  const depthMm = Math.round(height * 10);
-  const widthInches = Math.round(widthMm / 25);
-  const heightInches = Math.round(heightMm / 25);
-  const depthInches = Math.round(depthMm / 25);
-
-  return `H ${heightMm} x W ${widthMm} x D ${depthMm}mm (${heightInches}" x ${widthInches}" x ${depthInches}")`;
 };
 
 const dedupeSpecEntries = (entries: Array<[string, string]>): Array<[string, string]> => {

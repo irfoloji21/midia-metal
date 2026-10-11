@@ -1,4 +1,4 @@
-import { findMatchingCombinationVariant, getProductVariantMode, getVariantAttributes, getVariantOptionNames, resolveSelectedVariantRecord } from "@/lib/variants";
+import { buildVariantSizeSummary, findMatchingCombinationVariant, getProductVariantMode, getVariantAttributes, getVariantOptionNames, resolveSelectedVariantRecord } from "@/lib/variants";
 
 export const parseMoneyValue = (value: unknown): number | null => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -104,26 +104,44 @@ export const getStandardizedDisplayTitle = (product: any, activeVariantMap?: Rec
       return normalized === "size" || normalized === "ölçü" || normalized === "ebat";
     };
 
-    if (activeVariantMap && Object.keys(activeVariantMap).length > 0) {
+    if (getProductVariantMode(product) === "combination") {
+      let selectedAttributes: Record<string, string> = {};
+      let sourceVariant: any = null;
+
+      if (activeVariantMap && Object.keys(activeVariantMap).length > 0) {
+        selectedAttributes = Object.fromEntries(
+          getVariantOptionNames(product)
+            .map((option) => [option, String(activeVariantMap[option]?.value ?? "").trim()] as const)
+            .filter(([, value]) => value),
+        );
+        sourceVariant = resolveSelectedVariantRecord(product, activeVariantMap);
+      } else {
+        const pricedVariants = (product.variants || [])
+          .map((variant: any) => ({ variant, price: parseMoneyValue(variant?.price) }))
+          .filter((entry: { price: number | null }) => entry.price !== null) as Array<{ variant: any; price: number }>;
+        const cheapestVariant = pricedVariants.length > 0
+          ? pricedVariants.reduce((min, current) => current.price < min.price ? current : min, pricedVariants[0]).variant
+          : product.variants?.[0];
+        sourceVariant = cheapestVariant;
+        selectedAttributes = getVariantAttributes(cheapestVariant);
+      }
+
+      const attributeValues = getVariantOptionNames(product)
+        .filter((option) => selectedAttributes[option])
+        .map((option) => selectedAttributes[option]);
+      const hasExplicitSizeValue = Object.entries(getVariantAttributes(sourceVariant))
+        .some(([option, value]) => isSizeOption(option) && Boolean(value));
+      const sizeSummary = hasExplicitSizeValue ? "" : buildVariantSizeSummary(sourceVariant);
+      if (sizeSummary) {
+        attributeValues.push(sizeSummary);
+      }
+      if (attributeValues.length > 0) {
+        appendText = ` - ${attributeValues.join(" / ")}`;
+      }
+    } else if (activeVariantMap && Object.keys(activeVariantMap).length > 0) {
       const sizeVariant = Object.values(activeVariantMap).find((v: any) => isSizeOption(v.option));
       if (sizeVariant && sizeVariant.value) {
         appendText = ` - ${sizeVariant.value}`;
-      }
-    } else if (getProductVariantMode(product) === "combination") {
-      const sizeOption = getVariantOptionNames(product).find((option) => isSizeOption(option));
-      const pricedVariants = (product.variants || [])
-        .map((variant: any) => ({
-          variant,
-          price: parseMoneyValue(variant?.price),
-        }))
-        .filter((entry: { price: number | null }) => entry.price !== null) as Array<{ variant: any; price: number }>;
-      const cheapestVariant = pricedVariants.length > 0
-        ? pricedVariants.reduce((min, current) => current.price < min.price ? current : min, pricedVariants[0]).variant
-        : product.variants?.[0];
-      const fallbackVariant = cheapestVariant || resolveSelectedVariantRecord(product, {}) || product.variants?.[0];
-      const sizeValue = sizeOption ? getVariantAttributes(fallbackVariant)[sizeOption] : "";
-      if (sizeValue) {
-        appendText = ` - ${sizeValue}`;
       }
     } else if (product.variants && Array.isArray(product.variants) && product.variants.length > 0) {
       const sizeVariants = product.variants.filter((v: any) => isSizeOption(v.option));
