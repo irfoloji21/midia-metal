@@ -25,9 +25,9 @@ const CACHE_TTL_MS = 60_000; // 1 minute
  * across SSR page renders within the same server process.
  * Returns an empty object on error (never throws).
  */
-export async function fetchSettings(): Promise<Record<string, string>> {
+export async function fetchSettings(options: { bypassCache?: boolean } = {}): Promise<Record<string, string>> {
   const now = Date.now();
-  if (cachedSettings && now - cacheTimestamp < CACHE_TTL_MS) {
+  if (!options.bypassCache && cachedSettings && now - cacheTimestamp < CACHE_TTL_MS) {
     return cachedSettings;
   }
 

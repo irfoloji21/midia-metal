@@ -1,6 +1,4 @@
 ---
-export const prerender = true;
-
 /**
  * services/index.astro — Services list page (PURE ASTRO)
  *
@@ -14,7 +12,7 @@ export const prerender = true;
  *   4. Use inline SVGs instead of lucide-react icons
  *   5. Use `class` instead of `className`
  *   6. Use Astro's native {expression} syntax for dynamic content
- *   7. No loading states needed — data is available at build time
+ *   7. No loading states needed — data is fetched before the page is rendered
  *
  * Original React island: src/islands/ServicesIsland.tsx (215 lines, 3 API calls)
  * Converted: Pure Astro (0 client-side JS for this page content)
@@ -28,8 +26,8 @@ import { fetchSettings, getPageTitle, getPageDescription } from '@/lib/settings'
 const siteUrl = import.meta.env.SITE;
 const API_BASE = getApiBase();
 
-// --- Data Fetching (runs at build time) ---
-const settings = await fetchSettings();
+// --- Data Fetching (runs for each server request) ---
+const settings = await fetchSettings({ bypassCache: true });
 
 let services: any[] = [];
 
