@@ -476,6 +476,16 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
 
     return value ? [[column.label, value] as [string, string]] : [];
   });
+  const combinationFrontendSpecEntries: Array<[string, string]> = (
+    !isSelectionTableMode && selectedCombinationVariant
+      ? variantTableColumns.combination
+        .filter((column) => column.frontendVisible && column.key.startsWith("custom:"))
+        .flatMap((column) => {
+          const value = formatVariantColumnValue(column.key, selectedCombinationVariant);
+          return value ? [[column.label, value] as [string, string]] : [];
+        })
+      : []
+  );
   const generalStockColumn = generalColumnsByKey.get("stock");
   const generalFrontendCustomColumns = variantTableColumns.general.filter(
     (column) => column.frontendVisible && column.key.startsWith("custom:"),
@@ -511,6 +521,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
     ...(shouldShowVariantSpecifications ? [
       ...selectedVariantSpecEntries,
       ...sizeFrontendSpecEntries,
+      ...combinationFrontendSpecEntries,
       ...generalFrontendSpecEntries,
     ] : []),
   ];

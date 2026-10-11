@@ -1726,7 +1726,7 @@ export default function AdminProducts() {
                                             <span className="ml-2 text-sm text-gray-600">Track Stock</span>
                                         </label>
                                     </div>
-                                     <div className="hidden col-span-2 rounded-lg border border-gray-200 bg-gray-50/60 p-4">
+                                     <div className="col-span-2 rounded-lg border border-gray-200 bg-gray-50/60 p-4">
                                          <label className="block text-sm font-bold text-[#10275c] uppercase tracking-wider">Frontend Layout</label>
                                         <p className="mt-2 text-xs text-gray-500">
                                             Keep the default layout for most products. Use the selection table only when customers need to compare exact combination rows in a structured table.
@@ -1958,12 +1958,12 @@ export default function AdminProducts() {
                                                     <div>
                                                         <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Extra Display Columns</p>
                                                         <p className="mt-1 text-xs text-gray-400">
-                                                            Add display-only row data such as Part Number, Airflow, Gauge, or P.D. for the optional selection table layout.
+                                                            Add row-specific display data such as Part Number, Airflow, Gauge, or P.D. The selection table shows these as columns; the default layout shows them in Specs after a combination is selected.
                                                         </p>
                                                     </div>
                                                     <VariantColumnManager
                                                         title="Extra Table Columns"
-                                                        description="These display-only text columns are stored on each combination row and can be shown on the frontend selection table."
+                                                        description="These display-only text columns are stored on each combination row. They appear as columns in Selection table layout, or under Specs in the default layout after a combination is selected."
                                                         columns={variantTableColumns.combination}
                                                         onLabelChange={(key, label) => updateVariantTableColumn("combination", key, { label })}
                                                         onVisibilityChange={(key, visible) => updateVariantTableColumn("combination", key, { visible })}
