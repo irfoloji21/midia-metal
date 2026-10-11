@@ -16,7 +16,7 @@ import AdaptiveProductImage from '@/components/AdaptiveProductImage.astro';
 
 const DEFAULT_PRICE_RANGE: [number, number] = [0, 5000];
 const INITIAL_VISIBLE_COUNT = 18;
-const LOAD_MORE_COUNT = 9;
+const SHOW_MORE_COUNT = 9;
 
 const parsePriceValue = (price: unknown): number => {
   if (typeof price === 'number') return price;
@@ -189,43 +189,49 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
               </div>
 
               {hasMoreProducts && (
-                <div class="pt-10" data-shop-sentinel-wrapper>
-                  <div data-shop-sentinel aria-hidden="true" class="h-1 w-full"></div>
+                <div class="pt-10 flex flex-wrap justify-center gap-3" data-shop-pagination>
+                  <button
+                    type="button"
+                    data-show-less
+                    hidden
+                    class="px-6 py-3 border border-[#1f2f52] text-[14px] font-semibold text-[#1f2f52] transition-colors hover:bg-[#1f2f52] hover:text-white"
+                  >
+                    Show less
+                  </button>
+                  <button
+                    type="button"
+                    data-show-more
+                    class="px-6 py-3 border border-orange bg-orange text-[14px] font-semibold text-white transition-colors hover:border-orange-hover hover:bg-orange-hover"
+                  >
+                    Show more
+                  </button>
                 </div>
               )}
 
               {hasMoreProducts && (
-                <script is:inline define:vars={{ initialVisibleCount: INITIAL_VISIBLE_COUNT, loadMoreCount: LOAD_MORE_COUNT }}>
+                <script is:inline define:vars={{ initialVisibleCount: INITIAL_VISIBLE_COUNT, showMoreCount: SHOW_MORE_COUNT }}>
                   (() => {
                     const cards = Array.from(document.querySelectorAll('[data-product-card]'));
-                    const sentinel = document.querySelector('[data-shop-sentinel]');
-                    const sentinelWrapper = document.querySelector('[data-shop-sentinel-wrapper]');
                     const showingCount = document.querySelector('[data-showing-count]');
-                    if (!sentinel || cards.length <= initialVisibleCount) return;
+                    const showMoreButton = document.querySelector('[data-show-more]');
+                    const showLessButton = document.querySelector('[data-show-less]');
+                    if (!showMoreButton || !showLessButton || cards.length <= initialVisibleCount) return;
 
                     let visibleCount = initialVisibleCount;
 
-                    const revealNextBatch = () => {
-                      const nextVisibleCount = Math.min(visibleCount + loadMoreCount, cards.length);
-                      for (let index = visibleCount; index < nextVisibleCount; index += 1) {
-                        cards[index]?.style.removeProperty('display');
-                      }
-                      visibleCount = nextVisibleCount;
+                    const updateVisibleProducts = (nextCount) => {
+                      visibleCount = Math.max(initialVisibleCount, Math.min(nextCount, cards.length));
+                      cards.forEach((card, index) => {
+                        if (index < visibleCount) card.style.removeProperty('display');
+                        else card.style.display = 'none';
+                      });
                       if (showingCount) showingCount.textContent = String(visibleCount);
-
-                      if (visibleCount >= cards.length) {
-                        observer.disconnect();
-                        sentinelWrapper?.remove();
-                      }
+                      showMoreButton.hidden = visibleCount >= cards.length;
+                      showLessButton.hidden = visibleCount <= initialVisibleCount;
                     };
 
-                    const observer = new IntersectionObserver((entries) => {
-                      if (entries.some((entry) => entry.isIntersecting)) revealNextBatch();
-                    }, {
-                      rootMargin: '300px 0px',
-                    });
-
-                    observer.observe(sentinel);
+                    showMoreButton.addEventListener('click', () => updateVisibleProducts(visibleCount + showMoreCount));
+                    showLessButton.addEventListener('click', () => updateVisibleProducts(visibleCount - showMoreCount));
                   })();
                 </script>
               )}
