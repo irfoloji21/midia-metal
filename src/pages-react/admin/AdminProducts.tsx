@@ -205,7 +205,7 @@ export default function AdminProducts() {
                 product_code: product.product_code || "",
                 variant_mode: variantMode,
                 variant_options: variantMode === "combination" ? combinationOptionNames : [],
-                frontend_variant_layout: variantMode === "combination" ? normalizedFrontendLayout : "default",
+                frontend_variant_layout: "default",
                 selection_table_config: variantMode === "combination"
                     ? normalizeSelectionTableConfig(product.selection_table_config, combinationOptionNames, product.variants || [], selectionTableSourceKeys)
                     : null,
@@ -218,7 +218,7 @@ export default function AdminProducts() {
                 combination_variants_draft: combinationVariants,
                 legacy_variant_option_draft: legacyOptionName,
                 combination_variant_options_draft: combinationOptionNames,
-                combination_frontend_variant_layout_draft: normalizedFrontendLayout,
+                combination_frontend_variant_layout_draft: "default",
                 combination_selection_table_config_draft: normalizeSelectionTableConfig(product.selection_table_config, combinationOptionNames, product.variants || [], selectionTableSourceKeys),
                 variant_table_columns: variantTableColumns,
                 variant_option: legacyOptionName,
@@ -1726,7 +1726,7 @@ export default function AdminProducts() {
                                             <span className="ml-2 text-sm text-gray-600">Track Stock</span>
                                         </label>
                                     </div>
-                                     <div className="col-span-2 rounded-lg border border-gray-200 bg-gray-50/60 p-4">
+                                     <div className="hidden col-span-2 rounded-lg border border-gray-200 bg-gray-50/60 p-4">
                                          <label className="block text-sm font-bold text-[#10275c] uppercase tracking-wider">Frontend Layout</label>
                                         <p className="mt-2 text-xs text-gray-500">
                                             Keep the default layout for most products. Use the selection table only when customers need to compare exact combination rows in a structured table.
