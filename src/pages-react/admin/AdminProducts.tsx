@@ -1726,7 +1726,7 @@ export default function AdminProducts() {
                                             <span className="ml-2 text-sm text-gray-600">Track Stock</span>
                                         </label>
                                     </div>
-                                     <div className="col-span-2 rounded-lg border border-gray-200 bg-gray-50/60 p-4">
+                                     <div className="hidden col-span-2 rounded-lg border border-gray-200 bg-gray-50/60 p-4">
                                          <label className="block text-sm font-bold text-[#10275c] uppercase tracking-wider">Frontend Layout</label>
                                         <p className="mt-2 text-xs text-gray-500">
                                             Keep the default layout for most products. Use the selection table only when customers need to compare exact combination rows in a structured table.

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 
@@ -8,17 +8,29 @@ export default function ContactForm({ messagePlaceholder = "How can we help you?
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [agreementError, setAgreementError] = useState(false);
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
+  const agreementCheckboxRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!agreed) { toast.error("Please agree to the privacy policy"); return; }
+    setSubmissionSuccess(false);
+    if (!agreed) {
+      setAgreementError(true);
+      toast.error("Please check the privacy policy agreement before sending your message.");
+      agreementCheckboxRef.current?.focus();
+      return;
+    }
+    setAgreementError(false);
     setIsSubmitting(true);
     try {
       await apiFetch("/v1/contact", { method: "POST", body: JSON.stringify(formData) });
       toast.success("Message sent successfully!");
+      setSubmissionSuccess(true);
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
       setAgreed(false);
     } catch (error) {
+      setSubmissionSuccess(false);
       toast.error("Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -27,6 +39,11 @@ export default function ContactForm({ messagePlaceholder = "How can we help you?
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {submissionSuccess && (
+        <p role="status" className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
+          Your message has been sent successfully. Thank you for getting in touch.
+        </p>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-7 gap-y-8">
         <label className="flex items-center gap-3 border-b border-[#c7d0de] pb-3">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-primary"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
@@ -54,10 +71,28 @@ export default function ContactForm({ messagePlaceholder = "How can we help you?
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></svg>
           {isSubmitting ? "Sending..." : buttonLabel}
         </button>
-        <label className="inline-flex items-center gap-3 text-[15px] text-[#8f9bb2] cursor-pointer">
-          <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="w-4 h-4 accent-orange" />
-          <span>I agree to the <a href="/privacy-policy" className="underline hover:text-primary transition-colors">privacy policy.</a></span>
-        </label>
+        <div>
+          <label className={`inline-flex items-center gap-3 rounded-md text-[15px] cursor-pointer ${agreementError ? "border border-red-500 bg-red-50 p-2 text-red-700" : "text-[#8f9bb2]"}`}>
+            <input
+              ref={agreementCheckboxRef}
+              type="checkbox"
+              checked={agreed}
+              aria-invalid={agreementError}
+              aria-describedby={agreementError ? "privacy-consent-error" : undefined}
+              onChange={(e) => {
+                setAgreed(e.target.checked);
+                if (e.target.checked) setAgreementError(false);
+              }}
+              className="w-4 h-4 accent-orange"
+            />
+            <span>I agree to the <a href="/privacy-policy" className="underline hover:text-primary transition-colors">privacy policy.</a></span>
+          </label>
+          {agreementError && (
+            <p id="privacy-consent-error" role="alert" className="mt-2 text-sm font-medium text-red-600">
+              Please check this box to agree to the privacy policy before sending your message.
+            </p>
+          )}
+        </div>
       </div>
     </form>
   );

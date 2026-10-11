@@ -344,8 +344,6 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   const shareText = encodeURIComponent(`${product?.name || "Product"} | Midia M Metal`);
   const description = (product?.description || "").trim();
   const descriptionHasHtml = /<\/?[a-z][\s\S]*>/i.test(description);
-  const activeShippingClass = String(selectedShippingVariant?.shipping_class ?? product?.shipping_class ?? "").trim();
-  const activeShipsSeparately = Boolean(selectedShippingVariant?.ships_separately ?? product?.ships_separately);
   const formatVariantColumnValue = (columnKey: string, variant: Record<string, any> | null): string => {
     if (!variant && !product) return "";
 
@@ -514,8 +512,6 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
       ...selectedVariantSpecEntries,
       ...sizeFrontendSpecEntries,
       ...generalFrontendSpecEntries,
-      ...(activeShippingClass ? [["Shipping Class", activeShippingClass.charAt(0).toUpperCase() + activeShippingClass.slice(1)]] as Array<[string, string]> : []),
-      ["Ships Separately", activeShipsSeparately ? "Yes" : "No"] as [string, string],
     ] : []),
   ];
   const specificationEntries: Array<[string, string]> = dedupeSpecEntries(generatedSpecificationEntries);
