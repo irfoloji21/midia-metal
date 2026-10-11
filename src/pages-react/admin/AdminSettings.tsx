@@ -142,6 +142,8 @@ const HIDDEN_SETTING_KEYS = new Set([
 ]);
 
 const LABEL_OVERRIDES: Record<string, string> = {
+    social_tiktok: "TikTok URL",
+    social_dribbble: "TikTok URL",
     home_reward_title: "1.title",
     home_reward_desc: "1.description",
     home_discount_title: "2.title",

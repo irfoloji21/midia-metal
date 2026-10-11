@@ -49,7 +49,7 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'footer_working_hours', 'value' => "Mon-Fri: 9 AM — 6 PM\nSaturday: 9 AM — 4 PM\nSunday: Closed", 'type' => 'textarea', 'group' => 'general'],
             ['key' => 'social_facebook', 'value' => '#', 'type' => 'url', 'group' => 'general'],
             ['key' => 'social_twitter', 'value' => '#', 'type' => 'url', 'group' => 'general'],
-            ['key' => 'social_dribbble', 'value' => '#', 'type' => 'url', 'group' => 'general'],
+            ['key' => 'social_tiktok', 'value' => '#', 'type' => 'url', 'group' => 'general'],
             ['key' => 'social_instagram', 'value' => '#', 'type' => 'url', 'group' => 'general'],
 
             // About Page
@@ -159,7 +159,7 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'contact_email', 'value' => 'softwaredevelopment2181@gmail.com', 'type' => 'text', 'group' => 'footer'],
             ['key' => 'social_facebook', 'value' => '#', 'type' => 'url', 'group' => 'footer'],
             ['key' => 'social_twitter', 'value' => '#', 'type' => 'url', 'group' => 'footer'],
-            ['key' => 'social_dribbble', 'value' => '#', 'type' => 'url', 'group' => 'footer'],
+            ['key' => 'social_tiktok', 'value' => '#', 'type' => 'url', 'group' => 'footer'],
             ['key' => 'social_instagram', 'value' => '#', 'type' => 'url', 'group' => 'footer'],
             ['key' => 'footer_nav_home', 'value' => 'Home', 'type' => 'text', 'group' => 'footer'],
             ['key' => 'footer_nav_services', 'value' => 'Services', 'type' => 'text', 'group' => 'footer'],

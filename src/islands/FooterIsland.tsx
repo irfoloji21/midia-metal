@@ -8,14 +8,30 @@
  * Settings are passed as props from BaseLayout (server-side fetched) to
  * eliminate redundant client-side API calls.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/api';
 
 interface FooterIslandProps {
   initialSettings?: Record<string, string>;
 }
 
 export default function FooterIsland({ initialSettings }: FooterIslandProps) {
-  const [settings] = useState<Record<string, string>>(initialSettings ?? {});
+  const [settings, setSettings] = useState<Record<string, string>>(initialSettings ?? {});
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    apiFetch<Array<{ key: string; value: string }>>('/v1/settings')
+      .then((items) => {
+        if (!isCurrent) return;
+        setSettings(Object.fromEntries(items.map(({ key, value }) => [key, String(value ?? '')])));
+      })
+      .catch((error) => console.error('Failed to refresh footer settings', error));
+
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
 
   const t = (key: string, def: string) => settings[key] || def;
 
@@ -124,7 +140,7 @@ export default function FooterIsland({ initialSettings }: FooterIslandProps) {
               {[
                 { icon: 'facebook', label: 'Facebook', href: t('social_facebook', '#') },
                 { icon: 'twitter', label: 'Twitter', href: t('social_twitter', '#') },
-                { icon: 'dribbble', label: 'Dribbble', href: t('social_dribbble', '#') },
+                { icon: 'tiktok', label: 'TikTok', href: t('social_tiktok', t('social_dribbble', '#')) },
                 { icon: 'instagram', label: 'Instagram', href: t('social_instagram', '#') },
               ].map(({ icon, label, href }, i) => (
                 <a
@@ -135,7 +151,7 @@ export default function FooterIsland({ initialSettings }: FooterIslandProps) {
                 >
                   {icon === 'facebook' && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white group-hover:text-white"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>}
                   {icon === 'twitter' && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white group-hover:text-white"><path d="M22 4s-.7 2.1-2 3.4c.2 1.4.2 2.8-.1 4.2A10 10 0 0 1 4 19c4.3.3 7.4-1.3 9-3 0 0-4.5.5-6-3 0 0 1.8.2 3-.2-2.5-1.5-3-4-3-5 0 0 1 .7 3 1-2.6-1.9-1.6-6 1-7a28.6 28.6 0 0 0 7 4s-1.5-4 2-6c0 0 2.1 0 4 2z" /></svg>}
-                  {icon === 'dribbble' && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white group-hover:text-white"><circle cx="12" cy="12" r="10" /><path d="M19.13 5.09C15.36 9.14 8.41 10.3 5 9.1" /><path d="M5.64 16.5c2.49-1 6.88-1.87 11.86-.24" /><path d="M10.74 3.08A17.93 17.93 0 0 1 14.8 17.7" /></svg>}
+                  {icon === 'tiktok' && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-white group-hover:text-white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.9 2.9 0 1 1-2.9-2.9c.25 0 .49.03.72.09V9.34a6.4 6.4 0 1 0 5.73 6.36V9.4a8.2 8.2 0 0 0 4.77 1.52V7.47a4.85 4.85 0 0 1-1.1-.78Z" /></svg>}
                   {icon === 'instagram' && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white group-hover:text-white"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>}
                 </a>
               ))}

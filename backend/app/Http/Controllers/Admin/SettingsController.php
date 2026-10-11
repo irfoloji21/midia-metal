@@ -49,7 +49,7 @@ class SettingsController extends Controller
 
         // Only allow updating settings in these admin-editable groups
         $editableGroups = [
-            'general', 'seo', 'contact', 'about', 'services', 'portfolio',
+            'general', 'footer', 'seo', 'contact', 'about', 'services', 'portfolio',
             'blog', 'home', 'legal', 'shipping-freight', 'nav', 'payment',
         ];
 
