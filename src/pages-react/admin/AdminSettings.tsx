@@ -32,6 +32,18 @@ const parseBankTransferAccounts = (value?: string): BankTransferAccount[] => {
 
 const HOME_SECTIONS: SettingsSection[] = [
     {
+        id: "hero-copy",
+        title: "Homepage Introduction",
+        description: "The main heading, introduction and contact button labels above the slider. Phone and WhatsApp use the contact phone setting.",
+        keys: [
+            "home_hero_title",
+            "home_hero_desc",
+            "home_hero_phone_label",
+            "home_hero_whatsapp_label",
+            "home_hero_quote_label",
+        ],
+    },
+    {
         id: "features",
         title: "Features Bar",
         description: "The four icon highlights under the hero slider.",
@@ -51,6 +63,8 @@ const HOME_SECTIONS: SettingsSection[] = [
         title: "Fabrication Section",
         description: "The metal welding and bespoke fabrication block before categories.",
         keys: [
+            "home_fabrication_section_label",
+            "home_fabrication_section_title",
             "home_welding_label",
             "home_welding_title",
             "home_welding_desc",
@@ -64,6 +78,15 @@ const HOME_SECTIONS: SettingsSection[] = [
             "home_welding_card_label",
             "home_welding_card_title",
             "home_welding_card_desc",
+        ],
+    },
+    {
+        id: "categories",
+        title: "Product Categories",
+        description: "The heading above the product category images.",
+        keys: [
+            "home_categories_section_label",
+            "home_categories_section_title",
         ],
     },
     {
@@ -142,6 +165,14 @@ const HIDDEN_SETTING_KEYS = new Set([
 ]);
 
 const LABEL_OVERRIDES: Record<string, string> = {
+    about_exp_value: "Highlight 1 Heading",
+    about_exp_label: "Highlight 1 Description",
+    about_proj_value: "Highlight 2 Heading",
+    about_proj_label: "Highlight 2 Description",
+    about_satisfaction_value: "Highlight 3 Heading",
+    about_satisfaction_label: "Highlight 3 Description",
+    about_support_value: "Highlight 4 Heading",
+    about_support_label: "Highlight 4 Description",
     social_tiktok: "TikTok URL",
     social_dribbble: "TikTok URL",
     home_reward_title: "1.title",

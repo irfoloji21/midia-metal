@@ -1,6 +1,4 @@
 ---
-export const prerender = true;
-
 /**
  * contact.astro — Contact page (PURE ASTRO + ContactForm island)
  *
@@ -17,15 +15,21 @@ import { fetchSettings, getPageTitle, getPageDescription } from '@/lib/settings'
 
 const siteUrl = import.meta.env.SITE;
 
-// --- Data Fetching (runs at build time) ---
-const settings = await fetchSettings();
+// --- Data Fetching (runs for each server request) ---
+const settings = await fetchSettings({ bypassCache: true });
 
 const t = (key: string, def: string) => settings[key] || def;
+const contactPhone = t('contact_phone', '');
+const contactEmail = t('contact_email', '');
+const phoneDigits = contactPhone.replace(/\D/g, '');
+const whatsappPhone = phoneDigits.startsWith('00')
+  ? phoneDigits.slice(2)
+  : phoneDigits.startsWith('0') ? `44${phoneDigits.slice(1)}` : phoneDigits;
 ---
 
 <BaseLayout
-  title={getPageTitle(settings, undefined, 'Contact')}
-  description={getPageDescription(settings, undefined, 'Get in touch with Midia M Metal for custom stainless steel fabrication and commercial kitchen ventilation enquiries.')}
+  title={getPageTitle(settings, 'contact_meta_title', 'Contact Midia M Metal | Discuss Your Job')}
+  description={getPageDescription(settings, 'contact_meta_description', 'Call, WhatsApp or email Midia M Metal about commercial kitchen equipment, ventilation, custom fabrication, installation or repairs. Based in London.')}
   canonicalPath="/contact"
   structuredData={[buildBreadcrumbJsonLd([
     { name: 'Home', url: `${siteUrl}/` },
@@ -37,39 +41,70 @@ const t = (key: string, def: string) => settings[key] || def;
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
         <!-- Static Contact Info -->
         <div>
-          <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#10275c] mb-5">{t("contact_hero_label", "CONTACT US")}</p>
-          <h2 class="font-sans text-[42px] md:text-[52px] leading-[0.94] font-semibold text-[#10275c] mb-6 whitespace-pre-line">
-            {t("contact_hero_title", "Have Questions?\nGet in Touch!")}
-          </h2>
-          <p class="text-[#58657f] text-[16px] leading-8 max-w-[560px] mb-10">
-            {t("contact_welcome", "Get in touch with us for Any custom stainless steel fabrication or ventilation system inquiries.")}
+          <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#10275c] mb-5">{t("contact_hero_label", "Contact Midia M Metal")}</p>
+          <h1 class="font-sans text-[38px] md:text-[52px] leading-[1.05] font-semibold text-[#10275c] mb-6 whitespace-pre-line">
+            {t("contact_hero_title", "Let’s talk about the job.")}
+          </h1>
+          <p class="text-[#58657f] text-[16px] leading-8 max-w-[560px] mb-6 whitespace-pre-line">
+            {t("contact_welcome", "Need something made, fitted or repaired? Call or WhatsApp us and tell us what you have in mind. We’ll talk through what you need and the next steps.\n\nYou can also email us or leave a message using the form.")}
           </p>
+          <div class="flex flex-wrap gap-3 mb-10">
+            {contactPhone && (
+              <a href={`tel:${contactPhone.replace(/\s/g, '')}`} class="inline-flex items-center justify-center px-7 py-3 bg-orange text-white text-sm font-semibold hover:bg-orange-hover transition-colors">
+                {t('contact_phone_label', 'Call Us')}
+              </a>
+            )}
+            {whatsappPhone && (
+              <a href={`https://wa.me/${whatsappPhone}`} target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3 border border-primary text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-colors">
+                {t('contact_whatsapp_label', 'WhatsApp Us')}
+              </a>
+            )}
+          </div>
 
           <div class="space-y-5 text-[#58657f] text-[16px]">
             <div class="flex items-start gap-4">
               <!-- MapPin icon -->
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#2f9cea] mt-1 flex-shrink-0"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              <p>{t("contact_address", "785 15th Street, Office 478 Boston")}</p>
+              <p>{t("contact_address", "")}</p>
             </div>
             <div class="flex items-start gap-4">
               <!-- Phone icon -->
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#2f9cea] mt-1 flex-shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              <p class="text-[#10275c] text-[28px] md:text-[39px] leading-none font-medium">{t("contact_phone", "+1 800 555 25 69")}</p>
+              <a href={`tel:${contactPhone.replace(/\s/g, '')}`} class="text-[#10275c] text-[28px] md:text-[39px] leading-none font-medium hover:text-orange transition-colors">{contactPhone}</a>
             </div>
             <div class="flex items-start gap-4">
               <!-- Mail icon -->
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#2f9cea] mt-1 flex-shrink-0"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-              <a href={`mailto:${t("contact_email", "info@email.com")}`} class="hover:text-orange transition-colors">{t("contact_email", "info@email.com")}</a>
+              <a href={`mailto:${contactEmail}`} class="break-all hover:text-orange transition-colors">{contactEmail}</a>
             </div>
+          </div>
+          <div class="mt-10 border-t border-[#c7d0de] pt-6">
+            <h2 class="font-sans text-[24px] font-semibold text-primary mb-2">{t('contact_quote_title', 'Looking for a price estimate?')}</h2>
+            <p class="text-sm leading-7 text-[#58657f] mb-3">{t('contact_quote_desc', 'Use our quote form to tell us what you need made or supplied.')}</p>
+            <a href="/get-a-quote" class="text-sm font-semibold text-primary underline underline-offset-4 hover:text-orange transition-colors">{t('contact_quote_button_label', 'Request a Quote')}</a>
           </div>
         </div>
 
         <!-- Contact Form Island -->
         <div>
+          <h2 class="font-sans text-[28px] md:text-[34px] leading-tight font-semibold text-primary mb-4">{t('contact_form_title', 'Leave us a message.')}</h2>
+          <p class="text-sm leading-7 text-[#58657f] mb-8">{t('contact_form_intro', 'Tell us what you need and where the job is. Include your postcode and any approximate measurements you have, so we can understand the work involved.')}</p>
           <ContactForm
             client:idle
-            messagePlaceholder={t("contact_form_message_placeholder", "How can we help you? Feel free to get in touch!")}
-            buttonLabel={t("contact_form_button_label", "Get in Touch")}
+            messagePlaceholder={t("contact_form_message_placeholder", "Tell us about the work you need.")}
+            buttonLabel={t("contact_form_button_label", "Send Message")}
+            copy={{
+              nameLabel: t('contact_form_name_label', 'Your Name'),
+              emailLabel: t('contact_form_email_label', 'Email Address'),
+              phoneLabel: t('contact_form_phone_label', 'Phone Number (optional)'),
+              subjectLabel: t('contact_form_subject_label', 'Subject (optional)'),
+              sendingLabel: t('contact_form_sending_label', 'Sending...'),
+              successMessage: t('contact_form_success_message', 'Thanks, we’ve received your message. We’ll get back to you using the contact details you provided.'),
+              errorMessage: t('contact_form_error_message', 'Your message couldn’t be sent. Please try again, or contact us by phone or WhatsApp.'),
+              privacyError: t('contact_form_privacy_error', 'Please tick the privacy policy box before sending your message.'),
+              privacyPrefix: t('contact_form_privacy_prefix', 'I agree to the'),
+              privacyLinkLabel: t('contact_form_privacy_link_label', 'privacy policy.'),
+            }}
           />
         </div>
       </div>

@@ -25,7 +25,7 @@ let heroSlides: any[] = [];
 let categories: any[] = [];
 let trendingItems: any[] = [];
 
-const settings = await fetchSettings();
+const settings = await fetchSettings({ bypassCache: true });
 
 try {
   const [slidesRes, categoriesRes, trendingRes] = await Promise.all([
@@ -63,6 +63,10 @@ const normalizeImage = (value: unknown, fallback = '/logo.png') => {
 // TODO (client): Replace placeholder phone with real number in Admin > Settings > contact_phone
 // or update the hardcoded fallback below before go-live.
 const contactPhone = settings['contact_phone'] || '';
+const phoneDigits = contactPhone.replace(/\D/g, '');
+const whatsappPhone = phoneDigits.startsWith('00')
+  ? phoneDigits.slice(2)
+  : phoneDigits.startsWith('0') ? `44${phoneDigits.slice(1)}` : phoneDigits;
 const organizationJsonLd = buildOrganizationJsonLd({
   name: 'Midia M Metal',
   url: `${siteUrl}/`,
@@ -95,7 +99,33 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
   <div class="min-h-screen bg-[#f2f3f5]">
     <!-- Hero Carousel (React island — needs auto-slide timer) -->
     <section class="container mx-auto px-4 lg:px-8 pt-4 md:pt-6">
-      <HeroCarousel slides={heroSlides} client:idle />
+      <div class="relative isolate overflow-hidden bg-primary md:min-h-[540px]">
+        <HeroCarousel slides={heroSlides} client:idle />
+        <div aria-hidden="true" class="absolute inset-0 z-10 pointer-events-none bg-[#031946]/25 bg-gradient-to-r from-[#031946]/95 via-[#031946]/75 to-[#031946]/10" />
+        <div class="relative z-20 max-w-[780px] px-6 pt-10 pb-28 sm:px-10 md:px-16 md:pt-16 md:pb-24">
+        <h1 class="max-w-[650px] font-sans text-[36px] sm:text-[44px] md:text-[56px] lg:text-[60px] leading-[1.06] tracking-[-0.025em] font-semibold text-white mb-5">
+          {t("home_hero_title", "Commercial kitchen equipment, made to measure.")}
+        </h1>
+        <p class="max-w-[600px] text-[15px] md:text-[17px] leading-7 text-white/85">
+          {t("home_hero_desc", "From a single sink unit to a full kitchen fit-out, we make the metalwork your kitchen needs. At Midia M Metal, our own team handles the measurements, fabrication and installation. We’re based in London and take on projects across the UK, depending on the work involved.")}
+        </p>
+        <div class="mt-6 flex flex-wrap items-center gap-3 md:gap-4">
+          {contactPhone && (
+            <a href={`tel:${contactPhone.replace(/\s/g, '')}`} class="inline-flex items-center justify-center px-7 py-3 bg-orange text-white text-sm font-semibold hover:bg-orange-hover transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+              {t("home_hero_phone_label", "Call Us")}
+            </a>
+          )}
+          {whatsappPhone && (
+            <a href={`https://wa.me/${whatsappPhone}`} target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3 border border-white/50 bg-white/5 text-white text-sm font-semibold hover:bg-white hover:text-primary transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+              {t("home_hero_whatsapp_label", "WhatsApp Us")}
+            </a>
+          )}
+          <a href="/get-a-quote" class="px-3 py-3 text-sm font-semibold text-white underline decoration-white/50 underline-offset-4 hover:decoration-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+            {t("home_hero_quote_label", "Request a Quote")}
+          </a>
+        </div>
+        </div>
+      </div>
     </section>
 
     <!-- Features Bar -->
@@ -155,7 +185,7 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
             <h2 class="font-sans text-[34px] md:text-[50px] leading-[0.95] font-semibold text-white mb-5 md:mb-6">
               {t("home_welding_title", "Metal welding & bespoke fabrication")}
             </h2>
-            <p class="text-sm md:text-[15px] leading-6 md:leading-7 text-white/80 max-w-xl">
+            <p class="text-sm md:text-[15px] leading-6 md:leading-7 text-white/80 max-w-xl whitespace-pre-line">
               {t(
                 "home_welding_desc",
                 "Custom stainless steel builds, repair work, on-site modifications, and workshop welding for commercial kitchens, industrial spaces, and made-to-order metalwork."
@@ -275,14 +305,14 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     <!-- CTA Banners -->
     <section class="container mx-auto px-4 lg:px-8 py-10 md:py-16">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="relative overflow-hidden min-h-[200px] md:h-[240px] bg-gradient-to-r from-[#eb5c10] to-[#ff7d1b] p-6 md:p-10 flex flex-col justify-center">
+        <div class="relative overflow-hidden min-h-[200px] md:min-h-[240px] bg-gradient-to-r from-[#eb5c10] to-[#ff7d1b] p-6 md:p-10 flex flex-col justify-center">
           <h3 class="text-[42px] md:text-5xl leading-[0.95] font-semibold text-white mb-4 md:mb-5 font-sans">{t("home_installation_title", "Installation services")}</h3>
           <p class="text-white/85 text-xs md:text-sm mb-5 md:mb-7 max-w-md">{t("home_installation_desc", "Dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia.")}</p>
           <a href="/get-a-quote" class="inline-flex items-center justify-center w-fit px-5 md:px-7 py-2.5 md:py-3 border border-white text-white text-xs md:text-sm font-semibold hover:bg-white hover:text-orange transition-all">
             {t("home_request_quote_label", "Request a Quote")}
           </a>
         </div>
-        <div class="relative overflow-hidden min-h-[200px] md:h-[240px] bg-[#e8edf1] flex items-center">
+        <div class="relative overflow-hidden min-h-[200px] md:min-h-[240px] bg-[#e8edf1] flex items-center">
           <div class="flex-1 p-6 md:p-10 flex flex-col justify-center z-10">
           <h3 class="text-[48px] md:text-[35px] leading-[0.95] md:leading-[1.02] font-semibold text-[#10275c] mb-3 md:mb-4 font-sans">{t("home_comfort_title", "Built for commercial kitchens")}</h3>
           <p class="text-[#6f7e9a] text-xs md:text-sm mb-5 md:mb-7">{t("home_comfort_desc", "Stainless steel products and systems designed for hygiene, durability, and compliance.")}</p>

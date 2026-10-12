@@ -1,11 +1,9 @@
 ---
-export const prerender = true;
-
 /**
  * about.astro — About page (PURE ASTRO)
  *
  * Converted from React island (AboutIsland.tsx) to pure Astro.
- * All data fetching happens at build time via frontmatter.
+ * Settings are fetched for each server request via frontmatter.
  * Zero client-side JavaScript for page content.
  *
  * Original: src/islands/AboutIsland.tsx
@@ -16,15 +14,24 @@ import { fetchSettings, getPageTitle, getPageDescription } from '@/lib/settings'
 
 const siteUrl = import.meta.env.SITE;
 
-// --- Data Fetching (runs at build time) ---
-const settings = await fetchSettings();
+// --- Data Fetching (runs for each server request) ---
+const settings = await fetchSettings({ bypassCache: true });
 
 // SEO — title/description from API with hardcoded fallbacks
-const pageTitle = getPageTitle(settings, 'about_title', 'About Us');
-const pageDescription = getPageDescription(settings, 'about_subtitle', 'Midia M Metal specializes in stainless steel fabrication and ventilation systems for commercial kitchens across the UK.');
+const pageTitle = getPageTitle(settings, 'about_meta_title', 'About Midia M Metal | London Fabrication & Welding Team');
+const pageDescription = getPageDescription(settings, 'about_meta_description', 'Meet Midia M Metal, a London-based team making and fitting commercial kitchen equipment. Custom stainless steel fabrication, welding, alterations and repairs.');
 
 // Helper: get setting
-const t = (key: string) => settings[key] || '';
+const t = (key: string, fallback = '') => settings[key] || fallback;
+const contactPhone = t('contact_phone');
+const phoneDigits = contactPhone.replace(/\D/g, '');
+const whatsappPhone = phoneDigits.startsWith('00')
+  ? phoneDigits.slice(2)
+  : phoneDigits.startsWith('0') ? `44${phoneDigits.slice(1)}` : phoneDigits;
+const contactActions = [
+  ...(contactPhone ? [{ kind: 'phone', href: `tel:${contactPhone.replace(/\s/g, '')}`, label: t('about_phone_label', 'Call Us') }] : []),
+  ...(whatsappPhone ? [{ kind: 'whatsapp', href: `https://wa.me/${whatsappPhone}`, label: t('about_whatsapp_label', 'WhatsApp Us') }] : []),
+];
 
 // Highlights data
 const highlights = [
@@ -69,8 +76,8 @@ const values = [
       name: 'Midia M Metal',
       url: `${siteUrl}/`,
       logo: `${siteUrl}/logo.png`,
-      email: 'softwaredevelopment2181@gmail.com',
-      telephone: '07545888522',
+      email: t('contact_email'),
+      ...(contactPhone ? { telephone: contactPhone } : {}),
     }),
   ]}
 >
@@ -82,21 +89,24 @@ const values = [
           <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#10275c] mb-4">
             {t('about_who_label')}
           </p>
-          <h2 class="font-sans text-[46px] md:text-[62px] leading-[0.95] font-semibold text-[#10275c] mb-6 whitespace-pre-wrap">
+          <h1 class="font-sans text-[38px] sm:text-[46px] md:text-[56px] leading-[1.05] font-semibold text-[#10275c] mb-6 whitespace-pre-wrap">
             {t('about_title')}
-          </h2>
+          </h1>
           <p class="text-[#58657f] text-[15px] leading-8 mb-5 whitespace-pre-wrap">
             {t('about_content_1')}
           </p>
           <p class="text-[#58657f] text-[15px] leading-8 mb-8 whitespace-pre-wrap">
             {t('about_content_2')}
           </p>
-          <a
-            href="/contact"
-            class="inline-flex items-center justify-center h-12 px-8 bg-orange text-white text-[14px] font-semibold hover:bg-orange-hover transition-colors"
-          >
-            Start Your Kitchen Project
-          </a>
+          <div class="flex flex-wrap items-center gap-3">
+            {contactActions.map((action) => (
+              <a href={action.href} target={action.kind === 'whatsapp' ? '_blank' : undefined} rel={action.kind === 'whatsapp' ? 'noopener noreferrer' : undefined}
+                class={`inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors ${action.kind === 'phone' ? 'bg-orange text-white hover:bg-orange-hover' : 'border border-primary text-primary hover:bg-primary hover:text-white'}`}>
+                {action.label}
+              </a>
+            ))}
+            <a href="/contact" class="px-3 py-3 text-sm font-semibold text-primary underline underline-offset-4 hover:text-orange transition-colors">{t('about_discuss_label', 'Discuss Your Job')}</a>
+          </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -110,11 +120,11 @@ const values = [
 
     <!-- Highlights -->
     <section class="container mx-auto px-4 lg:px-8 pb-16 md:pb-24">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {highlights.map((item) => (
-          <div class="bg-[#f4f5f7] border border-[#d7dfeb] p-6 md:p-8 text-center">
-            <p class="font-sans text-[40px] md:text-[56px] leading-none font-semibold text-[#10275c]">{item.value}</p>
-            <p class="text-[#58657f] text-[13px] md:text-[14px] mt-3">{item.label}</p>
+          <div class="bg-[#f4f5f7] border border-[#d7dfeb] p-4 sm:p-6 lg:p-8 text-center">
+            <h3 class="font-sans text-[23px] md:text-[28px] leading-tight break-words font-semibold text-[#10275c]">{item.value}</h3>
+            <p class="text-[#58657f] text-[13px] md:text-[14px] leading-6 mt-3">{item.label}</p>
           </div>
         ))}
       </div>
@@ -125,10 +135,10 @@ const values = [
       <p class="text-center text-[10px] font-bold tracking-[0.24em] text-muted-foreground uppercase mb-3">
         {t('about_values_label')}
       </p>
-      <h2 class="text-center font-sans text-[44px] md:text-[62px] leading-[0.95] font-semibold text-[#10275c] mb-12 md:mb-14">
+      <h2 class="text-center font-sans text-[36px] md:text-[52px] leading-[1.08] font-semibold text-[#10275c] mb-12 md:mb-14">
         {t('about_values_title')}
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
         <!-- Value 1: ShieldCheck -->
         <div class="bg-[#f4f5f7] border border-[#d7dfeb] p-7">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-orange mb-5"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
@@ -158,17 +168,19 @@ const values = [
 
     <!-- CTA Banner -->
     <section class="bg-gradient-to-r from-[#0c63a4] to-[#1296df]">
-      <div class="container mx-auto px-4 lg:px-8 py-9 md:py-11 flex flex-col md:flex-row items-center justify-between gap-6">
-        <h3 class="font-sans text-[34px] md:text-[44px] leading-[1.02] font-semibold text-white whitespace-pre-line">
+      <div class="container mx-auto px-4 lg:px-8 py-9 md:py-11 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <h3 class="max-w-xl font-sans text-[32px] md:text-[40px] leading-[1.1] font-semibold text-white whitespace-pre-line">
           {t('about_cta_title')}
         </h3>
-        <a
-          href="/contact"
-          class="inline-flex items-center justify-center px-8 h-12 bg-white text-[#10275c] text-sm font-semibold hover:bg-[#edf3f9] transition-colors"
-        >
-          Talk to Our Team
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
+        <div class="flex flex-wrap gap-3 shrink-0">
+          {contactActions.map((action) => (
+            <a href={action.href} target={action.kind === 'whatsapp' ? '_blank' : undefined} rel={action.kind === 'whatsapp' ? 'noopener noreferrer' : undefined}
+              class={`inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors ${action.kind === 'phone' ? 'bg-white text-primary hover:bg-[#edf3f9]' : 'border border-white text-white hover:bg-white hover:text-primary'}`}>
+              {action.label}
+            </a>
+          ))}
+          <a href="/get-a-quote" class="inline-flex items-center justify-center px-6 py-3 border border-white text-white text-sm font-semibold hover:bg-white hover:text-primary transition-colors">{t('about_quote_label', 'Request a Quote')}</a>
+        </div>
       </div>
     </section>
   </div>

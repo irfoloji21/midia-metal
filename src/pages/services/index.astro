@@ -35,11 +35,21 @@ try {
   const servicesRes = await fetch(`${API_BASE}/v1/services`).then(r => r.ok ? r.json() : []);
   services = servicesRes || [];
 } catch (err) {
-  console.error('Failed to load services data at build time:', err);
+  console.error('Failed to load services data:', err);
 }
 
 // Helper: get setting
-const t = (key: string) => settings[key] || '';
+const t = (key: string, fallback = '') => settings[key] || fallback;
+const contactPhone = t('contact_phone', t('services_hero_phone'));
+const phoneDigits = contactPhone.replace(/\D/g, '');
+const whatsappPhone = phoneDigits.startsWith('00')
+  ? phoneDigits.slice(2)
+  : phoneDigits.startsWith('0') ? `44${phoneDigits.slice(1)}` : phoneDigits;
+const contactActions = [
+  ...(contactPhone ? [{ kind: 'phone', href: `tel:${contactPhone.replace(/\s/g, '')}`, label: t('services_phone_label', 'Call Us') }] : []),
+  ...(whatsappPhone ? [{ kind: 'whatsapp', href: `https://wa.me/${whatsappPhone}`, label: t('services_whatsapp_label', 'WhatsApp Us') }] : []),
+  { kind: 'quote', href: '/get-a-quote', label: t('services_quote_label', 'Request a Quote') },
+];
 
 // ItemList JSON-LD for services listing
 const servicesUrl = `${siteUrl}/services`;
@@ -57,8 +67,8 @@ const itemListJsonLd = services.length > 0
 ---
 
 <BaseLayout
-  title={getPageTitle(settings, 'services_hero_subtitle', 'Services')}
-  description={getPageDescription(settings, 'services_hero_desc', 'Commercial kitchen ventilation, stainless steel welding, custom fabrication, canopy installation, and maintenance services across the UK.')}
+  title={getPageTitle(settings, 'services_meta_title', 'Commercial Kitchen Fabrication & Installation | Midia M Metal')}
+  description={getPageDescription(settings, 'services_meta_description', 'Custom kitchen equipment, ventilation, canopy installation and welding from our London-based team. Call us about fabrication, fitting, repairs or maintenance.')}
   canonicalPath="/services"
   structuredData={[
     buildBreadcrumbJsonLd([
@@ -74,7 +84,7 @@ const itemListJsonLd = services.length > 0
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div class="max-w-xl">
           <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#10275c] mb-4">{t("services_hero_label")}</p>
-          <h2 class="font-sans text-[48px] md:text-[62px] leading-[0.95] font-semibold text-[#10275c] mb-6">{t("services_hero_subtitle")}</h2>
+          <h1 class="font-sans text-[38px] sm:text-[48px] md:text-[56px] leading-[1.05] font-semibold text-[#10275c] mb-6">{t("services_hero_subtitle")}</h1>
           <p class="text-[#1c2b4a] text-[23px] md:text-[26px] leading-[1.25] mb-5">
             {t("services_hero_tagline")}
           </p>
@@ -82,16 +92,12 @@ const itemListJsonLd = services.length > 0
             {t("services_hero_desc")}
           </p>
           <div class="flex items-center gap-4 flex-wrap">
-            <a href="/about" class="inline-flex items-center justify-center px-8 py-4 bg-orange text-white text-sm font-semibold hover:bg-orange-hover transition-colors">
-              About Our Team
-            </a>
-            <a href={`tel:${t("services_hero_phone")}`} class="flex items-center gap-3 text-sm font-semibold text-primary">
-              <span class="w-11 h-11 border border-[#d3dbe7] grid place-items-center bg-white">
-                <!-- Phone icon (inline SVG replaces lucide-react Phone) -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-              </span>
-              {t("services_hero_phone")}
-            </a>
+            {contactActions.map((action) => (
+              <a href={action.href} target={action.kind === 'whatsapp' ? '_blank' : undefined} rel={action.kind === 'whatsapp' ? 'noopener noreferrer' : undefined}
+                class={`inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors ${action.kind === 'phone' ? 'bg-orange text-white hover:bg-orange-hover' : action.kind === 'whatsapp' ? 'border border-primary text-primary hover:bg-primary hover:text-white' : 'text-primary underline underline-offset-4 hover:text-orange'}`}>
+                {action.label}
+              </a>
+            ))}
           </div>
         </div>
         <div class="relative h-[360px] md:h-[520px]">
@@ -120,13 +126,12 @@ const itemListJsonLd = services.length > 0
                   <Image src={s.image} alt={s.title} width={200} height={200} loading="lazy" decoding="async" class="w-full h-full object-cover" />
                 </div>
               </a>
-              <p class="text-xs text-muted-foreground mb-1">Best service</p>
-              <h3 class="font-sans text-[33px] leading-tight font-semibold text-[#10275c] mb-3">
+              <h3 class="font-sans text-[28px] lg:text-[32px] leading-tight font-semibold text-[#10275c] mb-3">
                 <a href={`/services/${s.slug}`} class="hover:text-orange transition-colors">
                   {s.title}
                 </a>
               </h3>
-              <p class="text-sm text-[#58657f] leading-relaxed mb-5 max-w-sm mx-auto">{s.description}</p>
+              <p class="text-sm text-[#58657f] leading-relaxed mb-5 max-w-sm mx-auto">{s.excerpt}</p>
               <a href={`/services/${s.slug}`} class="inline-flex items-center justify-center w-8 h-8 rounded-full border border-[#cfd8e6] text-primary hover:text-orange hover:border-orange transition-colors" aria-label={`View details for ${s.title}`}>
                 <span class="sr-only">View details for {s.title}</span>
                 <!-- ArrowRight icon -->
@@ -142,22 +147,22 @@ const itemListJsonLd = services.length > 0
 
     <!-- CTA Banner -->
     <section class="bg-gradient-to-r from-[#0c63a4] to-[#1296df]">
-      <div class="container mx-auto px-4 lg:px-8 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6">
-        <h3 class="font-sans text-[36px] md:text-[44px] leading-[1.05] font-semibold text-white whitespace-pre-line">
+      <div class="container mx-auto px-4 lg:px-8 py-8 md:py-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <h3 class="max-w-2xl font-sans text-[32px] md:text-[40px] leading-[1.1] font-semibold text-white whitespace-pre-line">
           {t("services_cta_title")}
         </h3>
-        <div class="flex gap-4 flex-wrap">
-          <a href="/get-a-quote" class="inline-flex items-center justify-center px-7 py-3 text-sm font-semibold bg-white text-[#10275c] hover:bg-[#eef3f8] transition-colors duration-200">
-            Request a Quote
-          </a>
-          <a href="/contact" class="inline-flex items-center justify-center px-7 py-3 border border-white text-white text-sm font-semibold hover:bg-white hover:text-[#0f6fb5] transition-colors">
-            Discuss Your Project
-          </a>
+        <div class="flex gap-3 flex-wrap shrink-0">
+          {contactActions.map((action) => (
+            <a href={action.href} target={action.kind === 'whatsapp' ? '_blank' : undefined} rel={action.kind === 'whatsapp' ? 'noopener noreferrer' : undefined}
+              class={`inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors ${action.kind === 'phone' ? 'bg-white text-primary hover:bg-[#eef3f8]' : 'border border-white text-white hover:bg-white hover:text-primary'}`}>
+              {action.label}
+            </a>
+          ))}
         </div>
       </div>
     </section>
 
-    <!-- Modern Solutions -->
+    <!-- Project and quotation process -->
     <section class="container mx-auto px-4 lg:px-8 py-16 md:py-24">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div class="flex gap-4">
@@ -166,12 +171,15 @@ const itemListJsonLd = services.length > 0
         </div>
         <div class="max-w-xl">
           <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground mb-3">{t("services_modern_label")}</p>
-          <h2 class="font-sans text-[50px] md:text-[70px] leading-[0.93] font-semibold text-[#10275c] mb-5">{t("services_modern_title")}</h2>
-          <p class="text-[#7b879f] text-sm leading-relaxed mb-7">
+          <h2 class="font-sans text-[36px] md:text-[48px] leading-[1.08] font-semibold text-[#10275c] mb-5">{t("services_modern_title")}</h2>
+          <p class="text-[#58657f] text-sm leading-7 mb-5 whitespace-pre-line">
             {t("services_modern_desc")}
           </p>
-          <a href="/shop" class="inline-flex items-center justify-center px-8 py-4 bg-orange text-white text-sm font-semibold hover:bg-orange-hover transition-colors">
-            Browse Ventilation Products
+          {t("services_site_visit_note") && (
+            <p class="text-[#58657f] text-sm leading-6 border-l-2 border-orange pl-4 mb-7">{t("services_site_visit_note")}</p>
+          )}
+          <a href="/contact" class="inline-flex items-center justify-center px-8 py-4 bg-orange text-white text-sm font-semibold hover:bg-orange-hover transition-colors">
+            {t("services_modern_cta_label", "Discuss Your Job")}
           </a>
         </div>
       </div>
@@ -187,7 +195,7 @@ const itemListJsonLd = services.length > 0
           </div>
           <h3 class="font-sans text-[34px] leading-tight font-semibold text-primary mb-3">{t("services_feature_1_title")}</h3>
           <p class="text-sm text-muted-foreground max-w-sm mx-auto">{t("services_feature_1_desc")}</p>
-          <a href="/services" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_1_title")}`}>
+          <a href="/services/custom-fabrication" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_1_title")}`}>
             <span class="sr-only">Learn more about {t("services_feature_1_title")}</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </a>
@@ -199,7 +207,7 @@ const itemListJsonLd = services.length > 0
           </div>
           <h3 class="font-sans text-[34px] leading-tight font-semibold text-primary mb-3">{t("services_feature_2_title")}</h3>
           <p class="text-sm text-muted-foreground max-w-sm mx-auto">{t("services_feature_2_desc")}</p>
-          <a href="/services" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_2_title")}`}>
+          <a href="/contact" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_2_title")}`}>
             <span class="sr-only">Learn more about {t("services_feature_2_title")}</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </a>
@@ -211,13 +219,19 @@ const itemListJsonLd = services.length > 0
           </div>
           <h3 class="font-sans text-[34px] leading-tight font-semibold text-primary mb-3">{t("services_feature_3_title")}</h3>
           <p class="text-sm text-muted-foreground max-w-sm mx-auto">{t("services_feature_3_desc")}</p>
-          <a href="/services" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_3_title")}`}>
+          <a href="/services/maintenance-cleaning" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_3_title")}`}>
             <span class="sr-only">Learn more about {t("services_feature_3_title")}</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </a>
         </div>
       </div>
     </section>
+
+    {t("services_coverage_desc") && (
+      <section class="container mx-auto px-4 lg:px-8 pb-16 md:pb-20">
+        <p class="max-w-3xl mx-auto border-t border-[#cfd8e6] pt-8 text-center text-sm leading-7 text-[#58657f]">{t("services_coverage_desc")}</p>
+      </section>
+    )}
 
   </div>
 </BaseLayout>
