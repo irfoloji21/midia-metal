@@ -119,6 +119,8 @@ npm run dev -- --host localhost --port 3000
 
 The Astro dev server proxies `/api`, `/sanctum`, and `/storage` to the Laravel backend.
 
+On Windows, start the backend with `powershell -NoProfile -ExecutionPolicy Bypass -File backend/start-local.ps1` from the project root. The execution policy applies only to this process. This enables the required PHP extensions and uses Laravel's development router so uploaded images are served correctly. It listens only on `127.0.0.1:8000`.
+
 ### 6. Open in browser
 
 - **Public site**: http://localhost:3000

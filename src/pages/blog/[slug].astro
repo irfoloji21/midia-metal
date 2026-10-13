@@ -152,7 +152,7 @@ const blogPostingJsonLd = buildBlogPostingJsonLd({
       <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px] gap-8 lg:gap-10 xl:gap-12 items-start">
         <!-- Main Content -->
         <article>
-          {post?.image && (
+          {post?.image?.trim() && (
             <Image src={post.image} alt={post.title} width={1200} height={800} loading="eager" decoding="async" class="w-full h-[260px] md:h-[360px] lg:h-[420px] object-cover" />
           )}
 
@@ -283,7 +283,9 @@ const blogPostingJsonLd = buildBlogPostingJsonLd({
                 .slice(0, 3)
                 .map((item: any) => (
                   <li class="flex gap-3">
-                    <Image src={item.image} alt={item.title} width={80} height={80} loading="lazy" decoding="async" class="w-20 h-20 object-cover flex-shrink-0 bg-[#f7f8fa]" />
+                    {item.image?.trim() && (
+                      <Image src={item.image} alt={item.title} width={80} height={80} loading="lazy" decoding="async" class="w-20 h-20 object-cover flex-shrink-0 bg-[#f7f8fa]" />
+                    )}
                     <div>
                       <a href={`/blog/${item.slug}`} class="text-[15px] font-semibold text-orange hover:text-orange/80 transition-colors leading-snug">
                         {item.title}

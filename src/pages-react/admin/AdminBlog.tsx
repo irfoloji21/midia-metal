@@ -23,8 +23,13 @@ export default function AdminBlog() {
 
     const loadPosts = async () => {
         try {
-            const res = await apiFetch<{ data: any[] }>("/admin/blog");
-            setPosts(res.data);
+            const res = await apiFetch<{ data: any[]; last_page: number }>("/admin/blog");
+            const remaining = await Promise.all(
+                Array.from({ length: Math.max(0, (res.last_page || 1) - 1) }, (_, i) =>
+                    apiFetch<{ data: any[] }>(`/admin/blog?page=${i + 2}`)
+                )
+            );
+            setPosts([...res.data, ...remaining.flatMap((page) => page.data)]);
         } catch (e) {
             toast.error("Failed to load blog posts");
         } finally {

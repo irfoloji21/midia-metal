@@ -1,0 +1,55 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\BlogPost;
+use App\Models\SiteSetting;
+use App\Support\HtmlSanitizer;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class WorkshopBlogSeriesSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $posts = json_decode(file_get_contents(database_path('content/blog-series.json')), true, 512, JSON_THROW_ON_ERROR);
+        $phone = preg_replace('/[^0-9+]/', '', (string) SiteSetting::where('key', 'contact_phone')->value('value'));
+        if (str_starts_with($phone, '0')) {
+            $phone = '+44'.substr($phone, 1);
+        } elseif (str_starts_with($phone, '44')) {
+            $phone = '+'.$phone;
+        }
+        if (! $phone) {
+            throw new \RuntimeException('Set the contact phone number before publishing.');
+        }
+
+        foreach ($posts as $post) {
+            if (! is_file(base_path('../public'.($post['image'] ?? '/images/blog/'.$post['slug'].'.webp')))) {
+                throw new \RuntimeException('Missing cover for '.$post['slug']);
+            }
+        }
+
+        // Explicit publication only. Preserve existing posts and later admin edits.
+        DB::transaction(function () use ($posts, $phone) {
+            $created = 0;
+            foreach ($posts as $entry) {
+                $contact = '<h3>'.e($entry['cta']).'</h3><p>'.e($entry['contact']).'</p>'
+                    .'<p><a href="https://wa.me/'.e(ltrim($phone, '+')).'">Message us on WhatsApp</a> · '
+                    .'<a href="tel:'.e($phone).'">Call us</a> · '
+                    .'<a href="/get-a-quote">Request a quote</a></p>';
+                $post = BlogPost::firstOrCreate(['slug' => $entry['slug']], [
+                    'title' => $entry['title'],
+                    'excerpt' => $entry['excerpt'],
+                    'content' => HtmlSanitizer::richText($entry['content'].$contact),
+                    'image' => $entry['image'] ?? '/images/blog/'.$entry['slug'].'.webp',
+                    'author' => 'Midia M Metal',
+                    'category' => $entry['category'],
+                    'active' => true,
+                    'published_at' => now(),
+                ]);
+                $created += (int) $post->wasRecentlyCreated;
+            }
+            $this->command?->info('Created '.$created.' articles. Active total: '.BlogPost::where('active', true)->count());
+        });
+    }
+}

@@ -11,14 +11,20 @@ class BlogController extends Controller
     public function index(Request $request)
     {
         $query = BlogPost::where('active', true);
-        if ($request->category) {
-            $query->where('category', $request->category);
+        $filters = $request->validate([
+            'categories' => 'sometimes|array|max:50',
+            'categories.*' => 'string|max:255',
+            'category' => 'sometimes|nullable|string|max:255',
+        ]);
+        $categories = $filters['categories'] ?? (! empty($filters['category']) ? [$filters['category']] : []);
+        if ($categories) {
+            $query->whereIn('category', $categories);
         }
         if ($request->search) {
             $query->where('title', 'like', "%{$request->search}%");
         }
 
-        return response()->json($query->latest('published_at')->paginate(9));
+        return response()->json($query->latest('published_at')->orderByDesc('id')->paginate(9));
     }
 
     public function show($slug)
@@ -42,6 +48,6 @@ class BlogController extends Controller
 
     public function recent()
     {
-        return response()->json(BlogPost::where('active', true)->latest('published_at')->take(3)->get());
+        return response()->json(BlogPost::where('active', true)->latest('published_at')->orderByDesc('id')->take(3)->get());
     }
 }

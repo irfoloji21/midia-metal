@@ -1,12 +1,12 @@
 ---
-export const prerender = true;
+export const prerender = false;
 
 /**
  * blog/index.astro — Blog list page (PURE ASTRO)
  *
  * Original: src/pages-react/BlogPage.tsx
  * React island: src/islands/BlogIsland.tsx (147 lines, 4 API calls)
- * Converted: Pure Astro with data fetched at build time.
+ * Server-rendered so pagination and newly published posts stay current.
  *
  * Pattern:
  *   1. Fetch ALL data in frontmatter using direct fetch() to backend
@@ -24,30 +24,50 @@ import { fetchSettings, getPageTitle, getPageDescription } from '@/lib/settings'
 const siteUrl = import.meta.env.SITE;
 const API_BASE = getApiBase();
 
-// --- Data Fetching (runs at build time) ---
+// Fetch the requested page from the public blog API.
 const settings = await fetchSettings();
+const requestedPage = Number(Astro.url.searchParams.get('page') || 1);
+const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+const selectedCategories = [...new Set(Astro.url.searchParams.getAll('category').filter(value => value.trim()))];
+const blogPageUrl = (targetPage: number) => {
+  const params = new URLSearchParams();
+  selectedCategories.forEach(category => params.append('category', category));
+  if (targetPage > 1) params.set('page', String(targetPage));
+  return params.size ? `/blog?${params.toString()}` : '/blog';
+};
+const canonicalPath = blogPageUrl(page);
+const apiParams = new URLSearchParams({ page: String(page) });
+selectedCategories.forEach(category => apiParams.append('categories[]', category));
 
 let posts: any[] = [];
 let categories: any[] = [];
 let recentPosts: any[] = [];
+let lastPage = 1;
+let total = 0;
+let firstResult = 0;
+let lastResult = 0;
 
 try {
   const [postsRes, catRes, recentRes] = await Promise.all([
-    fetch(`${API_BASE}/v1/blog`).then(r => r.ok ? r.json() : { data: [] }),
+    fetch(`${API_BASE}/v1/blog?${apiParams.toString()}`).then(r => r.ok ? r.json() : { data: [] }),
     fetch(`${API_BASE}/v1/blog/categories`).then(r => r.ok ? r.json() : []),
     fetch(`${API_BASE}/v1/blog/recent`).then(r => r.ok ? r.json() : []),
   ]);
   posts = postsRes.data || postsRes || [];
+  lastPage = postsRes.last_page || 1;
+  total = postsRes.total || 0;
+  firstResult = postsRes.from || 0;
+  lastResult = postsRes.to || 0;
   categories = catRes || [];
   recentPosts = recentRes || [];
 } catch (err) {
-  console.error('Failed to load blog data at build time:', err);
+  console.error('Failed to load blog data:', err);
 }
 
 const t = (key: string, def: string) => settings[key] || def;
 
 // ItemList JSON-LD for blog listing
-const blogUrl = `${siteUrl}/blog`;
+const blogUrl = `${siteUrl}${canonicalPath}`;
 const itemListJsonLd = posts.length > 0
   ? buildItemListJsonLd({
       name: 'Blog',
@@ -64,7 +84,7 @@ const itemListJsonLd = posts.length > 0
 <BaseLayout
   title={getPageTitle(settings, 'blog_hero_title', 'Blog')}
   description={getPageDescription(settings, undefined, 'Read insights on commercial kitchen ventilation, stainless steel fabrication, canopy systems, hygiene, and maintenance from Midia M Metal.')}
-  canonicalPath="/blog"
+  canonicalPath={canonicalPath}
   structuredData={[
     buildBreadcrumbJsonLd([
       { name: 'Home', url: `${siteUrl}/` },
@@ -78,11 +98,12 @@ const itemListJsonLd = posts.length > 0
       <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_370px] gap-8 lg:gap-10">
         <!-- Main Content -->
         <div>
-          <p class="text-[13px] text-[#647089] mb-8">Showing results for blog</p>
+          <p class="text-[13px] text-[#647089] mb-8">Showing {firstResult}–{lastResult} of {total} articles</p>
           {posts.length > 0 ? (
             <div class="space-y-10">
               {posts.map((post, index) => (
                 <article class="group">
+                  {post.image?.trim() && (
                   <a href={`/blog/${post.slug}`} class="block relative overflow-hidden bg-[#f7f8fa]">
                     <Image
                       src={post.image}
@@ -99,7 +120,13 @@ const itemListJsonLd = posts.length > 0
                       </span>
                     )}
                   </a>
+                  )}
                   <div class="pt-5">
+                    {!post.image?.trim() && post.category && (
+                      <span class="mb-3 h-8 px-3 inline-flex items-center bg-orange text-white text-[11px] font-semibold uppercase tracking-wide">
+                        {post.category}
+                      </span>
+                    )}
                     <div class="flex items-center gap-5 text-[13px] text-[#58657f] mb-3">
                       <span class="flex items-center gap-1">
                         <!-- Calendar icon -->
@@ -133,6 +160,13 @@ const itemListJsonLd = posts.length > 0
           ) : (
             <div class="py-16 text-center text-[#6e7a92] bg-[#f4f5f7] border border-[#d5deea]">No blog posts found.</div>
           )}
+          {lastPage > 1 && (
+            <nav aria-label="Blog pagination" class="mt-10 flex flex-wrap items-center gap-3">
+              {page > 1 && <a href={blogPageUrl(page - 1)} rel="prev" class="border border-[#d1dbe8] px-4 py-2 text-primary hover:text-orange">Previous</a>}
+              <span class="text-sm text-[#58657f]">Page {page} of {lastPage}</span>
+              {page < lastPage && <a href={blogPageUrl(page + 1)} rel="next" class="border border-[#d1dbe8] px-4 py-2 text-primary hover:text-orange">Next</a>}
+            </nav>
+          )}
         </div>
 
         <!-- Sidebar -->
@@ -153,12 +187,27 @@ const itemListJsonLd = posts.length > 0
           <div>
             <h3 class="font-sans text-[16px] leading-none font-semibold text-primary mb-5">{t("blog_sidebar_categories", "Categories")}</h3>
             <ul class="space-y-2">
-              {categories.map((category) => (
+              {categories.filter(category => category.category).map((category) => (
                 <li>
-                  <span class="text-[15px] inline-flex items-center gap-2 text-primary hover:text-orange transition-colors cursor-pointer">
-                    <span class="text-[8px]">•</span>
-                    {category.category} ({category.count})
-                  </span>
+                  <form method="get" action="/blog">
+                    {(selectedCategories.includes(category.category)
+                      ? selectedCategories.filter(value => value !== category.category)
+                      : [...selectedCategories, category.category]
+                    ).map(value => <input type="hidden" name="category" value={value} />)}
+                    <button
+                      type="submit"
+                      aria-pressed={selectedCategories.includes(category.category)}
+                      class:list={[
+                        'w-full text-left text-[15px] inline-flex items-center gap-2 rounded px-2 py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange',
+                        selectedCategories.includes(category.category)
+                          ? 'bg-orange/10 text-orange font-semibold'
+                          : 'text-primary hover:text-orange hover:bg-orange/5',
+                      ]}
+                    >
+                      <span aria-hidden="true" class="text-[12px]">{selectedCategories.includes(category.category) ? '✓' : '•'}</span>
+                      {category.category} ({category.count})
+                    </button>
+                  </form>
                 </li>
               ))}
             </ul>
@@ -169,7 +218,9 @@ const itemListJsonLd = posts.length > 0
             <ul class="space-y-4">
               {recentPosts.map((post) => (
                 <li class="flex gap-3">
-                  <Image src={post.image} alt={post.title} width={80} height={80} loading="lazy" decoding="async" class="w-20 h-20 object-cover flex-shrink-0 bg-[#f7f8fa]" />
+                  {post.image?.trim() && (
+                    <Image src={post.image} alt={post.title} width={80} height={80} loading="lazy" decoding="async" class="w-20 h-20 object-cover flex-shrink-0 bg-[#f7f8fa]" />
+                  )}
                   <div>
                     <a href={`/blog/${post.slug}`} class="text-[15px] font-semibold text-orange hover:text-orange/80 transition-colors leading-snug">
                       {post.title}
