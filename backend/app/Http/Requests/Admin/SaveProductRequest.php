@@ -38,7 +38,8 @@ class SaveProductRequest extends FormRequest
             'variant_options' => 'nullable|array',
             'frontend_variant_layout' => 'nullable|string|in:default,selection_table',
             'selection_table_config' => 'nullable|array',
-            'price' => ['required', 'string', 'regex:/^\s*£?\s*\d+(?:,\d{3})*(?:\.\d{1,2})?\s*$/'],
+            'price_on_request' => 'boolean',
+            'price' => [$this->boolean('price_on_request') ? 'nullable' : 'required', 'string', 'regex:/^\s*£?\s*\d+(?:,\d{3})*(?:\.\d{1,2})?\s*$/'],
             'image' => 'nullable|string',
             'gallery' => 'nullable|array',
             'description' => 'nullable|string',
@@ -59,7 +60,7 @@ class SaveProductRequest extends FormRequest
             'ships_separately' => 'nullable|boolean',
             'freight_delivery_price' => 'nullable|numeric|min:0|max:9999.99',
             'specifications' => 'nullable|array',
-            'variants' => 'required|array|min:1',
+            'variants' => $this->boolean('price_on_request') ? 'nullable|array' : 'required|array|min:1',
             'variant_table_columns' => 'nullable|array',
         ];
     }

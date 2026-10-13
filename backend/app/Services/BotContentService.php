@@ -141,7 +141,9 @@ class BotContentService
         }
         $html .= ' &rsaquo; '.$e($product->name).'</nav>';
         $html .= '<h1>'.$e($product->name).'</h1>';
-        if ($price) {
+        if ($product->price_on_request) {
+            $html .= '<p><a href="'.$e($baseUrl.'/get-a-quote').'">Contact us for price</a></p>';
+        } elseif ($price) {
             $html .= '<p><strong>Price:</strong> &pound;'.$e($price).'</p>';
         }
         $html .= '<p><strong>Availability:</strong> '.$e($avail).'</p>';
@@ -170,7 +172,9 @@ class BotContentService
                 foreach ($related as $rel) {
                     $relUrl = $baseUrl.'/shop/'.($rel->slug ?: $rel->id);
                     $html .= '<li><a href="'.$e($relUrl).'">'.$e($rel->name).'</a>';
-                    if ($rel->price) {
+                    if ($rel->price_on_request) {
+                        $html .= ' &mdash; Contact us for price';
+                    } elseif ($rel->price) {
                         $rp = preg_replace('/[^\d.]/', '', (string) $rel->price);
                         $html .= ' &mdash; &pound;'.$e($rp);
                     }
@@ -244,7 +248,9 @@ class BotContentService
                 $price = preg_replace('/[^\d.]/', '', (string) $product->price);
                 $html .= '<li>';
                 $html .= '<a href="'.$e($pUrl).'"><strong>'.$e($product->name).'</strong></a>';
-                if ($price) {
+                if ($product->price_on_request) {
+                    $html .= ' &mdash; Contact us for price';
+                } elseif ($price) {
                     $html .= ' &mdash; &pound;'.$e($price);
                 }
                 if ($product->description) {
@@ -281,7 +287,9 @@ class BotContentService
                     $catUrl = $baseUrl.'/shop/category/'.$product->category->slug;
                     $html .= ' in <a href="'.$e($catUrl).'">'.$e($product->category->name).'</a>';
                 }
-                if ($price) {
+                if ($product->price_on_request) {
+                    $html .= ' &mdash; Contact us for price';
+                } elseif ($price) {
                     $html .= ' &mdash; &pound;'.$e($price);
                 }
                 if ($product->description) {
@@ -419,7 +427,9 @@ class BotContentService
                 $pUrl = $baseUrl.'/shop/'.($product->slug ?: $product->id);
                 $price = preg_replace('/[^\d.]/', '', (string) $product->price);
                 $html .= '<li><a href="'.$e($pUrl).'">'.$e($product->name).'</a>';
-                if ($price) {
+                if ($product->price_on_request) {
+                    $html .= ' &mdash; Contact us for price';
+                } elseif ($price) {
                     $html .= ' &mdash; &pound;'.$e($price);
                 }
                 $html .= '</li>';

@@ -11,6 +11,8 @@ import { $wishlist, removeFromWishlist } from "@/stores/wishlist";
 import { addToCart } from "@/stores/cart";
 import { apiFetch } from "@/lib/api";
 import { normalizeMediaUrl } from "@/lib/media";
+import { getStandardizedDisplayPrice, getProductQuoteUrl } from "@/lib/pricing";
+import type { Product } from "@/types/product";
 import withErrorBoundary from "@/lib/withErrorBoundary";
 import {
     Dialog,
@@ -132,6 +134,22 @@ function AccountIsland() {
         fetchCurrentCustomer();
     }, []);
 
+    const wishlistIds = wishlist.map((item) => String(item.id)).join(",");
+    useEffect(() => {
+        if (activeTab !== "wishlist" || !wishlistIds) return;
+        let cancelled = false;
+        Promise.allSettled(wishlistIds.split(",").map((id) => apiFetch<Product>(`/v1/products/${id}`)))
+            .then((results) => {
+                if (cancelled) return;
+                const products = new Map(results.flatMap((result) => result.status === "fulfilled" ? [[String(result.value.id), result.value] as const] : []));
+                $wishlist.set($wishlist.get().map((item) => {
+                    const product = products.get(String(item.id));
+                    return product ? { ...item, name: product.name, price: getStandardizedDisplayPrice(product), price_on_request: product.price_on_request, slug: product.slug, image: product.image } : item;
+                }));
+            });
+        return () => { cancelled = true; };
+    }, [activeTab, wishlistIds]);
+
     useEffect(() => {
         if (isLoading) {
             return;
@@ -238,19 +256,44 @@ function AccountIsland() {
         } catch { toast.error("Could not download invoice."); }
     };
 
-    const handleBuyAgain = (order: any) => {
+    const handleWishlistPurchase = async (productId: number | string) => {
+        try {
+            const product = await apiFetch<Product>(`/v1/products/${productId}`);
+            if (product.price_on_request) {
+                window.location.href = getProductQuoteUrl(product);
+                return;
+            }
+            if (product.variants?.length) {
+                window.location.href = `/shop/${product.slug}`;
+                return;
+            }
+            if (addToCart(product)) toast.success("Added to cart!");
+        } catch {
+            toast.error("This product is currently unavailable.");
+        }
+    };
+
+    const handleBuyAgain = async (order: any) => {
         if (!order.items || order.items.length === 0) return;
-        order.items.forEach((item: any) => {
-            addToCart({
-                id: item.product_id || item.id,
-                name: item.product_name,
-                price: item.product_price,
-                image: "",
-                qty: item.quantity,
-            }, item.quantity);
-        });
-        toast.success("Items added to cart!");
-        window.location.href = "/cart";
+        try {
+            const products = await Promise.all(order.items.map((item: any) => apiFetch<Product>(`/v1/products/${item.product_id || item.id}`)));
+            const quoteProduct = products.find((product) => product.price_on_request);
+            if (quoteProduct) {
+                toast.error(`${quoteProduct.name} now requires a quote. Please contact us for a price.`);
+                return;
+            }
+            let added = false;
+            products.forEach((product, index) => {
+                const item = order.items[index];
+                if (addToCart({ ...product, selected_variants: item.variant_details }, item.quantity)) added = true;
+            });
+            if (added) {
+                toast.success("Items added to cart!");
+                window.location.href = "/cart";
+            }
+        } catch {
+            toast.error("One or more products are currently unavailable.");
+        }
     };
 
     const handleOpenOrderRequestDialog = (order: any) => {
@@ -614,15 +657,16 @@ function AccountIsland() {
                                             )}
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-primary text-sm truncate">{item.name}</p>
-                                                <p className="text-orange font-bold text-sm">£{item.price}</p>
+                                                <p className="text-orange font-bold text-sm">{getStandardizedDisplayPrice(item)}</p>
                                             </div>
                                             <div className="flex flex-col gap-2">
                                                 <button
-                                                    onClick={() => { addToCart({ id: item.id, name: item.name, price: item.price, image: item.image, qty: 1 }); toast.success("Added to cart!"); }}
+                                                    onClick={() => handleWishlistPurchase(item.id)}
                                                     className="p-2 bg-orange text-white hover:bg-orange-hover transition-colors"
-                                                    title="Add to Cart"
+                                                    title={item.price_on_request ? "Request a quote" : "Add to Cart"}
+                                                    aria-label={item.price_on_request ? `Request a quote for ${item.name}` : `Add ${item.name} to cart`}
                                                 >
-                                                    <ShoppingCart className="w-4 h-4" />
+                                                    {item.price_on_request ? <MessageSquare className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
                                                 </button>
                                                 <button
                                                     onClick={() => removeFromWishlist(item.id)}

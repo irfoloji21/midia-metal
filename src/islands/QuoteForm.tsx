@@ -24,6 +24,20 @@ const QuoteForm = () => {
     const update = (field: string, val: string) => setForm({ ...form, [field]: val });
 
     useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const productName = params.get("product")?.slice(0, 255);
+        if (!productName) return;
+        const productId = params.get("product_id")?.slice(0, 30);
+        const options = params.get("options")?.slice(0, 1500);
+        const description = [
+            `I'd like a quote for ${productName}${productId ? ` (SKU: ${productId})` : ""}.`,
+            options ? `Selected options: ${options}` : "",
+            "", "My requirements: ",
+        ].filter((line, index) => line || index > 1).join("\n");
+        setForm((prev) => ({ ...prev, description: prev.description || description }));
+    }, []);
+
+    useEffect(() => {
         if (!customer) return;
 
         setForm((prev) => ({

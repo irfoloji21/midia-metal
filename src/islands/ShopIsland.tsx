@@ -187,7 +187,9 @@ export default function ShopIsland({
 
       fetchedProducts = fetchedProducts.filter((p: any) => {
         const price = parsePriceValue(getStandardizedDisplayPrice(p));
-        const matchesPrice = price >= priceRange[0] && price <= priceRange[1];
+        const matchesPrice = p.price_on_request
+          ? priceRange[0] === DEFAULT_PRICE_RANGE[0] && priceRange[1] === DEFAULT_PRICE_RANGE[1]
+          : price >= priceRange[0] && price <= priceRange[1];
         const matchesStock = !inStockOnly || !p.track_stock || Number(getAvailableStock(p) ?? 0) > 0;
         return matchesPrice && matchesStock;
       });
@@ -197,6 +199,11 @@ export default function ShopIsland({
       fetchedProducts = fetchedProducts.filter((product: any) => matchesVariantFilters(product, selectedVariantFilters));
 
       fetchedProducts.sort((a: any, b: any) => {
+        if (sortBy === "price-low" || sortBy === "price-high") {
+          const requestOrder = Number(Boolean(a.price_on_request)) - Number(Boolean(b.price_on_request));
+          if (requestOrder) return requestOrder;
+          if (a.price_on_request && b.price_on_request) return 0;
+        }
         const priceA = parsePriceValue(getStandardizedDisplayPrice(a));
         const priceB = parsePriceValue(getStandardizedDisplayPrice(b));
         if (sortBy === "price-low") return priceA - priceB;

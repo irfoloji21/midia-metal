@@ -1,0 +1,112 @@
+{
+  "tool": "Built-in image_gen",
+  "style": "Use case: product-mockup. Create one exceptionally realistic commercial product photograph for a British metal fabrication catalogue. Square framing, entire product in frame with 10 percent clear margin, three-quarter front view at natural height, straight verticals, 70mm lens feel. A consistent quiet fabrication workshop photo bay: light grey plaster wall, clean pale grey concrete floor, soft daylight from a large window to camera left. No people, tools, decoration, text, lettering, logos, watermarks or collage. Genuine brushed stainless steel grain, folded edges, believable TIG welded joints, subtle handling marks, realistic metal reflections and contact shadows; looks photographed, not CGI. Every support, fastener and joint physically plausible. Small parts sit flat on a matte grey bench in the same photo bay.",
+  "images": [
+    {"file":"public/images/products/cutting-disc.webp","subject":"Close product photograph of ONE thin black resin-bonded abrasive metal cut-off disc resting flat on the grey bench, viewed at a slight angle. Uniform unbroken circular outer edge, one round steel-reinforced central mounting hole, clearly thin flat disc, subtle woven fibreglass texture on dark surface. Absolutely no saw teeth, no silver saw blade, no machine, no print or logo. Representative unbranded workshop consumable."},
+    {
+      "file": "public/images/products/prep-table.webp",
+      "subject": "One stainless steel commercial preparation table, rectangular top with small folded edge, four straight square tubular legs, flat full-width undershelf welded between the four legs, all four adjustable feet on the floor. No rear upstand, no drawers."
+    },
+    {
+      "file": "public/images/products/cabinet-workbench.webp",
+      "subject": "One stainless steel kitchen workbench with a flat top and short rear upstand, two sliding cabinet doors in parallel tracks with simple recessed pulls, four short adjustable feet, seamless closed sides. No sink."
+    },
+    {
+      "file": "public/images/products/sink-unit.webp",
+      "subject": "One commercial stainless steel single deep rectangular bowl sink unit, bowl on left and ribbed drainer on right, rear upstand, four straight tubular legs with low cross-bracing. One drain in bowl, no tap installed, no floating plumbing."
+    },
+    {
+      "file": "public/images/products/wall-shelf.webp",
+      "subject": "One simple single-tier stainless steel wall shelf fixed to the grey wall with two clearly connected triangular stainless brackets and four visible mounting screws, short rear lip, clean rectangular shelf. Entire assembly visible."
+    },
+    {
+      "file": "public/images/products/storage-rack.webp",
+      "subject": "One freestanding stainless steel storage rack with exactly four flat shelves and four continuous square corner uprights terminating in four adjustable feet. All shelves square, parallel and fully supported. Empty shelves."
+    },
+    {
+      "file": "public/images/products/wall-cupboard.webp",
+      "subject": "One stainless steel wall-mounted cupboard with two hinged flush doors, simple vertical stainless handles, rectangular enclosed carcass with no worktop or legs. Fixed naturally to grey wall, entire unit visible."
+    },
+    {
+      "file": "public/images/products/drawer-unit.webp",
+      "subject": "One freestanding stainless steel undercounter cabinet with exactly three equal-width stacked closed drawers, recessed horizontal pulls, flat top and four short adjustable feet. Crisp parallel drawer gaps."
+    },
+    {
+      "file": "public/images/products/worktop.webp",
+      "subject": "One separate made-to-measure stainless steel rectangular worktop with folded-down front and side edges and a short rear upstand. Supported flat on two simple dark workshop trestles, all supports visible. No cupboards, sink or tools."
+    },
+    {
+      "file": "public/images/products/bbq-grill.webp",
+      "subject": "One unlit rectangular commercial charcoal grill fabricated in stainless steel, heavy straight grilling rods across a deep charcoal trough, removable ash tray with handle underneath, four square steel legs and low cross braces. No gas controls, no flame, no food, no hood."
+    },
+    {
+      "file": "public/images/products/ductwork.webp",
+      "subject": "One realistic rectangular galvanized steel ventilation duct elbow standing on its broad flat end on the floor, with clean folded corner seams and matching rectangular flanged openings, physically coherent 90 degree bend. No fan, wires or disconnected floating parts."
+    },
+    {
+      "file": "public/images/products/table-frame.webp",
+      "subject": "One welded mild steel dining table frame with satin black finish, rectangular top perimeter frame with open centre, four straight square tube legs, simple clean welded joints. No wooden tabletop, no extra legs. Whole frame on floor."
+    },
+    {
+      "file": "public/images/products/metal-gate.webp",
+      "subject": "One single pedestrian steel gate hung between two short sturdy posts anchored to the floor, satin charcoal black finish, simple evenly spaced vertical bars inside a rectangular frame, two plausible hinges on left post and latch on right. No decorative scrolls."
+    },
+    {
+      "file": "public/images/products/railings.webp",
+      "subject": "One straight fabricated steel railing panel with matte black finish, two sturdy end posts on rectangular base plates anchored to floor, straight top and bottom rails with evenly spaced vertical infill bars. Entire single panel, no stairs, no additional railings."
+    },
+    {
+      "file": "public/images/products/handrail.webp",
+      "subject": "One straight brushed stainless steel tubular handrail fixed horizontally to the grey wall by three physically connected wall brackets, closed rounded ends, screws on round wall plates. Entire rail with generous margin, no stairs."
+    },
+    {
+      "file": "public/images/products/castor.webp",
+      "subject": "Close product photograph of ONE heavy-duty swivel castor standing naturally on its grey polyurethane wheel, steel pressed fork connected to swivel bearing and flat rectangular four-hole top mounting plate, a small believable brake pedal. Side three-quarter view clearly shows axle nut through fork and wheel, no impossible extra axles or floating wheel."
+    },
+    {
+      "file": "public/images/products/equipment-leg.webp",
+      "subject": "Close product photograph of ONE adjustable stainless steel equipment leg resting horizontally on a matte grey bench. Square four-hole mounting plate firmly welded to tubular leg at left, black circular levelling foot threaded concentrically into right end. Complete simple mechanically coherent leg, no extra objects."
+    },
+    {
+      "file": "public/images/products/bracket.webp",
+      "subject": "Close product photograph of ONE thick stainless steel right-angle mounting bracket lying naturally on one flange on a grey bench, two evenly spaced round mounting holes in each flange, clean 90-degree bend, deburred edges, fine brushed grain. No hardware or extra components."
+    },
+    {
+      "file": "public/images/products/enclosure.webp",
+      "subject": "One simple rectangular brushed stainless steel sheet metal equipment enclosure standing on floor, closed front door with two real hinges on left and single small quarter-turn latch on right, folded seams, no electronics, cables, ventilation holes or text."
+    },
+    {
+      "file": "public/images/products/filter-tank.webp",
+      "subject": "One tall narrow rectangular stainless steel grease filter soaking tank, floor-standing, with flat removable lid placed flat beside it, open top showing one rectangular mesh filter resting vertically INSIDE the tank and physically supported by tank. Small simple drain valve low on front. No chemicals, labels or people."
+    },
+    {
+      "file": "public/images/products/led-bar.webp",
+      "subject": "Close realistic photograph of one slim linear LED canopy light bar resting diagonally on grey bench, brushed metal housing and one continuous frosted diffuser, two small mounting tabs, unlit, short cable with sealed exit. No plug, labels, electric sparks or glow."
+    },
+    {
+      "file": "public/images/products/sealed-led.webp",
+      "subject": "One compact rectangular sealed LED light fitting resting on grey bench, brushed metal rectangular frame, opaque frosted diffuser, four corner screws and perimeter gasket visible, short cable through side gland, unlit, no ratings labels."
+    },
+    {
+      "file": "public/images/products/led-pack.webp",
+      "subject": "Two matching slim commercial LED light bars laid neatly side by side on grey bench, each with straight brushed metal housing and frosted diffuser, physically connected small end mounting tabs, short separate cables. Unlit, no loose brackets or labels."
+    },
+    {
+      "file": "public/images/products/mesh-filter.webp",
+      "subject": "One rectangular stainless steel mesh grease filter leaning slightly back against grey wall with bottom edge resting on grey bench, folded perimeter frame, fine layered woven metal mesh clearly visible across flat face, one small pull handle correctly attached. No fan, baffles or text."
+    },
+    {
+      "file": "public/images/products/wall-canopy.webp",
+      "subject": "One wall-mounted stainless steel commercial kitchen extraction canopy, rectangular wide body with sloping front fascia, clearly visible row of stainless baffle filters underneath and short round duct collar on top, attached to grey wall at realistic height. Entire hood visible, no cooker, lights or fan motor."
+    },
+    {
+      "file": "public/images/products/island-canopy.webp",
+      "subject": "One stainless steel island extraction canopy suspended horizontally by four straight steel rods visibly continuing upward out of frame, symmetrical sloping fascia on both long sides and row of baffle filters underneath, one round duct collar on top. Physically plausible and entire hood visible. Empty grey workshop background."
+    },
+    {
+      "file": "public/images/products/cladding-panel.webp",
+      "subject": "One large flat rectangular brushed stainless steel wall cladding sheet fixed to grey wall, subtle clean folded edges and fine consistent vertical brushed grain. Entire sheet visible with clear grey margin, genuine planar metal, not a mirror, no fixtures or text."
+    }
+  ],
+  "notes": "Generated illustrative product images, not photographs of completed Midia M Metal projects. New product prices are temporary local demonstration values and must be reviewed before production."
+}

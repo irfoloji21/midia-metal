@@ -6,6 +6,7 @@
 import { atom, computed } from 'nanostores';
 
 export interface WishlistItem {
+  price_on_request?: boolean;
   id: number | string;
   name: string;
   price: string | number;

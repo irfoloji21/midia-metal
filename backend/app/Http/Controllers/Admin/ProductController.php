@@ -36,7 +36,7 @@ class ProductController extends Controller
         $validated = $request->validated();
 
         $validated['description'] = HtmlSanitizer::richText($validated['description'] ?? null);
-        $validated['price'] = $this->normalizeMoneyValue($validated['price'], 'price');
+        $validated['price'] = $this->normalizeMoneyValue($validated['price'] ?? null, 'price') ?? '';
         $validated['old_price'] = $this->normalizeMoneyValue($validated['old_price'] ?? null, 'old_price');
         $validated['image'] = trim((string) ($validated['image'] ?? ''));
         $validated['stock_quantity'] = max(0, (int) ($validated['stock_quantity'] ?? 0));
@@ -57,6 +57,7 @@ class ProductController extends Controller
             $validated['variant_mode'],
             $validated['variant_options'] ?? null,
             $validated['variants'] ?? null,
+            (bool) ($validated['price_on_request'] ?? false),
         );
         $validated['selection_table_config'] = $this->normalizeSelectionTableConfig(
             $validated['selection_table_config'] ?? null,
@@ -82,7 +83,7 @@ class ProductController extends Controller
         $validated = $request->validated();
 
         $validated['description'] = HtmlSanitizer::richText($validated['description'] ?? null);
-        $validated['price'] = $this->normalizeMoneyValue($validated['price'], 'price');
+        $validated['price'] = $this->normalizeMoneyValue($validated['price'] ?? null, 'price') ?? '';
         $validated['old_price'] = $this->normalizeMoneyValue($validated['old_price'] ?? null, 'old_price');
         $validated['image'] = trim((string) ($validated['image'] ?? ''));
         $validated['stock_quantity'] = max(0, (int) ($validated['stock_quantity'] ?? 0));
@@ -104,6 +105,7 @@ class ProductController extends Controller
             $validated['variant_mode'],
             $validated['variant_options'] ?? null,
             $validated['variants'] ?? null,
+            (bool) ($validated['price_on_request'] ?? false),
         );
         $validated['selection_table_config'] = $this->normalizeSelectionTableConfig(
             $validated['selection_table_config'] ?? $product->selection_table_config ?? null,
@@ -628,9 +630,9 @@ class ProductController extends Controller
         return '£'.number_format((float) $normalized, 2, '.', '');
     }
 
-    private function assertValidCombinationSetup(string $variantMode, ?array $variantOptions, ?array $variants): void
+    private function assertValidCombinationSetup(string $variantMode, ?array $variantOptions, ?array $variants, bool $priceOnRequest = false): void
     {
-        if ($variantMode !== 'combination') {
+        if ($variantMode !== 'combination' || $priceOnRequest) {
             return;
         }
 
@@ -666,7 +668,7 @@ class ProductController extends Controller
             })
             ->filter();
 
-        if ($prices->isNotEmpty()) {
+        if ($prices->isNotEmpty() && ! ($validated['price_on_request'] ?? false)) {
             $validated['price'] = $prices->sortBy('value')->first()['display'];
         }
 

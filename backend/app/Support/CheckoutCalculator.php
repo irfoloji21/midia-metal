@@ -52,6 +52,12 @@ class CheckoutCalculator
                 ]);
             }
 
+            if ($product->price_on_request) {
+                throw ValidationException::withMessages([
+                    "items.$index.product_id" => ["Please contact us for a price for {$product->name}. This product cannot be purchased online."],
+                ]);
+            }
+
             if (($product->variants === null || count($product->variants) === 0)
                 && $product->track_stock
                 && $product->stock_quantity !== null

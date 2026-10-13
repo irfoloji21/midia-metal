@@ -119,14 +119,14 @@ export function buildProductJsonLd({
   image?: string;
   sku?: string;
   url: string;
-  price: string | number;
+  price: string | number | null;
   priceCurrency?: string;
   availability?: string;
   brand?: string;
   ratingValue?: number;
   reviewCount?: number;
 }) {
-  const numericPrice = priceToNumber(price);
+  const numericPrice = price === null ? null : priceToNumber(price);
   const jsonLd: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -135,14 +135,14 @@ export function buildProductJsonLd({
     ...(image ? { image } : {}),
     ...(sku ? { sku } : {}),
     brand: { "@type": "Brand", name: brand },
-    offers: {
+    ...(numericPrice !== null ? { offers: {
       "@type": "Offer",
       url,
       priceCurrency,
-      price: numericPrice !== null ? numericPrice.toFixed(2) : "0.00",
+      price: numericPrice.toFixed(2),
       availability,
       seller: { "@type": "Organization", name: DEFAULT_SITE_NAME },
-    },
+    } } : {}),
   };
 
   if (ratingValue && reviewCount && reviewCount > 0) {

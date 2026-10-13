@@ -24,7 +24,7 @@ import { $customer } from "@/stores/auth";
 import { toast } from "sonner";
 import Breadcrumb from "@/components/Breadcrumb";
 import SelectionTableSection from "@/components/product/SelectionTableSection";
-import { formatMoneyValue, resolveSelectedVariantUnitPrice, getStandardizedDisplayPrice, getStandardizedDisplayTitle, shouldShowOldPrice } from "@/lib/pricing";
+import { formatMoneyValue, resolveSelectedVariantUnitPrice, getStandardizedDisplayPrice, getStandardizedDisplayTitle, shouldShowOldPrice, PRICE_ON_REQUEST_LABEL, getProductQuoteUrl } from "@/lib/pricing";
 import { getAvailableStock, MAX_ORDER_QUANTITY } from "@/lib/stock";
 import {
   buildVariantSizeSummary,
@@ -291,7 +291,8 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   const selectionTableConfig = normalizeSelectionTableConfig(product?.selection_table_config, variantOptions, product?.variants || [], selectionTableSourceKeys);
   const selectionTableTabs = getSelectionTableTabValues(selectionTableConfig, product?.variants || []);
   const isSelectionTableMode = (
-    frontendVariantLayout === "selection_table"
+    !product?.price_on_request
+    && frontendVariantLayout === "selection_table"
     && isCombinationMode
     && Boolean(selectionTableConfig.tab_option)
     && selectionTableTabs.length > 0
@@ -351,7 +352,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
 
     switch (columnKey) {
       case "price":
-        return formatMoneyValue(variant?.price ?? selectedUnitPrice ?? product?.price ?? "");
+        return product?.price_on_request ? PRICE_ON_REQUEST_LABEL : formatMoneyValue(variant?.price ?? selectedUnitPrice ?? product?.price ?? "");
       case "stock": {
         const stockValue = variant?.stock ?? product?.stock_quantity;
         return stockValue === null || stockValue === undefined || stockValue === ""
@@ -653,6 +654,10 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   };
 
   const handlePurchaseAction = (mode: "add_to_basket" | "buy_now") => {
+    if (product.price_on_request) {
+      window.location.href = getProductQuoteUrl(product, selectedVariants);
+      return;
+    }
     const missingOptions = variantOptions
       .filter((option) => !selectedVariants[option]?.value)
       .map((option) => formatVariantOptionLabel(option));
@@ -825,7 +830,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                     removeFromWishlist(product.id);
                     toast.success("Removed from wishlist");
                   } else {
-                    addToWishlist({ id: product.id, name: product.name, price: product.price, image: normalizeMediaUrl(product.image) });
+                    addToWishlist({ id: product.id, name: product.name, price: product.price, price_on_request: product.price_on_request, slug: product.slug, image: normalizeMediaUrl(product.image) });
                     toast.success("Added to wishlist!");
                   }
                 }}
@@ -837,23 +842,32 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
             </div>
             <div className="flex items-baseline gap-3 mt-3 mb-3">
               <p className="text-orange text-[28px] md:text-[34px] leading-none font-medium">
-                {formatMoneyValue(displayedTotalPrice)}
+                {product.price_on_request ? PRICE_ON_REQUEST_LABEL : formatMoneyValue(displayedTotalPrice)}
               </p>
-              {qty > 1 && (
+              {!product.price_on_request && qty > 1 && (
                 <p className="text-[#6e7a92] text-[13px] md:text-[15px] font-medium">
                   {formatMoneyValue(displayedUnitPrice)} each
                 </p>
               )}
-              {shouldShowOldPrice(product.old_price, displayedUnitPrice) && (
+              {!product.price_on_request && shouldShowOldPrice(product.old_price, displayedUnitPrice) && (
                 <p className="text-[#9aa6bc] text-[20px] md:text-[24px] line-through font-normal">
                   {product.old_price}
                 </p>
               )}
             </div>
-            <p className="mb-3 text-[12px] font-medium uppercase tracking-wide text-[#6e7a92]">VAT included</p>
+            {product.price_on_request ? (
+              <p className="mb-4 text-sm text-[#6e7a92]">Price depends on the size, material and details of your job. Tell us what you need and we’ll prepare a quote.</p>
+            ) : (
+              <p className="mb-3 text-[12px] font-medium uppercase tracking-wide text-[#6e7a92]">VAT included</p>
+            )}
 
             <div className="flex items-center gap-3 flex-wrap mb-3">
-              {!isSelectionTableMode && (
+              {product.price_on_request && (
+                <a href={getProductQuoteUrl(product, selectedVariants)} className="min-h-[50px] px-8 py-3 bg-orange text-white text-sm font-semibold inline-flex items-center hover:bg-orange-hover transition-colors">
+                  Request a quote
+                </a>
+              )}
+              {!product.price_on_request && !isSelectionTableMode && (
                 <>
                   <div>
                     <div className="w-[118px] h-[50px] border border-[#cad4e4] flex items-center px-5 bg-[#eaf0f3]">
@@ -904,7 +918,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
               )}
 
             </div>
-            {!isSelectionTableMode && (
+            {!product.price_on_request && !isSelectionTableMode && (
               <p className="mb-8 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#6e7a92]">
                 {stockLabel}
               </p>

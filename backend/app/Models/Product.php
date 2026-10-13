@@ -20,6 +20,7 @@ class Product extends Model
         'frontend_variant_layout',
         'selection_table_config',
         'price',
+        'price_on_request',
         'old_price',
         'image',
         'gallery',
@@ -45,6 +46,7 @@ class Product extends Model
     ];
 
     protected $casts = [
+        'price_on_request' => 'boolean',
         'show_variant_in_title' => 'boolean',
         'variant_options' => 'array',
         'selection_table_config' => 'array',

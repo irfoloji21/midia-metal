@@ -93,6 +93,10 @@ async function showToast(message: string, type: 'success' | 'error' = 'error') {
 }
 
 export function addToCart(product: AddToCartProduct, quantity: number = 1) {
+  if (product.price_on_request) {
+    showToast(`Please contact us for a price for ${product.name}.`);
+    return false;
+  }
   const cart = $cart.get();
 
   // Build unique ID from product + variant selection
@@ -106,7 +110,7 @@ export function addToCart(product: AddToCartProduct, quantity: number = 1) {
 
   if (availableStock !== null && availableStock <= 0) {
     showToast(`${product.name} is out of stock.`);
-    return;
+    return false;
   }
 
   const existing = cart.find((item) => item.id === uniqueId);
@@ -135,7 +139,7 @@ export function addToCart(product: AddToCartProduct, quantity: number = 1) {
           : item
       )
     );
-    return;
+    return true;
   }
 
   // New item
@@ -161,6 +165,7 @@ export function addToCart(product: AddToCartProduct, quantity: number = 1) {
       available_stock: availableStock,
     },
   ]);
+  return true;
 }
 
 export function removeFromCart(id: number | string) {
@@ -219,13 +224,13 @@ export function setIsBusiness(value: boolean) {
 
 // --- Initialization ---
 
-/** Hydrate stock data for cart items missing it. Call once on app load. */
+/** Refresh stock and purchasing availability once per product on app load. */
 const hydratedProductIds = new Set<string>();
 
 export async function hydrateCartStock() {
   const cart = $cart.get();
   const itemsMissingStock = cart.filter(
-    (item) => item.available_stock === undefined && !hydratedProductIds.has(String(item.product_id))
+    (item) => !hydratedProductIds.has(String(item.product_id))
   );
   if (itemsMissingStock.length === 0) return;
 
@@ -233,16 +238,22 @@ export async function hydrateCartStock() {
   uniqueProductIds.forEach((id) => hydratedProductIds.add(String(id)));
 
   try {
-    const products = await Promise.all(
+    const results = await Promise.allSettled(
       uniqueProductIds.map((productId) => apiFetch<Record<string, unknown>>(`/v1/products/${productId}`))
     );
-
+    const products = results.flatMap((result, index) => {
+      if (result.status === 'fulfilled') return [result.value];
+      hydratedProductIds.delete(String(uniqueProductIds[index]));
+      return [];
+    });
     const byId = new Map(products.map((product) => [String(product.id), product]));
+    const quoteOnlyItems = $cart.get().filter((item) => byId.get(String(item.product_id))?.price_on_request);
+    if (quoteOnlyItems.length > 0) {
+      showToast(`${[...new Set(quoteOnlyItems.map((item) => item.name))].join(', ')} now requires a quote and has been removed from your basket. Please contact us for a price.`);
+    }
 
     $cart.set(
-      $cart.get().map((item) => {
-        if (item.available_stock !== undefined) return item;
-
+      $cart.get().filter((item) => !byId.get(String(item.product_id))?.price_on_request).map((item) => {
         const product = byId.get(String(item.product_id));
         if (!product) return item;
 

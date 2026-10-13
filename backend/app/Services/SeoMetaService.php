@@ -287,7 +287,9 @@ class SeoMetaService
             '<h1>'.$escape($p['name']).'</h1>',
             '<p>'.$escape($p['description']).'</p>',
         ];
-        if ($p['price']) {
+        if ($p['price_on_request'] ?? false) {
+            $lines[] = '<p>Contact us for price</p>';
+        } elseif ($p['price']) {
             $lines[] = '<p>Price: &pound;'.$escape($p['price']).' GBP</p>';
         }
         if ($p['availability']) {
@@ -484,7 +486,7 @@ class SeoMetaService
                         '@type' => 'Brand',
                         'name' => $siteName,
                     ],
-                    'offers' => [
+                    ...($product->price_on_request ? [] : ['offers' => [
                         '@type' => 'Offer',
                         'url' => $canonicalUrl,
                         'priceCurrency' => 'GBP',
@@ -494,10 +496,11 @@ class SeoMetaService
                             '@type' => 'Organization',
                             'name' => $siteName,
                         ],
-                    ],
+                    ]]),
                 ],
             ];
             $meta['_product_noscript'] = [
+                'price_on_request' => $product->price_on_request,
                 'name' => $product->name,
                 'description' => $this->normalizeText($product->description ?: $product->name, 300),
                 'price' => preg_replace('/[^\d.]/', '', (string) $product->price),

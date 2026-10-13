@@ -1,5 +1,18 @@
 import { buildVariantSizeSummary, findMatchingCombinationVariant, getProductVariantMode, getVariantAttributes, getVariantOptionNames, resolveSelectedVariantRecord } from "@/lib/variants";
 
+export const PRICE_ON_REQUEST_LABEL = "Contact us for price";
+
+export const getProductQuoteUrl = (product: { name: string; id?: number | string }, selectedVariants?: Record<string, any> | null): string => {
+  const options = Object.entries(selectedVariants || {})
+    .filter(([, selection]) => selection?.value)
+    .map(([option, selection]) => `${option}: ${selection.value}`)
+    .join(", ");
+  const params = new URLSearchParams({ product: product.name });
+  if (product.id !== undefined) params.set("product_id", String(product.id));
+  if (options) params.set("options", options);
+  return `/get-a-quote?${params.toString()}`;
+};
+
 export const parseMoneyValue = (value: unknown): number | null => {
   if (typeof value === "number" && Number.isFinite(value)) {
     return Math.round(value * 100) / 100;
@@ -23,8 +36,9 @@ export const shouldShowOldPrice = (oldPrice: unknown, currentPrice: unknown): bo
 export const resolveSelectedVariantUnitPrice = (
   basePrice: unknown,
   selectedVariants?: Record<string, any> | null,
-  productOrVariants?: { variant_mode?: unknown; variant_options?: unknown; variants?: Array<Record<string, any>> | null } | Array<Record<string, any>> | null,
+  productOrVariants?: { price_on_request?: boolean; variant_mode?: unknown; variant_options?: unknown; variants?: Array<Record<string, any>> | null } | Array<Record<string, any>> | null,
 ): number | null => {
+  if (!Array.isArray(productOrVariants) && productOrVariants?.price_on_request) return null;
   const base = parseMoneyValue(basePrice);
   const resolvedVariant = Array.isArray(productOrVariants)
     ? null
@@ -77,6 +91,7 @@ export const resolveSelectedVariantUnitPrice = (
 
 export const getStandardizedDisplayPrice = (product: any): string => {
   if (!product) return "£0.00";
+  if (product.price_on_request) return PRICE_ON_REQUEST_LABEL;
   
   const base = parseMoneyValue(product.price);
   

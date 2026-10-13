@@ -81,12 +81,19 @@ if (selectedTags.length > 0) {
 
 filteredProducts = filteredProducts.filter((product: any) => {
   const price = parsePriceValue(getStandardizedDisplayPrice(product));
-  const matchesPrice = price >= minPrice && price <= maxPrice;
+  const matchesPrice = product.price_on_request
+    ? minPrice === DEFAULT_PRICE_RANGE[0] && maxPrice === DEFAULT_PRICE_RANGE[1]
+    : price >= minPrice && price <= maxPrice;
   const matchesStock = !inStockOnly || !product.track_stock || Number(getAvailableStock(product) ?? 0) > 0;
   return matchesPrice && matchesStock;
 });
 
 filteredProducts = filteredProducts.slice().sort((a: any, b: any) => {
+  if (sortBy === 'price-low' || sortBy === 'price-high') {
+    const requestOrder = Number(Boolean(a.price_on_request)) - Number(Boolean(b.price_on_request));
+    if (requestOrder) return requestOrder;
+    if (a.price_on_request && b.price_on_request) return 0;
+  }
   const priceA = parsePriceValue(getStandardizedDisplayPrice(a));
   const priceB = parsePriceValue(getStandardizedDisplayPrice(b));
   if (sortBy === 'price-low') return priceA - priceB;

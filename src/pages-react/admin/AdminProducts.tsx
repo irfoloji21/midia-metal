@@ -97,7 +97,7 @@ export default function AdminProducts() {
     const [maxPrice, setMaxPrice] = useState("");
     const { sort, toggleSort } = useTableSort("name");
     const oldPriceValue = parseMoneyValue(currentProduct?.old_price);
-    const hasPriceAboveOldPrice = oldPriceValue !== null && [
+    const hasPriceAboveOldPrice = !currentProduct?.price_on_request && oldPriceValue !== null && [
         currentProduct?.price,
         ...(currentProduct?.variants || []).map((variant: any) => variant?.price),
     ].some((price) => {
@@ -232,6 +232,7 @@ export default function AdminProducts() {
                 frontend_variant_layout: "default" satisfies FrontendVariantLayout,
                 selection_table_config: null,
                 price: "",
+                price_on_request: false,
                 old_price: "",
                 image: "",
                 gallery: [],
@@ -295,7 +296,7 @@ export default function AdminProducts() {
             finalProduct.tags = tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean);
             finalProduct.product_code = String(finalProduct.product_code ?? "").trim() || null;
 
-            if (!String(finalProduct.price ?? "").trim()) {
+            if (!finalProduct.price_on_request && !String(finalProduct.price ?? "").trim()) {
                 const firstVariantPrice = (finalProduct.variants || []).find((variant: any) => String(variant?.price ?? "").trim())?.price;
                 if (firstVariantPrice) {
                     finalProduct.price = firstVariantPrice;
@@ -321,7 +322,7 @@ export default function AdminProducts() {
                     finalProduct.variant_options.every((optionName: string) => String(variant?.attributes?.[optionName] ?? "").trim())
                 ));
 
-                if ((finalProduct.variant_options.length > 0 ? completeCombinationRows : (finalProduct.variants || [])).length === 0) {
+                if (!finalProduct.price_on_request && (finalProduct.variant_options.length > 0 ? completeCombinationRows : (finalProduct.variants || [])).length === 0) {
                     toast.error("Add at least one sellable combination row before saving.");
                     return;
                 }
@@ -354,7 +355,7 @@ export default function AdminProducts() {
                 finalProduct.selection_table_config = null;
                 finalProduct.variants = mapVariantsForStorage(finalProduct.variants || [], finalProduct.price || "");
 
-                if ((finalProduct.variants || []).length === 0) {
+                if (!finalProduct.price_on_request && (finalProduct.variants || []).length === 0) {
                     toast.error("Add at least one simple option row before saving.");
                     return;
                 }
@@ -395,7 +396,7 @@ export default function AdminProducts() {
         .filter((p) => {
             const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = categoryFilter === "all" || p.product_category_id?.toString() === categoryFilter;
-            const price = Number.parseFloat(String(p.price ?? "").replace(/[£,]/g, "").trim());
+            const price = p.price_on_request ? NaN : Number.parseFloat(String(p.price ?? "").replace(/[£,]/g, "").trim());
             const min = minPrice.trim() === "" ? null : Number(minPrice);
             const max = maxPrice.trim() === "" ? null : Number(maxPrice);
             const matchesPrice = Number.isFinite(price)
@@ -1106,6 +1107,7 @@ export default function AdminProducts() {
                     <input
                         type="text"
                         value={variant.price ?? ""}
+                        disabled={Boolean(currentProduct?.price_on_request)}
                         onChange={(event) => updateSizeVariantField(index, "price", event.target.value)}
                         className={`w-16 ${baseInputClass}`}
                         placeholder={currentProduct?.price || "£0.00"}
@@ -1231,6 +1233,7 @@ export default function AdminProducts() {
                     <input
                         type="text"
                         value={newSizeVariant.price}
+                        disabled={Boolean(currentProduct?.price_on_request)}
                         onChange={(event) => setNewSizeVariant((prev) => ({ ...prev, price: event.target.value }))}
                         className={`w-16 ${baseInputClass}`}
                         placeholder={currentProduct?.price || "£0.00"}
@@ -1455,7 +1458,7 @@ export default function AdminProducts() {
                                         {product.category?.name || "N/A"}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {product.price}
+                                        {product.price_on_request ? "Contact us for price" : product.price}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -1537,10 +1540,26 @@ export default function AdminProducts() {
                                         </label>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Price</label>
+                                        <label className="block text-sm font-medium text-gray-700" htmlFor="product-price">Price</label>
+                                        <label className="mt-2 flex items-center gap-2 text-sm text-gray-700">
+                                            <input
+                                                type="checkbox"
+                                                checked={Boolean(currentProduct.price_on_request)}
+                                                onChange={(e) => setCurrentProduct({ ...currentProduct, price_on_request: e.target.checked })}
+                                                className="rounded border-gray-300 text-orange focus:ring-orange"
+                                            />
+                                            Contact us for price
+                                        </label>
+                                        {currentProduct.price_on_request && (
+                                            <p className="mt-2 text-sm text-gray-500">
+                                                Customers will see “Contact us for price” and can request a quote instead of buying online. No price is required. Any saved prices are kept but hidden from customers.
+                                            </p>
+                                        )}
                                         <input
+                                            id="product-price"
                                             type="text"
-                                            required
+                                            required={!currentProduct.price_on_request}
+                                            disabled={Boolean(currentProduct.price_on_request)}
                                             value={currentProduct.price}
                                             onChange={(e) => setCurrentProduct({ ...currentProduct, price: e.target.value })}
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
@@ -1551,6 +1570,7 @@ export default function AdminProducts() {
                                         <input
                                             type="text"
                                             value={currentProduct.old_price || ""}
+                                            disabled={Boolean(currentProduct.price_on_request)}
                                             onChange={(e) => setCurrentProduct({ ...currentProduct, old_price: e.target.value })}
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                                         />
@@ -2033,7 +2053,7 @@ export default function AdminProducts() {
                                                                                             {visibleCombinationCustomColumns.map((column) => (
                                                                                                 <td key={column.key} className="px-2 py-2">{renderCombinationCustomFieldCell(variant, index, column.key)}</td>
                                                                                             ))}
-                                                                                            <td className="px-2 py-2"><input type="text" value={variant.price ?? ""} onChange={(event) => updateCombinationVariantField(index, "price", event.target.value)} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" placeholder={currentProduct.price || "£0.00"} /></td>
+                                                                                            <td className="px-2 py-2"><input type="text" disabled={Boolean(currentProduct?.price_on_request)} value={variant.price ?? ""} onChange={(event) => updateCombinationVariantField(index, "price", event.target.value)} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" placeholder={currentProduct.price || "£0.00"} /></td>
                                                                                             <td className="px-2 py-2"><input type="number" min={0} value={variant.stock ?? ""} onChange={(event) => updateCombinationVariantField(index, "stock", normalizeVariantStock(event.target.value))} className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" /></td>
                                                                                             <td className="px-2 py-2"><input type="number" min={0.01} step="0.001" value={variant.shipping_weight_kg ?? ""} onChange={(event) => updateCombinationVariantField(index, "shipping_weight_kg", normalizeShippingNumber(event.target.value))} className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" placeholder="base" /></td>
                                                                                             <td className="px-2 py-2"><input type="number" min={1} step="0.01" value={variant.shipping_length_cm ?? ""} onChange={(event) => updateCombinationVariantField(index, "shipping_length_cm", normalizeShippingNumber(event.target.value))} className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" placeholder="base" /></td>
@@ -2106,6 +2126,7 @@ export default function AdminProducts() {
                                                                         <input
                                                                             type="text"
                                                                             value={newCombinationVariant.price}
+                                                                            disabled={Boolean(currentProduct?.price_on_request)}
                                                                             onChange={(event) => setNewCombinationVariant((prev) => ({ ...prev, price: event.target.value }))}
                                                                             className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none"
                                                                             placeholder={currentProduct.price || "£0.00"}

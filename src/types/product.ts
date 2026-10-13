@@ -103,6 +103,7 @@ export interface Product extends ShippingDimensions {
   frontend_variant_layout: string;
   selection_table_config: Record<string, unknown> | null;
   price: string;
+  price_on_request?: boolean;
   old_price: string | null;
   image: string;
   gallery: string[];
@@ -139,6 +140,7 @@ export interface ProductSummary {
   name: string;
   slug: string;
   price: string;
+  price_on_request?: boolean;
   old_price?: string | null;
   image: string;
 }

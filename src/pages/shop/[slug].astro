@@ -58,7 +58,7 @@ const pageDescription = rawDescription
 
 // Product JSON-LD for rich snippets in Google Search
 const productUrl = `${siteUrl}/shop/${slug}`;
-const numericPrice = parseMoneyValue(productPrice.replace('£', '')) ?? 0;
+const numericPrice = product.price_on_request ? null : parseMoneyValue(productPrice);
 const productJsonLd = buildProductJsonLd({
   name: productName,
   description: rawDescription,

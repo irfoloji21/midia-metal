@@ -1,0 +1,678 @@
+{
+  "categories": [
+    {
+      "slug": "kitchen-worktables",
+      "name": "Kitchen Worktables",
+      "image": "/images/products/prep-table.webp",
+      "description": "Stainless steel preparation tables, cabinet benches and made-to-measure worktops built around your working space.",
+      "order": 7
+    },
+    {
+      "slug": "sinks-wash-stations",
+      "name": "Sinks & Wash Stations",
+      "image": "/images/products/sink-unit.webp",
+      "description": "Sink units and washing benches with bowl positions, drainers and access planned around your kitchen.",
+      "order": 8
+    },
+    {
+      "slug": "shelving-storage",
+      "name": "Shelving & Storage",
+      "image": "/images/products/storage-rack.webp",
+      "description": "Wall shelves, cupboards, drawer units and freestanding racks made to keep equipment within reach.",
+      "order": 9
+    },
+    {
+      "slug": "commercial-grills",
+      "name": "Commercial Grills",
+      "image": "/images/products/bbq-grill.webp",
+      "description": "Bespoke fabricated grill bodies and cooking layouts, with the specification agreed for the intended installation.",
+      "order": 10
+    },
+    {
+      "slug": "ventilation-components",
+      "name": "Fans & Ductwork",
+      "image": "/images/products/ductwork.webp",
+      "description": "Replacement ventilation fans and made-to-measure duct components matched to the system requirements.",
+      "order": 11
+    },
+    {
+      "slug": "bespoke-metalwork",
+      "name": "Bespoke Metalwork",
+      "image": "/images/products/table-frame.webp",
+      "description": "Welded table frames, sheet metal enclosures and other metalwork made from your measurements and requirements.",
+      "order": 12
+    },
+    {
+      "slug": "gates-railings",
+      "name": "Gates, Railings & Handrails",
+      "image": "/images/products/metal-gate.webp",
+      "description": "Made-to-measure gates, railing panels and handrails with fixings and finish planned for the site.",
+      "order": 13
+    },
+    {
+      "slug": "equipment-parts",
+      "name": "Equipment Parts & Fixings",
+      "image": "/images/products/castor.webp",
+      "description": "Replacement castors, adjustable legs and custom brackets matched to existing equipment.",
+      "order": 14
+    },
+    {
+      "slug": "filter-cleaning",
+      "name": "Filter Cleaning Equipment",
+      "image": "/images/products/filter-tank.webp",
+      "description": "Stainless steel cleaning tanks sized around removable canopy filters and the available wash area.",
+      "order": 15
+    }
+  ],
+  "products": [
+    {
+      "id": 2,
+      "expected": "canopy-2",
+      "name": "Bespoke Stainless Steel Kitchen Extraction Canopy",
+      "category": "canopies",
+      "image": "/images/products/wall-canopy.webp",
+      "tags": [
+        "Extraction Canopies",
+        "Stainless Steel",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Product": "Fabricated canopy body",
+        "Layout": "Made to suit the cooking line",
+        "System components": "Fan, ductwork and installation by agreed scope"
+      },
+      "description": "<p>A bespoke stainless steel extraction canopy made to fit your commercial kitchen. We size the metalwork around the cooking line, available height and duct connection.</p><p>The canopy needs to work with the equipment below it and the extraction system connected to it. We start with the kitchen layout and a look at the route the ductwork will take. Filter access and cleaning room need to be considered while the job is still on the drawing.</p><h3>Details worth getting right</h3><ul><li>Overall dimensions and mounting arrangement agreed for the site</li><li>Filter positions and outlet details coordinated with the system design</li><li>Wall-mounted and other layouts discussed to suit the kitchen</li></ul><h3>Let's make sure it fits</h3><p>Send a sketch of the cooking line with the appliance details and ceiling height. We will confirm the metalwork, system components and fitting included in the quotation.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "id": 4,
+      "expected": "centrifugal-fan-4",
+      "name": "Centrifugal Extraction Fan for Ventilation Systems",
+      "category": "ventilation-components",
+      "image": "/images/centrifugal-fan-square.png",
+      "tags": [
+        "Centrifugal Fans",
+        "Ventilation",
+        "Replacement Parts"
+      ],
+      "specifications": {
+        "Type": "Centrifugal fan",
+        "Selection": "Duty and system resistance to be confirmed",
+        "Electrical details": "Confirm the specific model before ordering"
+      },
+      "description": "<p>A centrifugal extraction fan for a ventilation system needs to match the airflow and resistance of the full duct run. We can help identify the right replacement.</p><p>A fan that fits the hole is not automatically the right fan. Duct length, bends, filters and the required airflow all matter. For a replacement, the old nameplate and the way the unit is connected give us a useful starting point.</p><h3>Details worth getting right</h3><ul><li>Check inlet, outlet and mounting dimensions</li><li>Confirm voltage, phase and control compatibility</li><li>Assess suitability for the air being extracted</li></ul><h3>Let's make sure it fits</h3><p>Send clear photos of the fan and nameplate with the system details. We confirm the manufacturer's performance information for the selected unit; we do not manufacture fan motors.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p>"
+    },
+    {
+      "id": 6,
+      "expected": "ventilation-fan-6",
+      "name": "Circular Duct Ventilation Fan",
+      "category": "ventilation-components",
+      "image": "/images/ventilation-fan-circular.png",
+      "tags": [
+        "Duct Fans",
+        "Ventilation",
+        "Replacement Parts"
+      ],
+      "specifications": {
+        "Form": "Circular duct fan",
+        "Connections": "Duct diameter to be confirmed",
+        "Performance": "Selected for the required system duty"
+      },
+      "description": "<p>A circular duct ventilation fan for a compatible air-handling system. Matching the duct diameter is the first step; the fan duty and electrical supply matter too.</p><p>When an existing fan becomes noisy or stops working, send us its details before buying a replacement. Two units of the same size can have very different duties. We look at the space around the fan as well, including access for fitting and later maintenance.</p><h3>Details worth getting right</h3><ul><li>Duct connection and mounting arrangement checked before supply</li><li>Airflow, pressure and operating conditions confirmed for the model</li><li>Controller and electrical supply compatibility checked together</li></ul><h3>Let's make sure it fits</h3><p>A photo of the label, the duct connections and the installation is useful. Suitability for grease-laden or hot air must be confirmed for the actual fan model.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p>"
+    },
+    {
+      "id": 7,
+      "expected": "stainless-steel-gridmesh-style-grease-filters-7",
+      "name": "Stainless Steel Mesh Grease Filter for Extraction Canopies",
+      "category": "mesh-filters",
+      "image": "/images/products/mesh-filter.webp",
+      "tags": [
+        "Mesh Filters",
+        "Grease Filters",
+        "Canopy Spares"
+      ],
+      "specifications": {
+        "Construction": "Metal mesh in a perimeter frame",
+        "Sizing": "Outside height, width and thickness required",
+        "Compatibility": "Match the existing canopy specification"
+      },
+      "description": "<p>A stainless steel mesh grease filter sized for a compatible extraction canopy. We check the frame and fitting before arranging a replacement.</p><p>Filters need to sit properly in their tracks and still lift out for cleaning. Measure the outside of the existing frame, including its thickness, rather than only the visible mesh. A photo of the filter in position helps us see how it is retained.</p><h3>Details worth getting right</h3><ul><li>Outside dimensions and frame profile checked</li><li>Handles and removal clearance considered</li><li>Filter type matched to the canopy's specified arrangement</li></ul><h3>Let's make sure it fits</h3><p>Send the old filter measurements and a front-and-side photo. Mesh and baffle filters are different designs; changing between them needs the canopy specification to be checked.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "id": 8,
+      "expected": "canopy-grease-filter-cleaning-tank-and-crystals-8",
+      "name": "Stainless Steel Canopy Grease Filter Cleaning Tank",
+      "category": "filter-cleaning",
+      "image": "/images/products/filter-tank.webp",
+      "tags": [
+        "Filter Cleaning",
+        "Canopy Maintenance",
+        "Stainless Steel"
+      ],
+      "specifications": {
+        "Product": "Grease filter soaking tank",
+        "Sizing": "Matched to filter dimensions",
+        "Cleaning products": "Supply and compatibility to be confirmed separately"
+      },
+      "description": "<p>A stainless steel grease filter cleaning tank gives removable canopy filters a dedicated place to soak. We can size the tank around the filters you use.</p><p>The tank needs enough internal space for the full filter and enough room above it to lift the filter out. We also think about where the tank stands, how it is emptied and how the lid is stored during cleaning. Those details make the daily job easier.</p><h3>Details worth getting right</h3><ul><li>Internal size agreed from the filters and quantity being cleaned</li><li>Lid and drainage arrangement discussed for the working area</li><li>Material compatibility checked against the chosen cleaning product</li></ul><h3>Let's make sure it fits</h3><p>Send the filter dimensions and the space available for the tank. Cleaning crystals or chemicals are included only when specified in your order; follow their supplier's handling and dilution instructions.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "id": 9,
+      "expected": "commercial-canopy-hood-9",
+      "name": "Wall-Mounted Commercial Kitchen Canopy Hood",
+      "category": "canopies",
+      "image": "/images/products/wall-canopy.webp",
+      "tags": [
+        "Wall Canopies",
+        "Kitchen Extraction",
+        "Stainless Steel"
+      ],
+      "specifications": {
+        "Layout": "Wall-mounted canopy",
+        "Construction": "Fabricated stainless steel body",
+        "Outlet and filters": "Agreed with the extraction design"
+      },
+      "description": "<p>A wall-mounted commercial kitchen canopy hood for a cooking line positioned against a wall. The size and outlet arrangement are made to suit the installation.</p><p>Wall space can be crowded with services, shelves and existing duct connections. We work from the actual cooking equipment and available clearances, then settle the hood shape and fixing details. We leave the filter access and maintenance requirements in the plan from the start.</p><h3>Details worth getting right</h3><ul><li>Width, projection and body height agreed for the cooking line</li><li>Outlet positioned to suit the planned duct route</li><li>Fixings and access considered alongside the metalwork</li></ul><h3>Let's make sure it fits</h3><p>Send the appliance layout, wall details and photos of the existing extraction. The fan and duct system need to be selected for the complete installation, and we confirm the quotation scope before making the hood.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "id": 10,
+      "expected": "stainless-extraction-canopy-10",
+      "name": "Stainless Steel Island Extraction Canopy",
+      "category": "canopies",
+      "image": "/images/products/island-canopy.webp",
+      "tags": [
+        "Island Canopies",
+        "Kitchen Extraction",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Example layout": "Suspended island canopy",
+        "Construction": "Stainless steel fabricated body",
+        "Support": "Suspension arrangement designed for the site"
+      },
+      "description": "<p>A stainless steel island extraction canopy for cooking equipment away from the wall. We work through the hood dimensions, suspension and duct route together.</p><p>An island layout needs attention on every side. Staff need room to work around the equipment, and the canopy must be supported properly above it. We start with the appliance positions and ceiling information before agreeing the metalwork.</p><h3>Details worth getting right</h3><ul><li>Canopy shape and coverage agreed with the extraction design</li><li>Suspension points coordinated with suitable structural supports</li><li>Filters and service access included in the layout discussion</li></ul><h3>Let's make sure it fits</h3><p>Send a plan of the cooking island, ceiling height and details of the support above. The example image shows the hood arrangement; the final suspension, fan, ductwork and installation scope are project-specific.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "id": 11,
+      "expected": "cutting-disk-pro-200-11",
+      "name": "Pro 200 Metal Cutting Disc",
+      "category": "cutting-disks",
+      "image": "/images/products/cutting-disc.webp",
+      "tags": [
+        "Cutting Discs",
+        "Workshop Consumables"
+      ],
+      "specifications": {
+        "Product": "Abrasive cutting disc",
+        "Compatibility": "Machine, bore, diameter and rated speed to be confirmed",
+        "Material suitability": "Use the disc manufacturer's stated application"
+      },
+      "description": "<p>A metal cutting disc selected to match the machine and the material being cut. Send the existing disc details if you are unsure which replacement you need.</p><p>Disc size, bore and speed rating have to suit the tool. The material marking matters as well, especially when the job involves stainless steel. We use the actual manufacturer's specification to match the consumable rather than relying on a product name.</p><h3>Details worth getting right</h3><ul><li>Confirm the full dimensions printed on the disc</li><li>Check the machine's disc specification</li><li>Specify whether the job involves mild steel or stainless steel</li></ul><h3>Let's make sure it fits</h3><p>The Pro 200 name is a catalogue reference, not a confirmed diameter. Send a photo of the existing disc label and tool details before ordering.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final disc specification and quantity are confirmed with your order.</em></p>"
+    },
+    {
+      "id": 12,
+      "expected": "cutting-disk-pro-250-12",
+      "name": "Pro 250 Metal Cutting Disc",
+      "category": "cutting-disks",
+      "image": "/images/products/cutting-disc.webp",
+      "tags": [
+        "Cutting Discs",
+        "Workshop Consumables"
+      ],
+      "specifications": {
+        "Product": "Abrasive cutting disc",
+        "Selection": "Matched to machine and metal",
+        "Size and rating": "Confirm against the manufacturer's markings"
+      },
+      "description": "<p>A replacement metal cutting disc for workshop cutting work. We confirm the size, bore and material suitability against your machine before supplying it.</p><p>When replacing a disc, keep the information from the old packaging or take a clear photo of the printed face. It tells us more than measuring the outside alone. We also need to know what metal you intend to cut.</p><h3>Details worth getting right</h3><ul><li>Outside diameter, thickness and bore checked together</li><li>Rated speed matched to the machine requirements</li><li>Material compatibility confirmed from the disc specification</li></ul><h3>Let's make sure it fits</h3><p>Pro 250 is the catalogue name and does not establish the disc dimensions. Let us match the manufacturer's details to your tool and job.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final disc specification and quantity are confirmed with your order.</em></p>"
+    },
+    {
+      "id": 13,
+      "expected": "precision-cutting-disk-set-13",
+      "name": "Metal Cutting Disc Set for Workshop Use",
+      "category": "cutting-disks",
+      "image": "/images/products/cutting-disc.webp",
+      "tags": [
+        "Cutting Discs",
+        "Workshop Consumables"
+      ],
+      "specifications": {
+        "Product": "Cutting disc set",
+        "Pack contents": "Quantity and disc specification to be agreed",
+        "Application": "Matched to the material and machine"
+      },
+      "description": "<p>A metal cutting disc set for keeping the right workshop consumables to hand. Disc size, type and pack quantity are agreed before supply.</p><p>It makes sense to order around the work you actually do. Let us know which machines you use and whether the cutting is mainly mild steel, stainless steel or another material. We can then discuss a consistent set of suitable discs.</p><h3>Details worth getting right</h3><ul><li>Disc dimensions and machine compatibility confirmed</li><li>Material application checked from the manufacturer's markings</li><li>Pack quantity specified in the order</li></ul><h3>Let's make sure it fits</h3><p>Send the current disc reference or a clear label photo. The catalogue image illustrates the product type; it does not define pack quantity or the final disc specification.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final disc specification and quantity are confirmed with your order.</em></p>"
+    },
+    {
+      "id": 14,
+      "expected": "led-canopy-light-bar-14",
+      "name": "LED Light Bar for Commercial Kitchen Canopies",
+      "category": "led-lights",
+      "image": "/images/products/led-bar.webp",
+      "tags": [
+        "Canopy Lighting",
+        "LED Lights",
+        "Replacement Parts"
+      ],
+      "specifications": {
+        "Product": "Linear LED light fitting",
+        "Compatibility": "Mounting, supply and driver to be confirmed",
+        "Operating conditions": "Rating to suit the installation"
+      },
+      "description": "<p>An LED canopy light bar for a compatible commercial kitchen fitting. We check the mounting, supply and working conditions before selecting a replacement.</p><p>A light above a cooking line has a different job from a light on an ordinary shelf. Heat, moisture and cleaning exposure need to be considered for the exact model. When replacing an existing fitting, its label and connection details are the best place to start.</p><h3>Details worth getting right</h3><ul><li>Overall length and fixing points checked</li><li>Voltage and driver arrangement confirmed</li><li>Temperature and ingress ratings verified for the location</li></ul><h3>Let's make sure it fits</h3><p>Send the old fitting's label, dimensions and a photo of its position. The selected manufacturer's specification determines suitability; electrical fitting should be carried out by a competent installer.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "id": 15,
+      "expected": "waterproof-led-unit-15",
+      "name": "Sealed LED Light Fitting for Commercial Equipment",
+      "category": "led-lights",
+      "image": "/images/products/sealed-led.webp",
+      "tags": [
+        "LED Lights",
+        "Equipment Lighting",
+        "Replacement Parts"
+      ],
+      "specifications": {
+        "Product": "Sealed LED fitting",
+        "Ingress rating": "Confirm for the selected model",
+        "Electrical supply": "Voltage and driver to be checked"
+      },
+      "description": "<p>A sealed LED light fitting for compatible commercial equipment. We match the fitting to the location, mounting space and electrical arrangement.</p><p>A sealed housing still needs the right rating for the job. Splash exposure, cleaning methods and heat can vary widely around a kitchen. We ask for the equipment details and the old light's markings before recommending a replacement.</p><h3>Details worth getting right</h3><ul><li>Housing dimensions and cable entry checked</li><li>Ingress and temperature suitability confirmed from the model data</li><li>Driver, voltage and fixing method matched to the equipment</li></ul><h3>Let's make sure it fits</h3><p>Send a front-and-back photo of the existing unit and its label. We confirm the actual rating before supply rather than treating every enclosed light as waterproof.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "id": 16,
+      "expected": "commercial-led-light-pack-16",
+      "name": "Commercial LED Light Bar Pack",
+      "category": "led-lights",
+      "image": "/images/products/led-pack.webp",
+      "tags": [
+        "LED Lights",
+        "Canopy Lighting",
+        "Replacement Parts"
+      ],
+      "specifications": {
+        "Product": "Matched LED light fittings",
+        "Pack quantity": "Confirmed in the quotation",
+        "Compatibility": "Supply, driver and mounting to be agreed"
+      },
+      "description": "<p>A commercial LED light bar pack for replacing or fitting a matched group of lights. We agree the fittings and quantity around the equipment.</p><p>When several lights are used together, matching the fitting length and light appearance makes the finished job tidier. The electrical arrangement still needs checking: a similar-looking fitting may use a different driver or supply.</p><h3>Details worth getting right</h3><ul><li>Number of fittings and lengths specified before supply</li><li>Mounting and connection details checked together</li><li>Operating conditions matched to the selected manufacturer's ratings</li></ul><h3>Let's make sure it fits</h3><p>Send the layout and the labels from any existing lights or drivers. The image shows an example pair; the actual pack contents and electrical accessories are listed in your order.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "id": 17,
+      "expected": "wall-cladding-sheets-17",
+      "name": "Stainless Steel Wall Cladding Sheets for Kitchens",
+      "category": "stainless-steel-sheets",
+      "image": "/images/products/cladding-panel.webp",
+      "tags": [
+        "Wall Cladding",
+        "Stainless Steel",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Product": "Cut-to-size wall cladding sheets",
+        "Finish": "Brushed stainless steel",
+        "Edges and cut-outs": "Agreed from the wall layout"
+      },
+      "description": "<p>Stainless steel wall cladding sheets cut to suit a kitchen or work area. We plan the panel sizes, edges and openings around the wall.</p><p>A wall rarely gives you a completely clear rectangle. Sockets, pipes and corners need to be marked before the sheet is cut. We can discuss panel divisions and folded returns so the joins fall in sensible places and exposed edges have a proper finish.</p><h3>Details worth getting right</h3><ul><li>Panel dimensions agreed from the wall measurements</li><li>Service openings set out before cutting</li><li>Material grade, thickness and fixing method discussed for the location</li></ul><h3>Let's make sure it fits</h3><p>Send a wall sketch with all openings measured from a clear reference edge. If the panel sits near heat-producing equipment, the complete wall build-up and required clearances must be checked for that installation.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "id": 18,
+      "expected": "brushed-stainless-panel-18",
+      "name": "Made-to-Measure Brushed Stainless Steel Splashback",
+      "category": "stainless-steel-sheets",
+      "image": "/images/products/cladding-panel.webp",
+      "tags": [
+        "Splashbacks",
+        "Stainless Steel",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Product": "Brushed stainless steel panel",
+        "Use": "Splashback or facing panel",
+        "Sizing": "Cut to the agreed drawing"
+      },
+      "description": "<p>A brushed stainless steel splashback made to fit behind a sink or worktop. We cut and finish the panel to the dimensions of your space.</p><p>The grain direction and edge details make a noticeable difference once a panel is fitted. We agree these along with any socket or pipe openings. For a replacement, a photo of the existing edges helps us see whether the new panel needs folded returns.</p><h3>Details worth getting right</h3><ul><li>Width, height and cut-outs agreed before cutting</li><li>Grain direction coordinated across adjoining panels</li><li>Edge treatment and fixing approach discussed for the wall</li></ul><h3>Let's make sure it fits</h3><p>Measure from finished surfaces and mark obstructions clearly on a sketch. We will confirm the material, thickness and final dimensions before making the panel.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "stainless-steel-prep-table",
+      "name": "Stainless Steel Prep Table with Undershelf",
+      "category": "kitchen-worktables",
+      "image": "/images/products/prep-table.webp",
+      "price": 295,
+      "code": "MM-PT01",
+      "tags": [
+        "Preparation Tables",
+        "Stainless Steel",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Construction": "Stainless steel top and tubular frame",
+        "Storage": "Open undershelf",
+        "Sizing": "Made to agreed measurements"
+      },
+      "description": "<p>A stainless steel prep table gives you a clear place to work and useful storage underneath. We make the frame and top to suit your kitchen.</p><p>A table can look right on paper and still get in the way during service. We start with the space you have, the height you work at and what needs to sit below it. The example shown has an open undershelf, so pans and tubs stay within reach.</p><h3>Details worth getting right</h3><ul><li>Length, depth and working height agreed before fabrication</li><li>Rear upstand and shelf layout can be discussed</li><li>Tell us about heavy equipment so the frame can be designed for it</li></ul><h3>Let's make sure it fits</h3><p>Measure the space at both ends and let us know about pipes, sockets and uneven floors. A quick photo usually saves a lot of guesswork.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "stainless-steel-cabinet-workbench",
+      "name": "Stainless Steel Cabinet Workbench with Sliding Doors",
+      "category": "kitchen-worktables",
+      "image": "/images/products/cabinet-workbench.webp",
+      "price": 645,
+      "code": "MM-CW01",
+      "tags": [
+        "Cabinet Workbenches",
+        "Stainless Steel",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Construction": "Stainless steel cabinet and worktop",
+        "Door layout": "Sliding doors in the example shown",
+        "Use": "Kitchen preparation and enclosed storage"
+      },
+      "description": "<p>A stainless steel cabinet workbench combines a preparation surface with enclosed storage. Sliding doors make sense where there is little room in front of the bench.</p><p>We build these for kitchens that need to use the same space for working and storing equipment. The cabinet layout should follow what you put inside it: tall tubs, pans and smaller utensils all need different clearances. We can work through that before cutting the sheet.</p><h3>Details worth getting right</h3><ul><li>Worktop and cabinet sized together</li><li>Internal shelf arrangement agreed around your equipment</li><li>Rear upstand, service openings and alternative door layouts available by discussion</li></ul><h3>Let's make sure it fits</h3><p>Send the overall space, the items you want to store and a photo of any pipework behind the unit. We will settle the layout and price before making it.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "stainless-steel-sink-unit",
+      "name": "Stainless Steel Sink Unit with Drainer",
+      "category": "sinks-wash-stations",
+      "image": "/images/products/sink-unit.webp",
+      "price": 495,
+      "code": "MM-SK01",
+      "tags": [
+        "Sink Units",
+        "Wash Stations",
+        "Stainless Steel"
+      ],
+      "specifications": {
+        "Example layout": "Single bowl with right-hand drainer",
+        "Construction": "Stainless steel sink top and supported frame",
+        "Connections": "Tap and waste arrangement to be agreed"
+      },
+      "description": "<p>A stainless steel sink unit made around your washing space, with the bowl and drainer where you need them. Single and multiple bowl layouts can be discussed.</p><p>Before we make a sink bench, we ask what you wash in it. A bowl that takes a few plates may be too small for your largest stockpot. We also look at which side the dirty items arrive from and where the clean items go, so the drainer helps the work flow.</p><h3>Details worth getting right</h3><ul><li>Bowl position and drainer side agreed before production</li><li>Open frame or cupboard arrangement can be discussed</li><li>Tap holes, waste position and plumbing access set out together</li></ul><h3>Let's make sure it fits</h3><p>Send the largest item you need to wash, the available space and the existing water and waste positions. Taps, plumbing and fitting are included only when listed in your agreed quotation.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "stainless-steel-wall-shelf",
+      "name": "Stainless Steel Wall Shelf for Commercial Kitchens",
+      "category": "shelving-storage",
+      "image": "/images/products/wall-shelf.webp",
+      "price": 95,
+      "code": "MM-WS01",
+      "tags": [
+        "Wall Shelves",
+        "Kitchen Storage",
+        "Stainless Steel"
+      ],
+      "specifications": {
+        "Construction": "Folded stainless steel shelf",
+        "Support": "Wall brackets",
+        "Sizing": "Length and depth to suit the space"
+      },
+      "description": "<p>A stainless steel wall shelf keeps everyday kitchen items off the worktop and close to hand. We make the shelf length and depth to fit your wall.</p><p>There is no benefit in a deep shelf that catches your head or hides the sockets below it. We look at what you want to store and the working space underneath, then agree the shelf and bracket arrangement. A simple folded edge gives the front a tidy finish.</p><h3>Details worth getting right</h3><ul><li>Single shelf or a set arranged to your space</li><li>Bracket positions agreed around wall obstructions</li><li>Material thickness and support chosen for the intended load</li></ul><h3>Let's make sure it fits</h3><p>Tell us what the wall is made from and what will sit on the shelf. Fixings need to suit the wall, and the installed load limit depends on the complete fixing arrangement.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "stainless-steel-storage-rack",
+      "name": "Stainless Steel Storage Rack with Four Shelves",
+      "category": "shelving-storage",
+      "image": "/images/products/storage-rack.webp",
+      "price": 365,
+      "code": "MM-SR01",
+      "tags": [
+        "Storage Racks",
+        "Kitchen Shelving",
+        "Stainless Steel"
+      ],
+      "specifications": {
+        "Example layout": "Four open shelves",
+        "Frame": "Freestanding stainless steel uprights",
+        "Shelf spacing": "Agreed to suit stored items"
+      },
+      "description": "<p>A stainless steel storage rack puts pans, containers and supplies in one organised place. This example uses four open shelves on a welded frame.</p><p>Shelf spacing matters as much as the overall height. We work from the containers you actually use, leaving enough room to lift them in and out. If a standard rack wastes a narrow corner or blocks a doorway, we can size the frame around the room.</p><h3>Details worth getting right</h3><ul><li>Overall width, depth and height made to agreed dimensions</li><li>Shelf count and clearances can be changed</li><li>Tell us the expected load and where the rack will stand</li></ul><h3>Let's make sure it fits</h3><p>A sketch with your largest containers marked on it is enough to start. We will agree the support and any required wall restraint with the installation details.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "stainless-steel-wall-cupboard",
+      "name": "Stainless Steel Wall Cupboard with Double Doors",
+      "category": "shelving-storage",
+      "image": "/images/products/wall-cupboard.webp",
+      "price": 385,
+      "code": "MM-WC01",
+      "tags": [
+        "Wall Cupboards",
+        "Kitchen Storage",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Example layout": "Two hinged doors",
+        "Construction": "Stainless steel enclosed cabinet",
+        "Mounting": "Wall-mounted; fixing arrangement to be agreed"
+      },
+      "description": "<p>A stainless steel wall cupboard adds enclosed storage above your work area. We make the cabinet to suit the wall space and what you need to keep inside.</p><p>We check the opening room for the doors before settling the design. A cupboard above a busy bench needs to be within reach without interfering with the work below. Shelf spacing, handles and the mounting arrangement are worked out as part of the job.</p><h3>Details worth getting right</h3><ul><li>Cabinet width, height and depth agreed with you</li><li>Internal shelves arranged around their contents</li><li>Sliding-door alternatives can be discussed for tight spaces</li></ul><h3>Let's make sure it fits</h3><p>Send a photo of the wall and the bench below it. The wall construction and loaded cupboard weight need to be considered when choosing the fixings.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "stainless-steel-drawer-unit",
+      "name": "Stainless Steel Undercounter Drawer Unit",
+      "category": "shelving-storage",
+      "image": "/images/products/drawer-unit.webp",
+      "price": 425,
+      "code": "MM-DU01",
+      "tags": [
+        "Drawer Units",
+        "Kitchen Storage",
+        "Stainless Steel"
+      ],
+      "specifications": {
+        "Example layout": "Three drawers",
+        "Position": "Freestanding undercounter unit",
+        "Construction": "Stainless steel cabinet"
+      },
+      "description": "<p>A stainless steel drawer unit gives small tools and utensils a proper place under the counter. Drawer depths can be arranged around the items you use.</p><p>We measure the usable gap, including anything that projects below the worktop. The example shown has three drawers, but the right arrangement depends on your kit. Deep tools need room; shallow utensils are easier to find in a shallower drawer.</p><h3>Details worth getting right</h3><ul><li>Overall size matched to the available opening</li><li>Drawer depths and handle style agreed before fabrication</li><li>Runner choice based on the intended contents</li></ul><h3>Let's make sure it fits</h3><p>Tell us the clear width and height under your counter, the depth available and what will go in each drawer. We can then work out a cabinet that earns its space.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "made-to-measure-stainless-steel-worktop",
+      "name": "Made-to-Measure Stainless Steel Worktop",
+      "category": "kitchen-worktables",
+      "image": "/images/products/worktop.webp",
+      "price": 245,
+      "code": "MM-WT01",
+      "tags": [
+        "Worktops",
+        "Stainless Steel",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Product": "Worktop only",
+        "Finish": "Brushed stainless steel",
+        "Edge and upstand": "Agreed to suit installation"
+      },
+      "description": "<p>A made-to-measure stainless steel worktop for an existing cabinet run or a new frame. We form the edges and upstand around the way it will be fitted.</p><p>The visible top is only part of the job. We need to know what supports it, where the joins will fall and whether it has to pass between two walls. A small mistake around a corner can be difficult to put right once the sheet is folded.</p><h3>Details worth getting right</h3><ul><li>Straight runs and shaped layouts considered from a sketch</li><li>Sink openings, service cut-outs and returns agreed before cutting</li><li>Support and material thickness chosen together</li></ul><h3>Let's make sure it fits</h3><p>Send the layout with dimensions and photos of the base units. Site measurements may be needed before fabrication. The trestles in the example image support the display and are not part of the worktop.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "bespoke-commercial-bbq-grill",
+      "name": "Bespoke Stainless Steel Commercial Charcoal Grill",
+      "category": "commercial-grills",
+      "image": "/images/products/bbq-grill.webp",
+      "price": 895,
+      "code": "MM-BG01",
+      "tags": [
+        "Charcoal Grills",
+        "Bespoke BBQ",
+        "Stainless Steel"
+      ],
+      "specifications": {
+        "Example design": "Freestanding charcoal grill",
+        "Construction": "Fabricated metal body and supported grate",
+        "Fuel arrangement": "Charcoal; no gas equipment included"
+      },
+      "description": "<p>A bespoke commercial charcoal grill made around your cooking space and working height. We can discuss the grate, fire bed and ash access before fabrication.</p><p>A grill needs more thought than a metal box with bars across it. We work through how you load the charcoal, reach the cooking surface and remove ash once everything has cooled. The frame also needs to suit the surface it will stand on and how the grill is moved.</p><h3>Details worth getting right</h3><ul><li>Cooking area and overall size agreed for your menu and space</li><li>Grate layout and removable parts discussed before manufacture</li><li>Material choices based on heat exposure and intended use</li></ul><h3>Let's make sure it fits</h3><p>Tell us where the grill will be used. Indoor use needs a properly designed extraction and fire-safety arrangement assessed for the installation. We agree the grill specification and installation scope separately.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "made-to-measure-ventilation-ductwork",
+      "name": "Made-to-Measure Metal Ventilation Ductwork",
+      "category": "ventilation-components",
+      "image": "/images/products/ductwork.webp",
+      "price": 145,
+      "code": "MM-VD01",
+      "tags": [
+        "Ductwork",
+        "Ventilation",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Example component": "Rectangular duct elbow",
+        "Material": "Selected for the system requirements",
+        "Connections": "Dimensions and flange arrangement to be agreed"
+      },
+      "description": "<p>Made-to-measure metal ductwork for ventilation routes that standard sections cannot neatly follow. We fabricate bends, transitions and connecting pieces from agreed drawings.</p><p>The awkward part is often the last connection: a beam in the way, an offset outlet or two different duct sizes. We need the actual opening sizes and the route between them before making the part. That helps the fitting go together without improvised changes on site.</p><h3>Details worth getting right</h3><ul><li>Straight sections, elbows and transitions discussed to suit the route</li><li>Flanges and connection details matched to adjoining components</li><li>Material and access requirements confirmed for the application</li></ul><h3>Let's make sure it fits</h3><p>Send a dimensioned sketch, photos and the system specification. Kitchen grease extract has its own design and cleaning requirements, so the complete route and access arrangement need to be agreed before fabrication.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "bespoke-metal-table-frame",
+      "name": "Bespoke Steel Table Frame for Custom Table Tops",
+      "category": "bespoke-metalwork",
+      "image": "/images/products/table-frame.webp",
+      "price": 195,
+      "code": "MM-TF01",
+      "tags": [
+        "Table Frames",
+        "Steel Fabrication",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Product": "Frame only; tabletop excluded",
+        "Example finish": "Satin black",
+        "Construction": "Welded steel tube"
+      },
+      "description": "<p>A bespoke steel table frame built to fit your chosen top. We agree the height, leg positions and fixing points before welding the frame.</p><p>A good frame starts with the tabletop. Its size, weight and material affect the support it needs and how it should be fixed. We also leave room for knees and chairs, rather than putting a leg exactly where someone needs to sit.</p><h3>Details worth getting right</h3><ul><li>Frame width, length and height made to your measurements</li><li>Top fixing details suited to the tabletop material</li><li>Finish and visible weld treatment agreed before manufacture</li></ul><h3>Let's make sure it fits</h3><p>Send the tabletop dimensions and weight, along with a sketch of the look you want. If the top is still being made, we can work from the supplier's confirmed drawing.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "made-to-measure-metal-gate",
+      "name": "Made-to-Measure Steel Pedestrian Gate",
+      "category": "gates-railings",
+      "image": "/images/products/metal-gate.webp",
+      "price": 495,
+      "code": "MM-GT01",
+      "tags": [
+        "Metal Gates",
+        "Steel Fabrication",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Example design": "Single pedestrian gate with vertical bars",
+        "Material": "Steel",
+        "Finish and fittings": "Agreed for the installation"
+      },
+      "description": "<p>A made-to-measure steel pedestrian gate for a garden, side entrance or access path. The frame, hinges and latch are planned around the actual opening.</p><p>We measure more than the gap between the posts. Ground levels, opening direction and the space behind the gate all affect how it works. The example shown uses simple vertical bars, but we can discuss the appearance and privacy you need.</p><h3>Details worth getting right</h3><ul><li>Frame size and clear opening agreed after measurements</li><li>Hinge, latch and post arrangement selected together</li><li>Outdoor finish discussed for the site and maintenance needs</li></ul><h3>Let's make sure it fits</h3><p>Send photos from both sides of the opening and note any slope. Final measurements, fixing method and installation requirements are agreed before the gate is made.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "bespoke-steel-railings",
+      "name": "Bespoke Steel Railings for Gardens and Entrances",
+      "category": "gates-railings",
+      "image": "/images/products/railings.webp",
+      "price": 285,
+      "code": "MM-RL01",
+      "tags": [
+        "Metal Railings",
+        "Steel Fabrication",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Example design": "Straight panel with vertical infill bars",
+        "Material": "Steel",
+        "Posts and fixings": "Designed for the installation"
+      },
+      "description": "<p>Bespoke steel railings made to follow a garden boundary or entrance. We work out the panel lengths, posts and finish around the site.</p><p>Long runs rarely fit neatly into equal panels. We take account of corners, steps and changes in level so the finished railing reads as one job. The example shown is a straight panel with vertical bars and base-plated posts.</p><h3>Details worth getting right</h3><ul><li>Panel divisions and post positions agreed before fabrication</li><li>Style can be matched to an accompanying gate</li><li>Fixing method chosen for the supporting wall or ground</li></ul><h3>Let's make sure it fits</h3><p>Send the run length, photos and any changes in level. Where railings act as guarding against a fall, the design, spacing and fixing requirements must be settled for that location before manufacture.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "stainless-steel-wall-handrail",
+      "name": "Made-to-Measure Stainless Steel Wall Handrail",
+      "category": "gates-railings",
+      "image": "/images/products/handrail.webp",
+      "price": 125,
+      "code": "MM-HR01",
+      "tags": [
+        "Handrails",
+        "Stainless Steel",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Example design": "Straight wall-mounted rail",
+        "Material": "Stainless steel tube",
+        "Bracket layout": "Agreed for wall and route"
+      },
+      "description": "<p>A stainless steel wall handrail cut and finished to suit the route. Brackets, end details and wall clearance are planned as part of the rail.</p><p>The rail needs to feel comfortable in the hand and leave enough room for your fingers. We look at where it starts and finishes, how the wall changes and where the brackets can be fixed securely. Angled or shaped runs can be discussed from a drawing.</p><h3>Details worth getting right</h3><ul><li>Length and shape made to agreed dimensions</li><li>Bracket locations matched to the supporting wall</li><li>End returns and finish confirmed before fabrication</li></ul><h3>Let's make sure it fits</h3><p>Send the wall construction and photos of the full route. For stairs, ramps or access work, the required heights and clearances need to be confirmed for the installation.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "replacement-equipment-castor",
+      "name": "Replacement Swivel Castor for Kitchen Equipment",
+      "category": "equipment-parts",
+      "image": "/images/products/castor.webp",
+      "price": 24,
+      "code": "MM-CA01",
+      "tags": [
+        "Castors",
+        "Replacement Parts",
+        "Kitchen Equipment"
+      ],
+      "specifications": {
+        "Example fitting": "Top plate swivel castor",
+        "Example option": "Brake pedal",
+        "Compatibility": "Plate, bolt centres, height and load to be checked"
+      },
+      "description": "<p>A replacement swivel castor can get a trolley or movable kitchen unit rolling properly again. We help match the mounting and wheel to the equipment.</p><p>Wheel diameter on its own is not enough to order a castor. The mounting plate, bolt centres and overall height must also work with the other wheels. We ask about the loaded equipment weight and floor surface before suggesting a suitable part.</p><h3>Details worth getting right</h3><ul><li>Braked and unbraked options can be discussed</li><li>Mounting details matched to the existing unit</li><li>Wheel material chosen for the floor and working conditions</li></ul><h3>Let's make sure it fits</h3><p>Send a side view and a photo of the mounting, plus measurements of the plate and bolt holes. Include the old castor's markings if they are readable. The image shows a representative top-plate design.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "adjustable-stainless-steel-equipment-leg",
+      "name": "Adjustable Stainless Steel Equipment Leg",
+      "category": "equipment-parts",
+      "image": "/images/products/equipment-leg.webp",
+      "price": 18,
+      "code": "MM-EL01",
+      "tags": [
+        "Adjustable Legs",
+        "Replacement Parts",
+        "Stainless Steel"
+      ],
+      "specifications": {
+        "Example fitting": "Top mounting plate",
+        "Adjustment": "Threaded levelling foot",
+        "Compatibility": "Height, fixing and load to be confirmed"
+      },
+      "description": "<p>An adjustable stainless steel equipment leg helps set a bench or cabinet level. The fixing and height need to match the unit it supports.</p><p>A replacement leg that is nearly right can leave the whole bench rocking. We check the mounting plate or fixing method, tube size and working height before choosing or making a replacement. The levelling foot then provides the final adjustment.</p><h3>Details worth getting right</h3><ul><li>Replacement legs for suitable benches, cabinets and equipment</li><li>Mounting details matched to the existing frame</li><li>Custom fabricated leg assemblies considered where needed</li></ul><h3>Let's make sure it fits</h3><p>Send photos of the underside and an undamaged leg, with the loaded equipment weight if known. Measure from the mounting surface to the floor and include the adjustment you need.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "custom-stainless-steel-mounting-bracket",
+      "name": "Custom Stainless Steel Mounting Bracket",
+      "category": "equipment-parts",
+      "image": "/images/products/bracket.webp",
+      "price": 22,
+      "code": "MM-BR01",
+      "tags": [
+        "Metal Brackets",
+        "Custom Parts",
+        "Stainless Steel"
+      ],
+      "specifications": {
+        "Example shape": "Right-angle bracket",
+        "Material": "Stainless steel",
+        "Holes and thickness": "Made to the agreed drawing"
+      },
+      "description": "<p>A custom stainless steel mounting bracket made to put the holes and fixing faces where your job needs them. One-off replacements and repeat parts can be discussed.</p><p>With a bracket, a few millimetres can make the difference between fitting cleanly and drilling everything again. We work from a drawing, sample or properly measured sketch. Tell us what it supports and how the force acts on it so the material and shape can be considered together.</p><h3>Details worth getting right</h3><ul><li>Hole diameter, spacing and edge distances agreed before cutting</li><li>Folded or welded arrangements to suit the part</li><li>Edges finished for handling and assembly</li></ul><h3>Let's make sure it fits</h3><p>Mark which dimensions are critical and whether the measurements are hole centres or outside edges. Photos help, but a tape beside the part is not a substitute for the dimensions.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    },
+    {
+      "slug": "bespoke-sheet-metal-enclosure",
+      "name": "Bespoke Sheet Metal Enclosure with Access Door",
+      "category": "bespoke-metalwork",
+      "image": "/images/products/enclosure.webp",
+      "price": 245,
+      "code": "MM-EN01",
+      "tags": [
+        "Metal Enclosures",
+        "Sheet Metal",
+        "Made to Measure"
+      ],
+      "specifications": {
+        "Example design": "Rectangular enclosure with hinged door",
+        "Material": "Selected for the working environment",
+        "Openings and fixings": "Made to the agreed layout"
+      },
+      "description": "<p>A bespoke sheet metal enclosure built around the equipment it needs to cover. We agree the access door, mounting points and openings before fabrication.</p><p>A cover is only useful if you can still get to the parts that need attention. We ask about service access, cables, pipes and any heat the equipment produces. From there we can lay out a box or cover that fits without creating a maintenance problem.</p><h3>Details worth getting right</h3><ul><li>Overall size and internal clearances worked out from your equipment</li><li>Hinged doors, removable panels and cut-outs discussed as needed</li><li>Material and finish selected for the location</li></ul><h3>Let's make sure it fits</h3><p>Send the equipment dimensions and mark all connections on a sketch. Any ventilation, electrical protection or sealing rating must be specified and confirmed separately; the example image does not establish a rating.</p><p><a href=\"/get-a-quote\">Send us your measurements</a> or <a href=\"/contact\">speak to Midia M Metal</a> about the job.</p><p><em>Illustrative product image. Final size, details and finish are agreed with your order.</em></p>"
+    }
+  ]
+}

@@ -93,6 +93,7 @@ export interface CheckoutLineItem {
  * or a hand-built object — all must satisfy at least these fields.
  */
 export interface AddToCartProduct {
+  price_on_request?: boolean;
   id: number | string;
   name: string;
   price: string | number;
