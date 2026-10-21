@@ -75,8 +75,24 @@ class HtmlSanitizer
             ]);
         };
 
-        // Preserve img-row divs; keep other divs with safe inline layout styles.
-        $content = preg_replace_callback('/<(\/?)(div\b[^>]*)>/i', function ($matches) use ($extractStyle) {
+        // Only these presentation classes are accepted from the rich text editor.
+        $extractLayoutClasses = static function (string $attributes): string {
+            if (! preg_match('/\bclass\s*=\s*(["\'])(.*?)\1/i', $attributes, $match)) {
+                return '';
+            }
+
+            return implode(' ', array_intersect(
+                [
+                    'service-section', 'service-section--image-left', 'service-copy', 'service-media', 'service-eyebrow', 'service-caption',
+                    'product-section', 'product-split', 'product-media', 'product-eyebrow', 'product-caption',
+                    'product-note', 'product-table-wrap', 'product-performance-table', 'product-links', 'product-spec-slot',
+                ],
+                preg_split('/\s+/', trim($match[2]))
+            ));
+        };
+
+        // Preserve editor layout blocks and safe inline styles.
+        $content = preg_replace_callback('/<(\/?)(div\b[^>]*)>/i', function ($matches) use ($extractStyle, $extractLayoutClasses) {
             $isClose = $matches[1] === '/';
             if ($isClose) {
                 return '</div>';
@@ -84,6 +100,10 @@ class HtmlSanitizer
             $attrs = $matches[2] ?? '';
             if (preg_match('/class\s*=\s*\'img-row\'/i', $attrs) || preg_match('/class\s*=\s*"img-row"/i', $attrs)) {
                 return '<div class="img-row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;margin:8px 0;">';
+            }
+
+            if ($classes = $extractLayoutClasses($attrs)) {
+                return '<div class="'.$classes.'">';
             }
 
             $style = $extractStyle($attrs);
@@ -109,11 +129,14 @@ class HtmlSanitizer
             '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><blockquote><a><span><img><div><table><thead><tbody><tr><td><th>'
         );
 
-        // Strip any <div> that wasn't converted to an img-row (safety pass)
-        $content = preg_replace_callback('/<div\b([^>]*)>/i', function ($matches) use ($extractStyle) {
+        $content = preg_replace_callback('/<div\b([^>]*)>/i', function ($matches) use ($extractStyle, $extractLayoutClasses) {
             $attrs = $matches[1] ?? '';
             if (strpos($attrs, 'img-row') !== false) {
                 return '<div class="img-row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;margin:8px 0;">';
+            }
+
+            if ($classes = $extractLayoutClasses($attrs)) {
+                return '<div class="'.$classes.'">';
             }
 
             $style = $extractStyle($attrs);

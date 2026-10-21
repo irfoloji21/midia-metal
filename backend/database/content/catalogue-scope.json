@@ -1,0 +1,162 @@
+{
+  "reference": "https://support.midiawork.com/shop",
+  "reviewed_on": "2026-10-15",
+  "notes": [
+    "Compare visible product types and category labels, not legacy URL slugs: led-lights is Sinks; mesh-filters is Centrifugal Fan; cutting-disks is Barbeque Mangal grill; baffle-filters is Tables on the reference site.",
+    "Retain existing local prices, stock, product URLs and prior inactive status. This is a scope review, not a price or SKU import.",
+    "Cutting discs remain within scope because they are listed as products on the reference shop, even though it has no dedicated category label.",
+    "Tables and canopies remain within scope because the reference lists those categories, even though their current product counts are zero."
+  ],
+  "reference_categories": [
+    {
+      "name": "Wheels",
+      "url": "https://support.midiawork.com/shop/category/wheels"
+    },
+    {
+      "name": "Baffle filter",
+      "url": "https://support.midiawork.com/shop/category/baffle-filter"
+    },
+    {
+      "name": "Comercial kitchen fan test",
+      "url": "https://support.midiawork.com/shop/category/comercial-kitchen-fan-test"
+    },
+    {
+      "name": "Tables",
+      "url": "https://support.midiawork.com/shop/category/baffle-filters"
+    },
+    {
+      "name": "Canopies",
+      "url": "https://support.midiawork.com/shop/category/canopies"
+    },
+    {
+      "name": "Barbeque Mangal grill",
+      "url": "https://support.midiawork.com/shop/category/cutting-disks"
+    },
+    {
+      "name": "Sinks",
+      "url": "https://support.midiawork.com/shop/category/led-lights"
+    },
+    {
+      "name": "Centrifugal Fan",
+      "url": "https://support.midiawork.com/shop/category/mesh-filters"
+    },
+    {
+      "name": "Stainless Steel Sheets",
+      "url": "https://support.midiawork.com/shop/category/stainless-steel-sheets"
+    }
+  ],
+  "withdrawn_categories": [
+    "led-lights",
+    "mesh-filters",
+    "shelving-storage",
+    "bespoke-metalwork",
+    "gates-railings",
+    "filter-cleaning"
+  ],
+  "withdrawn_products": [
+    {
+      "slug": "stainless-steel-gridmesh-style-grease-filters-7",
+      "reason": "The reference lists baffle filters, not mesh grease filters."
+    },
+    {
+      "slug": "canopy-grease-filter-cleaning-tank-and-crystals-8",
+      "reason": "No filter cleaning tanks or chemicals in the reference catalogue."
+    },
+    {
+      "slug": "led-canopy-light-bar-14",
+      "reason": "No LED lighting products in the reference catalogue."
+    },
+    {
+      "slug": "waterproof-led-unit-15",
+      "reason": "No LED lighting products in the reference catalogue."
+    },
+    {
+      "slug": "commercial-led-light-pack-16",
+      "reason": "No LED lighting products in the reference catalogue."
+    },
+    {
+      "slug": "stainless-steel-cabinet-workbench",
+      "reason": "No standalone cabinet workbenches; the reference's sink with sliding doors is a sink product."
+    },
+    {
+      "slug": "stainless-steel-wall-shelf",
+      "reason": "No standalone shelving or storage range in the reference catalogue."
+    },
+    {
+      "slug": "stainless-steel-storage-rack",
+      "reason": "No standalone shelving or storage range in the reference catalogue."
+    },
+    {
+      "slug": "stainless-steel-wall-cupboard",
+      "reason": "No standalone cupboards in the reference catalogue."
+    },
+    {
+      "slug": "stainless-steel-drawer-unit",
+      "reason": "No standalone drawer units in the reference catalogue."
+    },
+    {
+      "slug": "made-to-measure-ventilation-ductwork",
+      "reason": "Ductwork is part of the ventilation service; it is not listed as a shop product on the reference site."
+    },
+    {
+      "slug": "bespoke-metal-table-frame",
+      "reason": "No separate general-purpose table-frame product range in the reference catalogue."
+    },
+    {
+      "slug": "made-to-measure-metal-gate",
+      "reason": "No gates in the reference catalogue."
+    },
+    {
+      "slug": "bespoke-steel-railings",
+      "reason": "No railings in the reference catalogue."
+    },
+    {
+      "slug": "stainless-steel-wall-handrail",
+      "reason": "No handrails in the reference catalogue."
+    },
+    {
+      "slug": "adjustable-stainless-steel-equipment-leg",
+      "reason": "The listed conveyor feet do not establish a range of fabricated stainless steel equipment-leg assemblies."
+    },
+    {
+      "slug": "custom-stainless-steel-mounting-bracket",
+      "reason": "No general mounting bracket product range in the reference catalogue."
+    },
+    {
+      "slug": "bespoke-sheet-metal-enclosure",
+      "reason": "No sheet metal enclosure product range in the reference catalogue."
+    }
+  ],
+  "category_updates": [
+    {
+      "slug": "kitchen-worktables",
+      "name": "Tables",
+      "description": "Stainless steel preparation tables and worktops for commercial kitchens.",
+      "image": "/images/products/prep-table.webp"
+    },
+    {
+      "slug": "sinks-wash-stations",
+      "name": "Sinks",
+      "description": "Stainless steel sink units and bowls for commercial kitchens.",
+      "image": "/images/products/sink-unit.webp"
+    },
+    {
+      "slug": "commercial-grills",
+      "name": "Barbecue Grills",
+      "description": "Commercial charcoal and mangal grills.",
+      "image": "/images/products/bbq-grill.webp"
+    },
+    {
+      "slug": "ventilation-components",
+      "name": "Ventilation Fans",
+      "description": "Centrifugal and duct fans for commercial kitchen ventilation systems.",
+      "image": "/images/centrifugal-fan-square.png"
+    },
+    {
+      "slug": "equipment-parts",
+      "name": "Wheels & Castors",
+      "description": "Replacement wheels and castors for commercial kitchen equipment.",
+      "image": "/images/products/castor.webp"
+    }
+  ]
+}

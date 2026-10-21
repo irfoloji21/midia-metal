@@ -38,6 +38,16 @@ export default defineConfig({
   },
 
   integrations: [
+    {
+      name: 'command-scoped-vite-cache',
+      hooks: {
+        'astro:config:setup': ({ command, updateConfig }) => {
+          // Astro check/build create temporary Vite servers. Keep their dependency
+          // caches separate so they cannot invalidate a running dev server.
+          updateConfig({ vite: { cacheDir: `./node_modules/.vite/${command}` } });
+        },
+      },
+    },
     react(),
     // Public stylesheet: scoped to public pages/islands (excludes admin UI components)
     tailwind({

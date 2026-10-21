@@ -14,25 +14,16 @@ import { getApiBase } from '@/lib/api-base';
 
 const API_BASE = getApiBase();
 
-/** In-memory TTL cache for settings (avoids repeated API calls during SSR) */
+/** Last successful response is used only if the settings API is unavailable. */
 let cachedSettings: Record<string, string> | null = null;
-let cacheTimestamp = 0;
-const CACHE_TTL_MS = 60_000; // 1 minute
 
 /**
  * Fetch settings from the API and return as a key-value map.
- * Results are cached in-memory for 1 minute to avoid redundant API calls
- * across SSR page renders within the same server process.
- * Returns an empty object on error (never throws).
+ * Read current values for each render; use the last response on a temporary error.
  */
-export async function fetchSettings(options: { bypassCache?: boolean } = {}): Promise<Record<string, string>> {
-  const now = Date.now();
-  if (!options.bypassCache && cachedSettings && now - cacheTimestamp < CACHE_TTL_MS) {
-    return cachedSettings;
-  }
-
+export async function fetchSettings(_options: { bypassCache?: boolean } = {}): Promise<Record<string, string>> {
   try {
-    const res = await fetch(`${API_BASE}/v1/settings`);
+    const res = await fetch(`${API_BASE}/v1/settings`, { cache: 'no-store' });
     if (!res.ok) return cachedSettings ?? {};
     const data = await res.json();
     const items = Array.isArray(data) ? data : data?.data || [];
@@ -43,7 +34,6 @@ export async function fetchSettings(options: { bypassCache?: boolean } = {}): Pr
       }
     }
     cachedSettings = map;
-    cacheTimestamp = now;
     return map;
   } catch {
     console.error('Failed to fetch settings from API');

@@ -310,7 +310,7 @@ class BotContentService
 
         $html = '<main>';
         $html .= '<h1>Our Services</h1>';
-        $html .= '<p>Commercial kitchen ventilation, stainless steel fabrication, canopy installation, and custom metalwork across the UK.</p>';
+        $html .= '<p>Commercial kitchen ventilation, stainless steel fabrication, canopy installation and custom metalwork. Our factory is in London.</p>';
         if ($services->isNotEmpty()) {
             $html .= '<ul>';
             foreach ($services as $service) {
@@ -420,7 +420,7 @@ class BotContentService
         $siteName = $meta['siteName'] ?? 'Midia M Metal';
         $html = '<main>';
         $html .= '<h1>'.$e($siteName).'</h1>';
-        $html .= '<p>Commercial kitchen ventilation, stainless steel fabrication, canopy systems, grease filters, and custom metalwork across the UK.</p>';
+        $html .= '<p>Commercial kitchen ventilation, stainless steel fabrication, canopy systems, grease filters and custom metalwork. Our factory is in London.</p>';
         if ($featured->isNotEmpty()) {
             $html .= '<section><h2>Featured Products</h2><ul>';
             foreach ($featured as $product) {

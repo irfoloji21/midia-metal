@@ -1,4 +1,7 @@
 import { useState } from "react";
+import portfolioImageAlt from "@/data/portfolio-image-alt.json";
+
+const imageAltByUrl: Record<string, string> = portfolioImageAlt;
 
 type Category = { id: number; name: string };
 type Project = { id: number; slug: string; title: string; image: string; description?: string; portfolio_category?: { name: string } };
@@ -24,7 +27,7 @@ export default function PortfolioFilter({ categories, projects }: { categories: 
             {filtered.map((project) => (
               <a key={project.id} href={`/portfolio/${project.slug}`} className="group block">
                 <div className="relative overflow-hidden bg-[#f7f8fa]">
-                  <img src={project.image} alt={project.title} className="w-full h-[250px] md:h-[300px] object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                  <img src={project.image} alt={imageAltByUrl[project.image] || project.title} className="w-full h-[250px] md:h-[300px] object-contain" />
                   <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/45 transition-colors duration-300 flex items-center justify-center">
                     <span className="text-white font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[13px] tracking-wide">View Project</span>
                   </div>
@@ -32,7 +35,7 @@ export default function PortfolioFilter({ categories, projects }: { categories: 
                 <div className="pt-4">
                   <p className="text-[11px] uppercase tracking-[0.22em] font-semibold text-[#8f9ab0] mb-2">{project.portfolio_category?.name || "Uncategorized"}</p>
                   <h3 className="font-sans text-[23px] md:text-[28px] leading-[1.02] font-semibold text-orange">{project.title}</h3>
-                  <p className="text-[14px] leading-7 text-[#6e7a92] mt-3">{project.description && project.description.length > 100 ? `${project.description.substring(0, 100)}...` : project.description || ""}</p>
+                  <p className="text-[14px] leading-7 text-[#6e7a92] mt-3">{project.description?.split(/\n\s*\n/)[0] || ""}</p>
                 </div>
               </a>
             ))}

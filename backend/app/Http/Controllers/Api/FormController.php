@@ -220,17 +220,8 @@ class FormController extends Controller
             'billing_postcode' => 'nullable|string|max:255',
             'billing_county' => 'nullable|string|max:255',
             'billing_country' => 'nullable|string|max:255',
-            'payment_method' => [
-                'nullable',
-                'string',
-                function ($attribute, $value, $fail) {
-                    $normalized = preg_replace('/[^a-z0-9]+/', '', strtolower((string) $value));
-                    if (in_array($normalized, ['cashondelivery', 'cod'], true)) {
-                        $fail('This payment method is no longer available.');
-                    }
-                },
-            ],
-            'bank_account_id' => 'nullable|string|max:64',
+            'payment_method' => 'required|in:card,bank_transfer',
+            'payment_token' => 'required|string',
             'fulfilment_method' => 'nullable|in:delivery,click_collect',
             'shipping_option_token' => 'nullable|string',
             'notes' => 'nullable|string',
@@ -242,7 +233,7 @@ class FormController extends Controller
             'items.*.product_id' => 'required|integer',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.selected_variants' => 'nullable|array',
-            'stripe_payment_intent_id' => 'nullable|string',
+            'stripe_payment_intent_id' => 'required|string|starts_with:pi_',
             'save_card' => 'nullable|boolean',
         ]);
 

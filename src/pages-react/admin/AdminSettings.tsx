@@ -1,45 +1,26 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
-import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Plus, Trash2 } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import type { SiteSetting, HeroSlide, SettingsSection } from "@/types/settings";
+import { GENERAL_SECTIONS, GENERAL_LABELS, LEGACY_GENERAL_KEYS, changedSettings, generalSettingGroup } from '@/lib/general-settings';
 
 type SettingRecord = SiteSetting;
 type HeroSlideRecord = HeroSlide;
 
-const GROUP_ORDER = ["header", "footer", "general", "shipping-tax", "shipping-freight", "payment", "home", "about", "contact", "services", "portfolio", "blog", "legal", "seo", "hero-slides"];
-
-interface BankTransferAccount {
-    id: string;
-    bank_name: string;
-    account_name: string;
-    sort_code: string;
-    account_number: string;
-    iban: string;
-    bic_swift: string;
-}
-
-const parseBankTransferAccounts = (value?: string): BankTransferAccount[] => {
-    try {
-        const parsed = JSON.parse(value || "[]");
-        return Array.isArray(parsed) ? parsed : [];
-    } catch {
-        return [];
-    }
-};
+const GROUP_ORDER = ["general", "shipping-tax", "shipping-freight", "home", "about", "contact", "services", "portfolio", "blog", "legal", "seo", "hero-slides"];
 
 const HOME_SECTIONS: SettingsSection[] = [
     {
         id: "hero-copy",
         title: "Homepage Introduction",
-        description: "The main heading, introduction and contact button labels above the slider. Phone and WhatsApp use the contact phone setting.",
+        description: "The main heading, introduction and call and quote button labels above the slider. The call button uses the contact phone setting.",
         keys: [
             "home_hero_title",
             "home_hero_desc",
             "home_hero_phone_label",
-            "home_hero_whatsapp_label",
             "home_hero_quote_label",
         ],
     },
@@ -148,6 +129,18 @@ const LEGACY_DUPLICATE_KEYS: Record<string, string> = {
 };
 
 const HIDDEN_SETTING_KEYS = new Set([
+    // Legacy About sections removed from the public page.
+    "about_exp_value",
+    "about_exp_label",
+    "about_proj_value",
+    "about_proj_label",
+    "about_satisfaction_value",
+    "about_satisfaction_label",
+    "about_support_value",
+    "about_support_label",
+    "about_value_4_title",
+    "about_value_4_desc",
+
     "shipping_rate",
     "shipping_flat_rate",
     "shipping_type",
@@ -212,6 +205,7 @@ const normalizeSettingsForDisplay = (settings: SettingRecord[]) => {
     const keys = new Set(settings.map((setting) => setting.key));
 
     return settings
+        .filter((setting) => !LEGACY_GENERAL_KEYS.has(setting.key))
         .filter((setting) => !HIDDEN_SETTING_KEYS.has(setting.key))
         .filter((setting) => {
             const canonicalKey = LEGACY_DUPLICATE_KEYS[setting.key];
@@ -219,6 +213,7 @@ const normalizeSettingsForDisplay = (settings: SettingRecord[]) => {
         })
         .map((setting) => {
             const nextSetting = { ...setting };
+            nextSetting.group = generalSettingGroup(nextSetting);
 
             if (SHIPPING_TAX_KEYS.has(nextSetting.key)) {
                 nextSetting.group = "shipping-tax";
@@ -240,11 +235,11 @@ const normalizeSettingsForDisplay = (settings: SettingRecord[]) => {
 export default function AdminSettings() {
     const [settings, setSettings] = useState<SettingRecord[]>([]);
     const [heroSlides, setHeroSlides] = useState<HeroSlideRecord[]>([]);
-    const [bankAccounts, setBankAccounts] = useState<BankTransferAccount[]>([]);
-    const [expandedBankAccountIds, setExpandedBankAccountIds] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("general");
     const [saving, setSaving] = useState(false);
+    const [openGeneralSection, setOpenGeneralSection] = useState<string | null>(null);
+    const savedValues = useRef<Record<string, string>>({});
 
     useEffect(() => {
         const loadData = async () => {
@@ -253,10 +248,8 @@ export default function AdminSettings() {
                     apiFetch<SiteSetting[]>("/admin/settings"),
                     apiFetch<HeroSlide[]>("/admin/hero-slides"),
                 ]);
-                setSettings(settingsRes);
-                setBankAccounts(parseBankTransferAccounts(
-                    settingsRes.find((setting) => setting.key === "bank_transfer_accounts")?.value,
-                ));
+                setSettings(settingsRes.filter((setting) => setting.key !== "bank_transfer_accounts"));
+                savedValues.current = Object.fromEntries(settingsRes.map(s => [s.key, s.value]));
                 setHeroSlides(slidesRes);
             } catch {
                 toast.error("Failed to load settings");
@@ -287,51 +280,18 @@ export default function AdminSettings() {
     }, [displaySettings]);
 
     useEffect(() => {
-        if (!tabs.includes(activeTab)) {
+        if (!loading && !tabs.includes(activeTab)) {
             setActiveTab(tabs[0] ?? "general");
         }
-    }, [activeTab, tabs]);
+    }, [activeTab, tabs, loading]);
 
     const filteredSettings = displaySettings.filter((setting) => (setting.group || "general") === activeTab);
     const homeGroups = useMemo(() => buildSections(filteredSettings, HOME_SECTIONS), [filteredSettings]);
+    const generalGroups = useMemo(() => buildSections(filteredSettings, GENERAL_SECTIONS), [filteredSettings]);
 
     const updateSetting = (key: string, value: string) => {
         setSettings((prev) => prev.map((setting) => (
             setting.key === key ? { ...setting, value } : setting
-        )));
-    };
-
-    const updateBankAccounts = (nextAccounts: BankTransferAccount[]) => {
-        setBankAccounts(nextAccounts);
-        setExpandedBankAccountIds((current) => current.filter((id) => nextAccounts.some((account) => account.id === id)));
-        updateSetting("bank_transfer_accounts", JSON.stringify(nextAccounts));
-    };
-
-    const addBankAccount = () => {
-        const id = typeof crypto !== "undefined" && "randomUUID" in crypto
-            ? crypto.randomUUID()
-            : `bank-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        updateBankAccounts([...bankAccounts, {
-            id,
-            bank_name: "",
-            account_name: "",
-            sort_code: "",
-            account_number: "",
-            iban: "",
-            bic_swift: "",
-        }]);
-        setExpandedBankAccountIds((current) => [...current, id]);
-    };
-
-    const toggleBankAccount = (id: string) => {
-        setExpandedBankAccountIds((current) => current.includes(id)
-            ? current.filter((accountId) => accountId !== id)
-            : [...current, id]);
-    };
-
-    const updateBankAccount = (id: string, key: keyof Omit<BankTransferAccount, "id">, value: string) => {
-        updateBankAccounts(bankAccounts.map((account) => (
-            account.id === id ? { ...account, [key]: value } : account
         )));
     };
 
@@ -343,21 +303,22 @@ export default function AdminSettings() {
 
     const handleSaveSettings = async (e: React.FormEvent) => {
         e.preventDefault();
+        const updates = changedSettings(filteredSettings, savedValues.current);
+        if (!Object.keys(updates).length) {
+            toast.info("No changes to save");
+            return;
+        }
         setSaving(true);
 
-        const updates = settings.reduce<Record<string, string>>((acc, setting) => {
-            acc[setting.key] = setting.value;
-            return acc;
-        }, {});
-
         try {
-            await apiFetch("/admin/settings", {
+            const result = await apiFetch<{ updated: string[] }>("/admin/settings", {
                 method: "PUT",
                 body: JSON.stringify({ settings: updates }),
             });
+            for (const key of result.updated) savedValues.current[key] = updates[key];
             toast.success("Settings saved successfully");
-        } catch {
-            toast.error("Failed to save settings");
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Failed to save settings");
         } finally {
             setSaving(false);
         }
@@ -431,8 +392,8 @@ export default function AdminSettings() {
 
     const renderSettingField = (setting: SettingRecord) => (
         <div key={setting.id} className="space-y-2">
-            <label className="block text-sm font-bold text-[#10275c] capitalize">
-                {FREIGHT_SURCHARGE_LABELS[setting.key]
+            <label htmlFor={`setting-${setting.key}`} className="block text-sm font-bold text-[#10275c]">
+                {GENERAL_LABELS[setting.key] || FREIGHT_SURCHARGE_LABELS[setting.key]
                     || LABEL_OVERRIDES[setting.key]
                     || setting.key.replace(/_/g, " ").replace(activeTab, "").trim()
                     || setting.key}
@@ -445,6 +406,7 @@ export default function AdminSettings() {
                 />
             ) : setting.type === "textarea" ? (
                 <textarea
+                    id={`setting-${setting.key}`}
                     rows={6}
                     value={setting.value || ""}
                     onChange={(e) => updateSetting(setting.key, e.target.value)}
@@ -452,6 +414,7 @@ export default function AdminSettings() {
                 />
             ) : setting.type === "image" ? (
                 <ImageUpload
+                    id={`setting-${setting.key}`}
                     value={setting.value}
                     onChange={(url) => updateSetting(setting.key, url)}
                 />
@@ -472,6 +435,7 @@ export default function AdminSettings() {
                 <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-gray-500">£</span>
                     <input
+                        id={`setting-${setting.key}`}
                         type="number"
                         step="0.01"
                         min="0"
@@ -482,7 +446,8 @@ export default function AdminSettings() {
                 </div>
             ) : (
                 <input
-                    type={setting.type === "url" ? "url" : "text"}
+                    id={`setting-${setting.key}`}
+                    type={setting.key === 'contact_email' ? 'email' : setting.type === "url" ? "url" : "text"}
                     value={setting.value || ""}
                     onChange={(e) => updateSetting(setting.key, e.target.value)}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#eb5c10] focus:ring-[#eb5c10] sm:text-sm p-3 border"
@@ -495,15 +460,6 @@ export default function AdminSettings() {
         <div className="space-y-6 max-w-6xl">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold font-sans text-[#10275c]">Site Management</h1>
-                {activeTab === "payment" && (
-                    <button
-                        type="button"
-                        onClick={addBankAccount}
-                        className="inline-flex items-center gap-2 rounded-md bg-orange px-4 py-2 text-sm font-semibold text-white hover:bg-orange-hover"
-                    >
-                        <Plus className="h-4 w-4" /> Add Bank Account
-                    </button>
-                )}
                 {activeTab === "hero-slides" && (
                     <button
                         type="button"
@@ -609,74 +565,28 @@ export default function AdminSettings() {
             ) : (
                 <div className="rounded-lg bg-white shadow p-8">
                     <form onSubmit={handleSaveSettings} className="space-y-8">
+                        {activeTab === 'general' && <p className="text-sm text-gray-500">Manage your shared website details here. Open a section to edit it, then save your changes.</p>}
+                        {activeTab === 'legal' && <p className="text-sm text-gray-500">Shared details follow General automatically: {'{{site_name}}'}, {'{{contact_email}}'}, {'{{contact_phone}}'} and {'{{contact_address}}'}. Keep these placeholders where the company details should stay in sync.</p>}
                         <div className="grid grid-cols-1 gap-8">
-                            {activeTab === "payment" ? (
-                                bankAccounts.length === 0 ? (
-                                    <div className="rounded-md border border-dashed border-gray-300 p-8 text-center text-sm text-gray-500">
-                                        No bank accounts yet. Add an account, enter its details, then save the settings.
-                                    </div>
-                                ) : (
-                                    <div className="space-y-5">
-                                        <p className="text-sm text-gray-600">
-                                            Add as many transfer accounts as needed. Customers will be able to choose one during checkout.
-                                        </p>
-                                        {bankAccounts.map((account, index) => (
-                                            <section key={account.id} className="rounded-lg border border-gray-200 bg-[#f8fafc] p-4">
-                                                <div className="flex items-center justify-between gap-4">
-                                                    <button
-                                                        type="button"
-                                                        aria-expanded={expandedBankAccountIds.includes(account.id)}
-                                                        aria-controls={`bank-account-fields-${account.id}`}
-                                                        onClick={() => toggleBankAccount(account.id)}
-                                                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                                                    >
-                                                        {expandedBankAccountIds.includes(account.id)
-                                                            ? <ChevronDown className="h-5 w-5 flex-shrink-0 text-[#10275c]" />
-                                                            : <ChevronRight className="h-5 w-5 flex-shrink-0 text-[#10275c]" />}
-                                                        <span className="truncate text-base font-semibold text-[#10275c]">
-                                                            {account.bank_name.trim() || `Bank Account ${index + 1}`}
-                                                            {account.bank_name.trim() && account.account_name.trim() ? ` - ${account.account_name}` : ""}
-                                                        </span>
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => updateBankAccounts(bankAccounts.filter((item) => item.id !== account.id))}
-                                                        className="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" /> Remove
-                                                    </button>
-                                                </div>
-                                                {expandedBankAccountIds.includes(account.id) && (
-                                                <div id={`bank-account-fields-${account.id}`} className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-5">
-                                                    {([
-                                                        ["bank_name", "Bank Name", true],
-                                                        ["account_name", "Account Name", true],
-                                                        ["sort_code", "Sort Code", true],
-                                                        ["account_number", "Account Number", true],
-                                                        ["iban", "IBAN (optional)", false],
-                                                        ["bic_swift", "BIC / SWIFT (optional)", false],
-                                                    ] as const).map(([key, label, required]) => (
-                                                        <label key={key} className="block space-y-2">
-                                                            <span className="text-sm font-bold text-[#10275c]">{label}</span>
-                                                            <input
-                                                                type="text"
-                                                                value={account[key]}
-                                                                required={required}
-                                                                onChange={(event) => updateBankAccount(account.id, key, event.target.value)}
-                                                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#eb5c10] focus:ring-[#eb5c10] sm:text-sm p-3 border"
-                                                            />
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                                )}
-                                            </section>
-                                        ))}
-                                    </div>
-                                )
-                            ) : filteredSettings.length === 0 ? (
+                            {filteredSettings.length === 0 ? (
                                 <div className="text-sm text-gray-500">No settings in this section.</div>
                             ) : (
-                                activeTab === "home" ? (
+                                activeTab === 'general' ? (
+                                    <div className="space-y-3">
+                                        {[...generalGroups.resolvedSections, ...(generalGroups.leftovers.length ? [{ id: 'other', title: 'Other general settings', description: '', settings: generalGroups.leftovers }] : [])].map(section => (
+                                            <div key={section.id} className="rounded-lg border border-gray-200 overflow-hidden">
+                                                <button type="button" aria-expanded={openGeneralSection === section.id} aria-controls={`general-panel-${section.id}`} onClick={() => setOpenGeneralSection(openGeneralSection === section.id ? null : section.id)} className="flex w-full items-center justify-between gap-4 bg-[#f8fafc] p-4 text-left text-sm font-semibold text-[#10275c] hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange">
+                                                    {section.title}
+                                                    <ChevronDown aria-hidden="true" className={`h-5 w-5 shrink-0 transition-transform ${openGeneralSection === section.id ? 'rotate-180' : ''}`} />
+                                                </button>
+                                                <div id={`general-panel-${section.id}`} hidden={openGeneralSection !== section.id} className="space-y-6 border-t p-5">
+                                                    {section.description && <p className="text-sm text-gray-500">{section.description}</p>}
+                                                    {section.settings.map(renderSettingField)}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : activeTab === "home" ? (
                                     <div className="space-y-6">
                                         {homeGroups.resolvedSections.map((section) => (
                                             <div key={section.id} className="rounded-lg border border-gray-200 bg-[#f8fafc] p-6 space-y-6">

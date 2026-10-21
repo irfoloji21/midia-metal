@@ -36,6 +36,15 @@ class AdminSettingsTest extends TestCase
 
     // ─── Settings update ──────────────────────────────────────────────
 
+    public function test_manual_bank_details_are_hidden_and_cannot_be_updated(): void
+    {
+        $this->authenticatedAdmin();
+        SiteSetting::updateOrCreate(['key' => 'bank_transfer_accounts'], ['value' => '[]', 'group' => 'payment']);
+        $this->getJson('/api/admin/settings')->assertOk()->assertJsonMissing(['key' => 'bank_transfer_accounts']);
+        $this->getJson('/api/v1/settings')->assertOk()->assertJsonMissing(['key' => 'bank_transfer_accounts']);
+        $this->putJson('/api/admin/settings', ['settings' => ['bank_transfer_accounts' => '[]']])->assertStatus(422);
+    }
+
     public function test_admin_can_update_editable_setting(): void
     {
         $this->authenticatedAdmin();

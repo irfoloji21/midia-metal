@@ -1,0 +1,123 @@
+/* Shared by the service page and its visual content editor. */
+.service-rich-content {
+  container: service-content / inline-size;
+  color: #58657f;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.service-rich-content .service-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: 32px;
+  padding: 48px max(24px, calc((100% - 1200px) / 2));
+  background: #fff;
+}
+
+.service-rich-content .service-section:nth-of-type(even) {
+  background: #f1f3f4;
+}
+
+.service-rich-content .service-copy,
+.service-rich-content .service-media {
+  min-width: 0;
+}
+
+.service-rich-content .service-eyebrow {
+  margin: 0 0 12px;
+  color: #ac410b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.service-rich-content .service-copy h2 {
+  margin: 0 0 24px;
+  padding: 0;
+  color: #10275c;
+  font-family: inherit;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -.025em;
+}
+
+.service-rich-content .service-copy p {
+  margin: 0 0 18px;
+}
+
+.service-rich-content .service-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.service-rich-content .service-copy a {
+  color: #10275c;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Keep the complete installation visible, including portrait photographs. */
+.service-rich-content .service-media img {
+  display: block !important;
+  float: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 540px;
+  object-fit: contain;
+  margin: 0 auto !important;
+}
+
+.service-rich-content .service-caption {
+  margin-top: 12px;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@container service-content (min-width: 48rem) {
+  .service-rich-content .service-section {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(40px, 5vw, 80px);
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  .service-rich-content .service-section--image-left .service-media {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .service-rich-content .service-section--image-left .service-copy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+.service-rich-editor .service-section {
+  padding: 24px;
+  gap: 24px;
+  outline: 1px dashed #cbd1db;
+  outline-offset: -1px;
+}
+
+.service-rich-editor .service-media:empty::before {
+  content: "Click here, then Upload Image";
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+  background: #eaf0f3;
+  color: #58657f;
+  font-size: 14px;
+}
+
+.service-rich-editor .service-copy h2 {
+  font-size: 26px;
+}
+
+.service-rich-editor .service-media img {
+  max-height: 360px;
+}

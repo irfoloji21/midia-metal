@@ -10,17 +10,19 @@ import {
   ChevronRight,
   Facebook,
   Twitter,
-  MessageCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, ApiError } from "@/lib/api";
+import { useReviewEligibility } from "@/lib/use-review-eligibility";
 import { normalizeMediaUrl } from "@/lib/media";
 import ProductImage from "@/components/ProductImage";
+import { hasProductEditorial, insertProductSpecifications } from "@/lib/product-editorial";
+import "@/product-editorial.css";
 import { useStore } from "@nanostores/react";
 import { addToCart } from "@/stores/cart";
 import withErrorBoundary from "@/lib/withErrorBoundary";
 import { $wishlist, addToWishlist, removeFromWishlist } from "@/stores/wishlist";
-import { $customer } from "@/stores/auth";
+import { $customer, logoutCustomer } from "@/stores/auth";
 import { toast } from "sonner";
 import Breadcrumb from "@/components/Breadcrumb";
 import SelectionTableSection from "@/components/product/SelectionTableSection";
@@ -42,6 +44,14 @@ import {
   normalizeSelectionTableConfig,
 } from "@/lib/selectionTable";
 import type { Product, VariantTableSection, VariantTableColumn, VariantTableColumns } from "@/types/product";
+
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M20.52 3.48A11.91 11.91 0 0 0 12.05 0C5.47 0 .11 5.35.1 11.94c0 2.1.55 4.15 1.6 5.96L0 24l6.25-1.64a11.94 11.94 0 0 0 5.8 1.48h.01C18.64 23.84 24 18.49 24 11.9c0-3.19-1.24-6.18-3.48-8.42ZM12.06 21.82a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.71.97.99-3.62-.24-.37a9.87 9.87 0 0 1-1.51-5.27c0-5.47 4.45-9.92 9.92-9.92a9.85 9.85 0 0 1 7.02 2.91 9.84 9.84 0 0 1 2.9 7.02c0 5.47-4.45 9.92-9.97 9.87Zm5.44-7.43c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.67-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.53.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.68-.51h-.57c-.2 0-.53.07-.8.37-.28.3-1.05 1.02-1.05 2.49s1.07 2.89 1.22 3.09c.15.2 2.11 3.22 5.11 4.51.71.31 1.27.49 1.7.63.71.22 1.36.19 1.87.11.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35Z" />
+    </svg>
+  );
+}
 
 // DOMPurify needs a DOM — only import on the client. Backend sanitizes on save,
 // so SSR pass-through is safe. We lazy-load via dynamic import on first use.
@@ -246,7 +256,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  const [canReviewStatus, setCanReviewStatus] = useState<"loading" | "allowed" | "not_purchased" | "not_delivered" | "already_reviewed" | "unauthenticated">("loading");
+  const { status: canReviewStatus, retry: retryReviewEligibility, markReviewed } = useReviewEligibility(id);
 
   const allImages = product ? [product.image, ...(product.gallery || [])].filter(Boolean).map((img: unknown) => normalizeMediaUrl(img)) : [];
   const variantMode = getProductVariantMode(product);
@@ -345,6 +355,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   const shareText = encodeURIComponent(`${product?.name || "Product"} | Midia M Metal`);
   const description = (product?.description || "").trim();
   const descriptionHasHtml = /<\/?[a-z][\s\S]*>/i.test(description);
+  const hasEditorial = hasProductEditorial(description);
   const formatVariantColumnValue = (columnKey: string, variant: Record<string, any> | null): string => {
     if (!variant && !product) return "";
 
@@ -461,7 +472,10 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
       return [["Size", formatSpecValue(explicitSizeEntry[1])]];
     }
 
-    const derivedSize = buildVariantSizeSummary(sourceVariant);
+    const showDerivedDimensions = variantTableColumns.size.some((column) => (
+      column.frontendVisible && ["shipping_length_cm", "shipping_width_cm", "shipping_height_cm"].includes(column.key)
+    ));
+    const derivedSize = showDerivedDimensions ? buildVariantSizeSummary(sourceVariant) : "";
 
     return derivedSize ? [["Size", derivedSize]] : [];
   })();
@@ -530,7 +544,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   const shareLinks = {
     facebook: product?.share_links?.facebook || `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
     twitter: product?.share_links?.twitter || `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${shareText}`,
-    whatsapp: product?.share_links?.whatsapp || `https://wa.me/?text=${encodeURIComponent(`${product?.name || "Product"} | Midia M Metal ${shareUrl}`)}`,
+    whatsapp: `https://wa.me/?text=${shareText}%20${encodeURIComponent(shareUrl)}`,
   };
 
   useEffect(() => {
@@ -594,30 +608,11 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
       }
     };
 
-    const fetchReviewStatus = async () => {
-      if (!customer || !id) {
-        setCanReviewStatus("unauthenticated");
-        return;
-      }
-      try {
-        const data = await apiFetch<{ can_review: boolean; reason?: string }>(`/v1/customer/products/${id}/can-review`);
-        if (data.can_review) {
-          setCanReviewStatus("allowed");
-        } else {
-          const reason = data.reason as typeof canReviewStatus ?? "not_purchased";
-          setCanReviewStatus(reason);
-        }
-      } catch (err) {
-        setCanReviewStatus("unauthenticated");
-      }
-    };
-
     if (id) {
       setMainImageIndex(0);
       fetchData();
-      fetchReviewStatus();
     }
-  }, [id, customer]);
+  }, [id]);
 
   useEffect(() => {
     const cap = availableStock !== null
@@ -644,10 +639,13 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
 
       toast.success("Review submitted successfully!");
       setProduct({ ...product, reviews: [data, ...(product.reviews || [])] });
+      markReviewed();
       setReviewComment("");
       setReviewRating(5);
     } catch (err: any) {
       toast.error(err.message || "Failed to submit review.");
+      if (err instanceof ApiError && err.status === 401) logoutCustomer();
+      else retryReviewEligibility();
     } finally {
       setIsSubmittingReview(false);
     }
@@ -792,11 +790,12 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
             { name: product.name },
           ]}
         />
-        <div className="grid grid-cols-1 xl:grid-cols-[45%_55%] gap-10 xl:gap-12 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-10 xl:gap-12 items-start">
           <div className="flex flex-col gap-4 max-w-[550px]">
             <div className="relative group bg-white border border-[#e1e5eb] p-8 flex items-center justify-center">
               <ProductImage src={allImages[mainImageIndex]} alt={product.name} className="w-full aspect-square" />
               <button
+                aria-label="Enlarge product image"
                 onClick={() => {
                   setLightboxIndex(mainImageIndex);
                   setIsLightboxOpen(true);
@@ -811,6 +810,8 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                 {allImages.map((img: string, idx: number) => (
                   <button
                     key={idx}
+                    aria-label={`View product image ${idx + 1}`}
+                    aria-pressed={idx === mainImageIndex}
                     onClick={() => setMainImageIndex(idx)}
                     className={`border-2 transition-colors overflow-hidden bg-white ${idx === mainImageIndex ? 'border-orange' : 'border-[#e1e5eb] hover:border-[#cad4e4]'}`}
                   >
@@ -840,6 +841,16 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                 <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-orange' : ''}`} />
               </button>
             </div>
+            {hasEditorial && (
+              <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-6">
+                {productSpecEntries.filter(([key]) => ["Motor power", "Supply", "Speed control"].includes(key)).map(([key, value]) => (
+                  <div key={key} className="border border-[#d1dbe8] bg-white/60 p-4">
+                    <dt className="text-[11px] text-[#6e7a92] uppercase tracking-wide mb-2">{key}</dt>
+                    <dd className="text-sm text-primary font-semibold">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
             <div className="flex items-baseline gap-3 mt-3 mb-3">
               <p className="text-orange text-[28px] md:text-[34px] leading-none font-medium">
                 {product.price_on_request ? PRICE_ON_REQUEST_LABEL : formatMoneyValue(displayedTotalPrice)}
@@ -856,7 +867,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
               )}
             </div>
             {product.price_on_request ? (
-              <p className="mb-4 text-sm text-[#6e7a92]">Price depends on the size, material and details of your job. Tell us what you need and we’ll prepare a quote.</p>
+              <p className="mb-4 text-sm text-[#6e7a92]">Request a quotation based on your required dimensions, material and specification.</p>
             ) : (
               <p className="mb-3 text-[12px] font-medium uppercase tracking-wide text-[#6e7a92]">VAT included</p>
             )}
@@ -1011,13 +1022,13 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                 />
               )}
 
-              <div className={isSelectionTableMode ? "pt-6" : "pt-2"}>
-                <span className="font-semibold text-primary">Share:</span>
-                <div className="mt-2 flex items-center gap-2">
+              <div className={`flex items-center gap-3 ${isSelectionTableMode ? "pt-6" : "pt-2"}`}>
+                <span className="shrink-0 font-semibold text-primary">Share:</span>
+                <div className="flex shrink-0 items-center gap-2">
                   {[
                     { key: "facebook", href: shareLinks.facebook, Icon: Facebook, label: "Share on Facebook" },
                     { key: "twitter", href: shareLinks.twitter, Icon: Twitter, label: "Share on Twitter" },
-                    { key: "whatsapp", href: shareLinks.whatsapp, Icon: MessageCircle, label: "Share on WhatsApp" },
+                    { key: "whatsapp", href: shareLinks.whatsapp, Icon: WhatsAppIcon, label: "Share on WhatsApp" },
                   ].map(({ key, href, Icon, label }) => (
                     <a
                       key={key}
@@ -1040,7 +1051,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
       </section >
 
       <section className="container mx-auto px-4 lg:px-8 pb-14">
-        <div className={`grid grid-cols-1 ${specificationEntries.length > 0 ? "xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]" : ""} gap-10 xl:gap-12 items-start`}>
+        <div className={`grid grid-cols-1 ${specificationEntries.length > 0 && !hasEditorial ? "xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]" : ""} gap-10 xl:gap-12 items-start`}>
           <div className="min-w-0">
             <div className="flex flex-wrap gap-0 mb-10">
               <button
@@ -1067,7 +1078,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
               <div className="w-full">
                 {description ? (
                   descriptionHasHtml ? (
-                    <div
+                    hasEditorial ? <div className="product-story" dangerouslySetInnerHTML={{ __html: sanitizeHtml(insertProductSpecifications(description, specificationEntries)) }} /> : <div
                       className="prose prose-sm max-w-none text-[#6e7a92] leading-7 prose-p:my-3 prose-headings:text-primary prose-strong:text-primary prose-a:text-orange prose-a:no-underline hover:prose-a:underline prose-ul:my-3 prose-ol:my-3 prose-li:my-1 prose-blockquote:border-orange prose-blockquote:text-[#5f6f8d] prose-ul:list-disc prose-ol:list-decimal [&_table]:w-full [&_table]:border-separate [&_table]:[border-spacing:18px_0] [&_td]:align-top [&_td]:pr-4 [&_td]:pb-3 [&_th]:align-top [&_th]:pr-4 [&_th]:pb-3 [&_img]:max-w-full"
                       dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
                     />
@@ -1086,6 +1097,11 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                   <h3 className="text-xl font-semibold text-primary mb-6">Write a review</h3>
                   {canReviewStatus === "loading" ? (
                     <p className="text-[#6e7a92] bg-[#f4f5f7] p-4 text-sm animate-pulse">Checking eligibility...</p>
+                  ) : canReviewStatus === "error" ? (
+                    <div role="alert" className="text-[#6e7a92] bg-[#f4f5f7] p-4 text-sm">
+                      <p>We could not check your review eligibility. Please try again.</p>
+                      <button type="button" onClick={retryReviewEligibility} className="mt-3 font-semibold text-primary underline">Try again</button>
+                    </div>
                   ) : canReviewStatus === "unauthenticated" ? (
                     <p className="text-[#6e7a92] bg-[#f4f5f7] p-4 text-sm">
                       You must be <a href="/login" className="text-orange underline">logged in</a> and have purchased this product to write a review.
@@ -1098,11 +1114,17 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                     <p className="text-[#6e7a92] bg-[#f4f5f7] p-4 text-sm">
                       You can write a review once your order has been delivered or collected.
                     </p>
+                  ) : canReviewStatus === "not_paid" ? (
+                    <p className="text-[#6e7a92] bg-[#f4f5f7] p-4 text-sm">
+                      A paid order is required to review this product. Orders awaiting payment or with a refund status are not eligible.
+                    </p>
+                  ) : canReviewStatus === "order_cancelled" ? (
+                    <p className="text-[#6e7a92] bg-[#f4f5f7] p-4 text-sm">Reviews are not available for cancelled orders.</p>
                   ) : canReviewStatus === "already_reviewed" ? (
                     <p className="text-[#6e7a92] bg-[#eaf0f3] p-4 text-sm font-medium">
                       You have already reviewed this product. Thank you for your feedback!
                     </p>
-                  ) : (
+                  ) : canReviewStatus === "allowed" ? (
                     <form onSubmit={handleReviewSubmit} className="space-y-4">
                       <div>
                         <label className="block text-sm text-[#6e7a92] mb-2 font-medium">Your Rating</label>
@@ -1111,6 +1133,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                             <button
                               key={star}
                               type="button"
+                              aria-label={`Rate ${star} out of 5`}
                               onClick={() => setReviewRating(star)}
                               className={`hover:scale-110 transition-transform ${star <= reviewRating ? 'text-orange' : 'text-gray-300'}`}
                             >
@@ -1120,8 +1143,9 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm text-[#6e7a92] mb-2 font-medium">Your Review (Optional)</label>
+                        <label htmlFor="product-review-comment" className="block text-sm text-[#6e7a92] mb-2 font-medium">Your Review (Optional)</label>
                         <textarea
+                          id="product-review-comment"
                           value={reviewComment}
                           onChange={(e) => setReviewComment(e.target.value)}
                           className="w-full h-32 border border-[#d1dbe8] bg-[#f8fafc] p-4 text-sm focus:outline-none focus:border-orange resize-none"
@@ -1136,7 +1160,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                         {isSubmittingReview ? "Submitting..." : "Submit Review"}
                       </button>
                     </form>
-                  )}
+                  ) : null}
                 </div>
 
                 <div className="space-y-6">
@@ -1175,11 +1199,11 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
             )}
           </div>
 
-          {specificationEntries.length > 0 && (
+          {specificationEntries.length > 0 && !hasEditorial && (
             <aside className="min-w-0">
               <div className="overflow-hidden rounded border border-[#d5deea] bg-white">
                 <div className="border-b border-[#d5deea] px-8 py-6">
-                  <h3 className="font-sans text-[24px] md:text-[28px] font-semibold text-primary">Specs</h3>
+                  <h3 className="font-sans text-[24px] md:text-[28px] font-semibold text-primary">Specifications</h3>
                 </div>
                 <div>
                   {specificationEntries.map(([key, value]) => (
@@ -1240,6 +1264,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
             onClick={() => setIsLightboxOpen(false)}
           >
             <button
+              aria-label="Close product gallery"
               onClick={() => setIsLightboxOpen(false)}
               className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-50 p-2 cursor-pointer"
             >
@@ -1252,6 +1277,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
             >
               {allImages.length > 1 && (
                 <button
+                  aria-label="Previous product image"
                   onClick={(e) => { e.stopPropagation(); setLightboxIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1)); }}
                   className="absolute left-2 md:left-0 p-3 rounded-full bg-white/10 hover:bg-white/25 text-white transition-colors z-[60] cursor-pointer backdrop-blur-sm"
                 >
@@ -1267,6 +1293,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
 
               {allImages.length > 1 && (
                 <button
+                  aria-label="Next product image"
                   onClick={(e) => { e.stopPropagation(); setLightboxIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0)); }}
                   className="absolute right-2 md:right-0 p-3 rounded-full bg-white/10 hover:bg-white/25 text-white transition-colors z-[60] cursor-pointer backdrop-blur-sm"
                 >

@@ -140,7 +140,13 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
   structuredData={[breadcrumbJsonLd, ...(itemListJsonLd ? [itemListJsonLd] : [])]}
 >
   <div class="min-h-screen bg-[#eaf0f3]">
-    <form method="GET" class="container mx-auto px-4 lg:px-8 pt-16 md:pt-20 pb-20 md:pb-24">
+    <form
+      method="GET"
+      data-shop-catalogue
+      data-initial-visible-count={INITIAL_VISIBLE_COUNT}
+      data-show-more-count={SHOW_MORE_COUNT}
+      class="container mx-auto px-4 lg:px-8 pt-16 md:pt-20 pb-20 md:pb-24"
+    >
       <div class="shop-layout grid gap-6 md:gap-8 lg:gap-10 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_370px]">
         <div>
           <div class="flex items-center justify-between mb-8 gap-4">
@@ -215,33 +221,6 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
                 </div>
               )}
 
-              {hasMoreProducts && (
-                <script is:inline define:vars={{ initialVisibleCount: INITIAL_VISIBLE_COUNT, showMoreCount: SHOW_MORE_COUNT }}>
-                  (() => {
-                    const cards = Array.from(document.querySelectorAll('[data-product-card]'));
-                    const showingCount = document.querySelector('[data-showing-count]');
-                    const showMoreButton = document.querySelector('[data-show-more]');
-                    const showLessButton = document.querySelector('[data-show-less]');
-                    if (!showMoreButton || !showLessButton || cards.length <= initialVisibleCount) return;
-
-                    let visibleCount = initialVisibleCount;
-
-                    const updateVisibleProducts = (nextCount) => {
-                      visibleCount = Math.max(initialVisibleCount, Math.min(nextCount, cards.length));
-                      cards.forEach((card, index) => {
-                        if (index < visibleCount) card.style.removeProperty('display');
-                        else card.style.display = 'none';
-                      });
-                      if (showingCount) showingCount.textContent = String(visibleCount);
-                      showMoreButton.hidden = visibleCount >= cards.length;
-                      showLessButton.hidden = visibleCount <= initialVisibleCount;
-                    };
-
-                    showMoreButton.addEventListener('click', () => updateVisibleProducts(visibleCount + showMoreCount));
-                    showLessButton.addEventListener('click', () => updateVisibleProducts(visibleCount - showMoreCount));
-                  })();
-                </script>
-              )}
             </>
           ) : (
             <div class="py-16 text-center text-[#6e7a92] bg-[#f4f5f7] border border-[#d5deea]">
@@ -307,7 +286,7 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
               </div>
             </div>
 
-            <div>
+            {tags.length > 0 && <div>
               <h3 class="text-[16px] leading-none font-semibold text-primary mb-5 font-sans">Tags</h3>
               <div class="flex flex-wrap gap-2">
                 {tags.map((tag) => {
@@ -320,10 +299,18 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
                   );
                 })}
               </div>
-            </div>
+            </div>}
           </div>
         </aside>
       </div>
     </form>
   </div>
 </BaseLayout>
+
+<script>
+  import { initializeShopPagination } from '@/lib/shop-pagination';
+
+  initializeShopPagination();
+  // Astro replaces the page contents during navigation without rerunning module scripts.
+  document.addEventListener('astro:page-load', initializeShopPagination);
+</script>

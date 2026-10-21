@@ -21,15 +21,11 @@ const settings = await fetchSettings({ bypassCache: true });
 const t = (key: string, def: string) => settings[key] || def;
 const contactPhone = t('contact_phone', '');
 const contactEmail = t('contact_email', '');
-const phoneDigits = contactPhone.replace(/\D/g, '');
-const whatsappPhone = phoneDigits.startsWith('00')
-  ? phoneDigits.slice(2)
-  : phoneDigits.startsWith('0') ? `44${phoneDigits.slice(1)}` : phoneDigits;
 ---
 
 <BaseLayout
-  title={getPageTitle(settings, 'contact_meta_title', 'Contact Midia M Metal | Discuss Your Job')}
-  description={getPageDescription(settings, 'contact_meta_description', 'Call, WhatsApp or email Midia M Metal about commercial kitchen equipment, ventilation, custom fabrication, installation or repairs. Based in London.')}
+  title={getPageTitle(settings, 'contact_meta_title', 'Contact Midia M Metal | Kitchen Equipment & Fabrication')}
+  description={getPageDescription(settings, 'contact_meta_description', 'Contact Midia M Metal for kitchen equipment, bespoke fabrication, ventilation systems, canopies and wall cladding. Our factory is in London.')}
   canonicalPath="/contact"
   structuredData={[buildBreadcrumbJsonLd([
     { name: 'Home', url: `${siteUrl}/` },
@@ -43,20 +39,15 @@ const whatsappPhone = phoneDigits.startsWith('00')
         <div>
           <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#10275c] mb-5">{t("contact_hero_label", "Contact Midia M Metal")}</p>
           <h1 class="font-sans text-[38px] md:text-[52px] leading-[1.05] font-semibold text-[#10275c] mb-6 whitespace-pre-line">
-            {t("contact_hero_title", "Let’s talk about the job.")}
+            {t("contact_hero_title", "Product and project enquiries.")}
           </h1>
           <p class="text-[#58657f] text-[16px] leading-8 max-w-[560px] mb-6 whitespace-pre-line">
-            {t("contact_welcome", "Need something made, fitted or repaired? Call or WhatsApp us and tell us what you have in mind. We’ll talk through what you need and the next steps.\n\nYou can also email us or leave a message using the form.")}
+            {t("contact_welcome", "Contact Midia M Metal for enquiries about commercial kitchen equipment, fabrication and installation.")}
           </p>
           <div class="flex flex-wrap gap-3 mb-10">
             {contactPhone && (
               <a href={`tel:${contactPhone.replace(/\s/g, '')}`} class="inline-flex items-center justify-center px-7 py-3 bg-orange text-white text-sm font-semibold hover:bg-orange-hover transition-colors">
                 {t('contact_phone_label', 'Call Us')}
-              </a>
-            )}
-            {whatsappPhone && (
-              <a href={`https://wa.me/${whatsappPhone}`} target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3 border border-primary text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-colors">
-                {t('contact_whatsapp_label', 'WhatsApp Us')}
               </a>
             )}
           </div>
@@ -79,31 +70,31 @@ const whatsappPhone = phoneDigits.startsWith('00')
             </div>
           </div>
           <div class="mt-10 border-t border-[#c7d0de] pt-6">
-            <h2 class="font-sans text-[24px] font-semibold text-primary mb-2">{t('contact_quote_title', 'Looking for a price estimate?')}</h2>
-            <p class="text-sm leading-7 text-[#58657f] mb-3">{t('contact_quote_desc', 'Use our quote form to tell us what you need made or supplied.')}</p>
+            <h2 class="font-sans text-[24px] font-semibold text-primary mb-2">{t('contact_quote_title', 'Request a quotation.')}</h2>
+            <p class="text-sm leading-7 text-[#58657f] mb-3">{t('contact_quote_desc', 'For project pricing, use our quotation form to submit your requirements and supporting files.')}</p>
             <a href="/get-a-quote" class="text-sm font-semibold text-primary underline underline-offset-4 hover:text-orange transition-colors">{t('contact_quote_button_label', 'Request a Quote')}</a>
           </div>
         </div>
 
         <!-- Contact Form Island -->
         <div>
-          <h2 class="font-sans text-[28px] md:text-[34px] leading-tight font-semibold text-primary mb-4">{t('contact_form_title', 'Leave us a message.')}</h2>
-          <p class="text-sm leading-7 text-[#58657f] mb-8">{t('contact_form_intro', 'Tell us what you need and where the job is. Include your postcode and any approximate measurements you have, so we can understand the work involved.')}</p>
+          <h2 class="font-sans text-[28px] md:text-[34px] leading-tight font-semibold text-primary mb-4">{t('contact_form_title', 'Send an enquiry.')}</h2>
+          <p class="text-sm leading-7 text-[#58657f] mb-8">{t('contact_form_intro', 'Use this form for product questions and general enquiries.')}</p>
           <ContactForm
             client:idle
-            messagePlaceholder={t("contact_form_message_placeholder", "Tell us about the work you need.")}
-            buttonLabel={t("contact_form_button_label", "Send Message")}
+            messagePlaceholder={t("contact_form_message_placeholder", "Enter your message.")}
+            buttonLabel={t("contact_form_button_label", "Send Enquiry")}
             copy={{
-              nameLabel: t('contact_form_name_label', 'Your Name'),
+              nameLabel: t('contact_form_name_label', 'Full Name'),
               emailLabel: t('contact_form_email_label', 'Email Address'),
               phoneLabel: t('contact_form_phone_label', 'Phone Number (optional)'),
-              subjectLabel: t('contact_form_subject_label', 'Subject (optional)'),
+              subjectLabel: t('contact_form_subject_label', 'Enquiry Subject (optional)'),
               sendingLabel: t('contact_form_sending_label', 'Sending...'),
-              successMessage: t('contact_form_success_message', 'Thanks, we’ve received your message. We’ll get back to you using the contact details you provided.'),
-              errorMessage: t('contact_form_error_message', 'Your message couldn’t be sent. Please try again, or contact us by phone or WhatsApp.'),
-              privacyError: t('contact_form_privacy_error', 'Please tick the privacy policy box before sending your message.'),
+              successMessage: t('contact_form_success_message', 'Your enquiry has been received. Our team will review the details and contact you using the information provided.'),
+              errorMessage: t('contact_form_error_message', 'Your enquiry could not be sent. Please try again or contact us by phone or email.'),
+              privacyError: t('contact_form_privacy_error', 'Please confirm your agreement to the privacy policy before sending your enquiry.'),
               privacyPrefix: t('contact_form_privacy_prefix', 'I agree to the'),
-              privacyLinkLabel: t('contact_form_privacy_link_label', 'privacy policy.'),
+              privacyLinkLabel: t('contact_form_privacy_link_label', 'Privacy Policy.'),
             }}
           />
         </div>

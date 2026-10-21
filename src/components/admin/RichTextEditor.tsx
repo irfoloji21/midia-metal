@@ -17,21 +17,28 @@ import {
   AlignRight,
   AlignJustify,
   LayoutGrid,
+  Columns2,
+  ArrowLeftRight,
+  ImageUp,
+  TextCursorInput,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
+import "@/service-content.css";
+import "@/product-editorial.css";
 
 type RichTextEditorProps = {
   label: string;
   value: string;
   onChange: (value: string) => void;
   helperText?: string;
+  serviceLayout?: boolean;
 };
 
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 const MAX_IMAGE_SIZE_LABEL = "2MB";
 
-export default function RichTextEditor({ label, value, onChange, helperText = "Saved as formatted HTML." }: RichTextEditorProps) {
+export default function RichTextEditor({ label, value, onChange, helperText = "Saved as formatted HTML.", serviceLayout = false }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -39,6 +46,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
   const selectionRef = useRef<Range | null>(null);
   const draggingImageRef = useRef<HTMLImageElement | null>(null);
   const activeImgRowRef = useRef<HTMLElement | null>(null);
+  const replacementImageRef = useRef<HTMLImageElement | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
@@ -271,7 +279,14 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
       return;
     }
 
-    if (selectedImage) {
+    const replacement = replacementImageRef.current;
+    replacementImageRef.current = null;
+    const insertionRange = getSafeInsertionRange();
+    const insertionNode = insertionRange?.startContainer;
+    const insertionElement = insertionNode instanceof HTMLElement ? insertionNode : insertionNode?.parentElement;
+    const mediaTarget = serviceLayout ? insertionElement?.closest(".service-media") : null;
+
+    if (selectedImage && !replacement && !mediaTarget) {
       const newRange = document.createRange();
       newRange.setStartAfter(selectedImage);
       newRange.collapse(true);
@@ -288,7 +303,22 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
         const url = await uploadImage(file);
         const alt = file.name.replace(/\.[^/.]+$/, "");
 
-        if (imgRowTarget && editorRef.current?.contains(imgRowTarget)) {
+        if (replacement && editorRef.current?.contains(replacement)) {
+          replacement.src = url;
+          replacement.style.cssText = "max-width:100%;height:auto;";
+          // Keep the descriptive alt text; it can be edited separately.
+          emitChange();
+          break;
+        } else if (mediaTarget && editorRef.current?.contains(mediaTarget)) {
+          const img = document.createElement("img");
+          img.src = url;
+          img.alt = alt;
+          img.loading = "lazy";
+          mediaTarget.replaceChildren(img);
+          setSelectedImage(img);
+          emitChange();
+          break;
+        } else if (imgRowTarget && editorRef.current?.contains(imgRowTarget)) {
           // Remove the placeholder hint if present
           const hint = imgRowTarget.querySelector<HTMLSpanElement>("span[contenteditable='false']");
           if (hint) {
@@ -304,6 +334,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           img.style.cssText = "height:auto;display:inline-block;margin:4px;max-width:48%;";
           img.loading = "lazy";
           imgRowTarget.appendChild(img);
+          emitChange();
         } else {
           const escapedSrc = String(url).replace(/"/g, "&quot;");
           const escapedAlt = alt.replace(/"/g, "&quot;");
@@ -335,6 +366,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
   };
 
   const openImagePicker = () => {
+    replacementImageRef.current = null;
     editorRef.current?.focus();
     saveSelection();
     imageInputRef.current?.click();
@@ -449,6 +481,45 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
     toast.info("Image row created! Now click Upload Image to add images side by side.", { duration: 4000 });
   };
 
+  const currentServiceSection = () => {
+    const node = getSafeInsertionRange()?.startContainer;
+    const element = node instanceof HTMLElement ? node : node?.parentElement;
+    const section = element?.closest<HTMLElement>(".service-section");
+    return section && editorRef.current?.contains(section) ? section : null;
+  };
+
+  const insertServiceSection = () => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    const previous = currentServiceSection();
+    const section = document.createElement("div");
+    const count = editor.querySelectorAll(".service-section").length;
+    section.className = `service-section${count % 2 ? " service-section--image-left" : ""}`;
+    section.innerHTML = '<div class="service-copy"><div class="service-eyebrow">Service detail</div><h2>Section heading</h2><p>Describe the work and the requirements for this service.</p></div><div class="service-media"></div>';
+    if (previous) previous.after(section);
+    else editor.appendChild(section);
+    const range = document.createRange();
+    range.selectNodeContents(section.querySelector(".service-media")!);
+    range.collapse(false);
+    editor.focus();
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+    selectionRef.current = range.cloneRange();
+    activeImgRowRef.current = null;
+    setSelectedImage(null);
+    emitChange();
+  };
+
+  const swapServiceSection = () => {
+    const section = currentServiceSection();
+    if (!section) {
+      toast.info("Click inside a section first.");
+      return;
+    }
+    section.classList.toggle("service-section--image-left");
+    emitChange();
+  };
+
   const buttons = [
     { title: "Bold", icon: Bold, action: () => runCommand("bold") },
     { title: "Italic", icon: Italic, action: () => runCommand("italic") },
@@ -503,8 +574,36 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           />
         </div>
 
+        {serviceLayout && (
+          <div className="flex flex-wrap gap-2 border-b border-gray-200 p-2 bg-[#f4f6f8]">
+            {[
+              { label: "Add image + text", icon: Columns2, action: insertServiceSection, disabled: false },
+              { label: "Swap sides", icon: ArrowLeftRight, action: swapServiceSection, disabled: false },
+              { label: "Replace photo", icon: ImageUp, disabled: !selectedImage, action: () => {
+                replacementImageRef.current = selectedImage;
+                imageInputRef.current?.click();
+              } },
+              { label: "Image description", icon: TextCursorInput, disabled: !selectedImage, action: () => {
+                if (!selectedImage) return;
+                const alt = window.prompt("Describe what is shown in the photograph", selectedImage.alt);
+                if (alt !== null) { selectedImage.alt = alt.trim(); emitChange(); }
+              } },
+            ].map(({ label: buttonLabel, icon: Icon, action, disabled }) => (
+              <button key={buttonLabel} type="button" disabled={disabled}
+                onMouseDown={(event) => { event.preventDefault(); saveSelection(); }}
+                onClick={action}
+                className="inline-flex items-center gap-2 rounded border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-primary disabled:opacity-40 hover:border-orange">
+                <Icon className="w-4 h-4" />{buttonLabel}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div
           ref={editorRef}
+          role="textbox"
+          aria-label={label || "Rich text content"}
+          aria-multiline="true"
           contentEditable
           suppressContentEditableWarning
           onClick={handleEditorClick}
@@ -512,6 +611,10 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           onKeyUp={saveSelection}
           onDragStart={(event) => {
             const target = event.target as HTMLElement;
+            if (serviceLayout && target.closest(".service-media")) {
+              event.preventDefault();
+              return;
+            }
             if (target.tagName === "IMG") {
               draggingImageRef.current = target as HTMLImageElement;
               event.dataTransfer.setData("text/x-internal-img", "1");
@@ -629,7 +732,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
             saveSelection();
             emitChange();
           }}
-          className={`min-h-[220px] max-h-[600px] overflow-y-auto p-3 focus:outline-none text-sm leading-6 text-gray-700 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:my-1 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:my-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:my-2 [&_blockquote]:border-l-4 [&_blockquote]:border-[#eb5c10] [&_blockquote]:pl-3 [&_blockquote]:italic [&_table]:w-full [&_table]:border-separate [&_table]:[border-spacing:18px_0] [&_td]:align-top [&_td]:pr-4 [&_td]:pb-3 [&_th]:align-top [&_th]:pr-4 [&_th]:pb-3 [&_img]:max-w-full ${isDragOver ? "bg-[#fff7f2] ring-2 ring-[#eb5c10]/40" : ""}`}
+          className={`${serviceLayout ? "service-rich-content service-rich-editor" : ""} min-h-[220px] max-h-[600px] overflow-y-auto p-3 focus:outline-none text-sm leading-6 text-gray-700 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:my-1 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:my-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:my-2 [&_blockquote]:border-l-4 [&_blockquote]:border-[#eb5c10] [&_blockquote]:pl-3 [&_blockquote]:italic [&_table]:w-full [&_table]:border-separate [&_table]:[border-spacing:18px_0] [&_td]:align-top [&_td]:pr-4 [&_td]:pb-3 [&_th]:align-top [&_th]:pr-4 [&_th]:pb-3 [&_img]:max-w-full ${isDragOver ? "bg-[#fff7f2] ring-2 ring-[#eb5c10]/40" : ""}`}
         />
 
         {selectedImage && imageRect && (
@@ -642,6 +745,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
               height: imageRect.height,
             }}
           >
+            {!serviceLayout && <>
             {/* Corners */}
             <div className="absolute w-3 h-3 bg-white border border-[#eb5c10] cursor-nwse-resize -top-1.5 -left-1.5 pointer-events-auto" onMouseDown={(e) => handleResizeStart(e, "nw")} />
             <div className="absolute w-3 h-3 bg-white border border-[#eb5c10] cursor-nesw-resize -top-1.5 -right-1.5 pointer-events-auto" onMouseDown={(e) => handleResizeStart(e, "ne")} />
@@ -718,6 +822,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
                 <AlignJustify className="w-4 h-4" />
               </button>
             </div>
+            </>}
           </div>
         )}
       </div>

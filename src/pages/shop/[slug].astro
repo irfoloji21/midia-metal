@@ -63,7 +63,8 @@ const productJsonLd = buildProductJsonLd({
   name: productName,
   description: rawDescription,
   image: product?.image,
-  sku: product?.sku || String(product?.id || ''),
+  sku: product?.product_code || product?.sku || String(product?.id || ''),
+  brand: product?.specifications?.Manufacturer || product?.specifications?.Brand || 'Midia M Metal',
   url: productUrl,
   price: numericPrice,
   availability: product?.stock > 0 || product?.in_stock !== false

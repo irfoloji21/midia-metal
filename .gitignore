@@ -44,5 +44,11 @@ tests/login-debug.png
 test-results/
 playwright-report/
 
+# Local media preparation, review packages, and generated audit output.
+# Keep these on disk; deployable assets live in public/ and backend/public/.
+/portfolio-preparation/
+/reports/
+/output/
+
 # Unused package manager lockfiles
 bun.lockb

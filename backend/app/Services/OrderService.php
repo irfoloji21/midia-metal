@@ -11,11 +11,11 @@ use App\Models\Product;
 use App\Models\SiteSetting;
 use App\Support\CheckoutCalculator;
 use App\Support\ProductVariantResolver;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Orchestrates order placement: calculates totals, creates the order + items
@@ -28,6 +28,7 @@ class OrderService
     public function __construct(
         private CheckoutCalculator $checkoutCalculator,
         private StripePaymentVerifier $stripeVerifier,
+        private StripeCheckoutContext $checkoutContext,
     ) {}
 
     /**
@@ -40,33 +41,12 @@ class OrderService
      */
     public function place(array $validated, ?Customer $authenticatedCustomer = null): Order
     {
-        $bankTransferDetails = null;
-        $paymentMethod = strtolower((string) ($validated['payment_method'] ?? 'bank_transfer'));
-        if (in_array($paymentMethod, ['bank_transfer', 'direct bank transfer'], true)) {
-            $accounts = json_decode((string) SiteSetting::where('key', 'bank_transfer_accounts')->value('value'), true);
-            $selectedAccount = collect(is_array($accounts) ? $accounts : [])
-                ->firstWhere('id', $validated['bank_account_id'] ?? null);
-
-            if (! $selectedAccount
-                || empty(trim((string) ($selectedAccount['bank_name'] ?? '')))
-                || empty(trim((string) ($selectedAccount['account_name'] ?? '')))
-                || empty(trim((string) ($selectedAccount['sort_code'] ?? '')))
-                || empty(trim((string) ($selectedAccount['account_number'] ?? '')))) {
-                throw ValidationException::withMessages([
-                    'bank_account_id' => 'Choose a valid bank account for the transfer.',
-                ]);
-            }
-
-            $bankTransferDetails = [
-                'id' => $selectedAccount['id'],
-                'bank_name' => $selectedAccount['bank_name'],
-                'account_name' => $selectedAccount['account_name'],
-                'sort_code' => $selectedAccount['sort_code'],
-                'account_number' => $selectedAccount['account_number'],
-                'iban' => $selectedAccount['iban'] ?? null,
-                'bic_swift' => $selectedAccount['bic_swift'] ?? null,
-            ];
+        $fingerprint = $this->checkoutContext->validate($validated, $authenticatedCustomer);
+        $intentId = $validated['stripe_payment_intent_id'];
+        if ($existing = Order::where('stripe_payment_intent_id', $intentId)->first()) {
+            return $existing;
         }
+        $paymentMethod = $validated['payment_method'];
 
         // 1. Calculate totals via CheckoutCalculator
         $totals = $this->checkoutCalculator->calculate(
@@ -81,98 +61,104 @@ class OrderService
         $discountAmount = $totals['discount_amount'];
         $taxAmount = $totals['tax_amount'];
         $total = $totals['total'];
-        $paymentStatus = 'pending';
-        $receiptUrl = null;
-
-        // 2. Verify Stripe payment if provided
-        if (! empty($validated['stripe_payment_intent_id'])) {
-            $result = $this->stripeVerifier->verify(
-                $validated['stripe_payment_intent_id'],
-                $total
-            );
-            $paymentStatus = $result['status'];
-            $receiptUrl = $result['receipt_url'];
-        }
+        $result = $this->stripeVerifier->verify($intentId, $total, $paymentMethod, $fingerprint);
+        $paymentStatus = $result['status'];
+        $receiptUrl = $result['receipt_url'];
+        $bankTransferDetails = $result['bank_transfer_details'];
 
         // 3. Generate unique order number
         $orderNumber = $this->generateOrderNumber();
 
         // 4. Create order + items in a transaction
-        $order = DB::transaction(function () use (
-            $validated, $totals, $orderNumber, $subtotal, $shipping,
-            $discountAmount, $taxAmount, $total, $paymentStatus, $authenticatedCustomer, $receiptUrl, $bankTransferDetails
-        ) {
-            if ($totals['coupon']) {
-                $totals['coupon']->increment('used_count');
-            }
+        try {
+            $order = DB::transaction(function () use (
+                $validated, $totals, $orderNumber, $subtotal, $shipping,
+                $discountAmount, $taxAmount, $total, $paymentStatus, $authenticatedCustomer, $receiptUrl, $bankTransferDetails
+            ) {
+                if ($totals['coupon']) {
+                    $totals['coupon']->increment('used_count');
+                }
 
-            $order = Order::create([
-                'order_number' => $orderNumber,
-                'customer_name' => $validated['customer_name'],
-                'customer_email' => $validated['customer_email'],
-                'customer_phone' => $validated['customer_phone'] ?? null,
-                'shipping_address' => $validated['shipping_address'],
-                'shipping_address_line1' => $validated['shipping_address_line1'] ?? null,
-                'shipping_address_line2' => $validated['shipping_address_line2'] ?? null,
-                'shipping_city' => $validated['shipping_city'] ?? null,
-                'shipping_postcode' => $validated['shipping_postcode'] ?? null,
-                'shipping_county' => $validated['shipping_county'] ?? null,
-                'shipping_country' => $validated['shipping_country'] ?? 'United Kingdom',
-                'billing_address' => $validated['billing_address'],
-                'billing_address_line1' => $validated['billing_address_line1'] ?? null,
-                'billing_address_line2' => $validated['billing_address_line2'] ?? null,
-                'billing_city' => $validated['billing_city'] ?? null,
-                'billing_postcode' => $validated['billing_postcode'] ?? null,
-                'billing_county' => $validated['billing_county'] ?? null,
-                'billing_country' => $validated['billing_country'] ?? null,
-                'payment_method' => $validated['payment_method'] ?? 'bank_transfer',
-                'bank_transfer_details' => $bankTransferDetails,
-                'notes' => $validated['notes'] ?? null,
-                'shipping_metadata' => [
-                    'fulfilment_method' => $validated['fulfilment_method'] ?? 'delivery',
-                    'selected_delivery_option' => $totals['shipping_option'],
-                ],
-                'shipping_provider' => $totals['shipping_option']['provider'] ?? null,
-                'shipping_carrier' => $totals['shipping_option']['carrier'] ?? null,
-                'shipping_service' => $totals['shipping_option']['service'] ?? null,
-                'subtotal' => $subtotal,
-                'shipping' => $shipping,
-                'discount_amount' => $discountAmount,
-                'tax_amount' => $taxAmount,
-                'total' => $total,
-                'coupon_code' => $validated['coupon_code'] ?? null,
-                'is_business' => $validated['is_business'] ?? false,
-                'company_name' => $validated['company_name'] ?? null,
-                'company_vat_number' => $validated['company_vat_number'] ?? null,
-                'customer_id' => $authenticatedCustomer?->id ?? null,
-                'status' => 'pending',
-                'payment_status' => $paymentStatus,
-                'stripe_payment_intent_id' => $validated['stripe_payment_intent_id'] ?? null,
-                'stripe_receipt_url' => $receiptUrl,
-            ]);
-
-            foreach ($totals['items'] as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item['product_id'],
-                    'product_name' => $item['product_name'],
-                    'product_price' => $item['product_price'],
-                    'quantity' => $item['quantity'],
-                    'variant_details' => $item['variant_details'],
+                $order = Order::create([
+                    'order_number' => $orderNumber,
+                    'customer_name' => $validated['customer_name'],
+                    'customer_email' => $validated['customer_email'],
+                    'customer_phone' => $validated['customer_phone'] ?? null,
+                    'shipping_address' => $validated['shipping_address'],
+                    'shipping_address_line1' => $validated['shipping_address_line1'] ?? null,
+                    'shipping_address_line2' => $validated['shipping_address_line2'] ?? null,
+                    'shipping_city' => $validated['shipping_city'] ?? null,
+                    'shipping_postcode' => $validated['shipping_postcode'] ?? null,
+                    'shipping_county' => $validated['shipping_county'] ?? null,
+                    'shipping_country' => $validated['shipping_country'] ?? 'United Kingdom',
+                    'billing_address' => $validated['billing_address'],
+                    'billing_address_line1' => $validated['billing_address_line1'] ?? null,
+                    'billing_address_line2' => $validated['billing_address_line2'] ?? null,
+                    'billing_city' => $validated['billing_city'] ?? null,
+                    'billing_postcode' => $validated['billing_postcode'] ?? null,
+                    'billing_county' => $validated['billing_county'] ?? null,
+                    'billing_country' => $validated['billing_country'] ?? null,
+                    'payment_method' => $validated['payment_method'],
+                    'bank_transfer_details' => $bankTransferDetails,
+                    'notes' => $validated['notes'] ?? null,
+                    'shipping_metadata' => [
+                        'fulfilment_method' => $validated['fulfilment_method'] ?? 'delivery',
+                        'selected_delivery_option' => $totals['shipping_option'],
+                    ],
+                    'shipping_provider' => $totals['shipping_option']['provider'] ?? null,
+                    'shipping_carrier' => $totals['shipping_option']['carrier'] ?? null,
+                    'shipping_service' => $totals['shipping_option']['service'] ?? null,
+                    'subtotal' => $subtotal,
+                    'shipping' => $shipping,
+                    'discount_amount' => $discountAmount,
+                    'tax_amount' => $taxAmount,
+                    'total' => $total,
+                    'coupon_code' => $validated['coupon_code'] ?? null,
+                    'is_business' => $validated['is_business'] ?? false,
+                    'company_name' => $validated['company_name'] ?? null,
+                    'company_vat_number' => $validated['company_vat_number'] ?? null,
+                    'customer_id' => $authenticatedCustomer?->id ?? null,
+                    'status' => 'pending',
+                    'payment_status' => $paymentStatus,
+                    'stripe_payment_intent_id' => $validated['stripe_payment_intent_id'] ?? null,
+                    'stripe_receipt_url' => $receiptUrl,
                 ]);
 
-                $this->decrementProductStock((int) $item['product_id'], $item['variant_details'] ?? null, (int) $item['quantity']);
-            }
+                foreach ($totals['items'] as $item) {
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $item['product_id'],
+                        'product_name' => $item['product_name'],
+                        'product_price' => $item['product_price'],
+                        'quantity' => $item['quantity'],
+                        'variant_details' => $item['variant_details'],
+                    ]);
 
-            return $order;
-        });
+                    $this->decrementProductStock((int) $item['product_id'], $item['variant_details'] ?? null, (int) $item['quantity']);
+                }
+
+                return $order;
+            });
+
+        } catch (UniqueConstraintViolationException $e) {
+            // A parallel retry may have committed this payment first.
+            $existing = Order::where('stripe_payment_intent_id', $intentId)->first();
+            if ($existing) {
+                return $existing;
+            }
+            throw $e;
+        }
 
         // 5. Send notification emails (outside transaction — non-critical)
-        $this->sendAdminNotification($order);
+        try {
+            $this->sendAdminNotification($order);
+        } catch (\Exception $e) {
+            report($e);
+        }
         $this->sendCustomerConfirmation($order);
 
         // 6. Handle card save/detach
-        if ($authenticatedCustomer && ! empty($validated['stripe_payment_intent_id'])) {
+        if ($authenticatedCustomer && $paymentMethod === 'card') {
             $this->stripeVerifier->handlePostCheckoutCard(
                 $authenticatedCustomer,
                 $validated['stripe_payment_intent_id'],
@@ -210,6 +196,7 @@ class OrderService
         $bankDetails = $order->bank_transfer_details;
         $bankSummary = $bankDetails
             ? "\n\nSelected Bank: {$bankDetails['bank_name']}\nAccount Name: {$bankDetails['account_name']}\nSort Code: {$bankDetails['sort_code']}\nAccount Number: {$bankDetails['account_number']}"
+                .(! empty($bankDetails['reference']) ? "\nStripe Payment Reference: {$bankDetails['reference']}" : '')
                 .(! empty($bankDetails['iban']) ? "\nIBAN: {$bankDetails['iban']}" : '')
                 .(! empty($bankDetails['bic_swift']) ? "\nBIC / SWIFT: {$bankDetails['bic_swift']}" : '')
             : '';

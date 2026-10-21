@@ -1,0 +1,196 @@
+{
+  "tool": "built-in image_gen",
+  "source": "https://support.midiawork.com/shop",
+  "generated": [
+    {
+      "id": 1,
+      "file": "baffle-grease-filters-v1.png",
+      "source": "1-0.png",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Input image 1 is the exact product to edit: a stainless steel baffle grease filter. Create a photorealistic studio photograph of THIS SAME filter, isolated on a very pale grey seamless background with a soft contact shadow. Make a modest camera-angle change to a slightly more frontal three-quarter view. Show the entire filter with comfortable margins. Preserve its exact rectangular proportions, five broad vertical baffle panels, all narrow gaps, frame depth, two side wire handles, top tabs, metal construction and polished finish. Remove any temporary white stickers only if present. Keep all product parts and branding unchanged. Do not add parts, accessories, text, logos or watermark. Natural brushed/polished stainless reflections, soft large studio lighting, crisp professional catalogue photography, no workshop background. Product fidelity is more important than a dramatic change of perspective.",
+      "master": "backend/storage/app/private/reference-generated-masters/baffle-grease-filters-v1.png",
+      "web_asset": "/images/products/reference-catalogue/baffle-grease-filters-v1.webp"
+    },
+    {
+      "id": 24,
+      "file": "product-24-v1.png",
+      "source": "24-0.webp",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. Subject: the same group of long bright metal divider strips, with their distinctive narrow raised centre profile. Preserve the group and long narrow proportions. Arrange the full strips diagonally in the frame without cutting off their ends.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-24-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-24-v1.webp"
+    },
+    {
+      "id": 25,
+      "file": "product-25-v1.png",
+      "source": "25-0.webp",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. Subject: the same FASTCUT yellow, grey and black 115mm thin cutting disc shown face-on. Preserve disc label artwork, centre bore/ring and all real printed markings. Remove loose clear outer wrapping glare, preserve the actual printed label; do not treat the grey label segments as removable white stickers. Slight tilt only, no stacked extra discs.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-25-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-25-v1.webp"
+    },
+    {
+      "id": 7,
+      "file": "product-7-v1.png",
+      "source": "7-0.jpg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. Subject: the group of real rectangular stainless baffle filters in the foreground. Preserve the individual filters, their vertical/horizontal baffles, edge holes and wire handles; remove the background press brake machine and table. Keep the group arrangement and product shapes accurate.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-7-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-7-v1.webp"
+    },
+    {
+      "id": 11,
+      "file": "product-11-v1.png",
+      "source": "11-0.webp",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact centrifugal blower with round inlet at left, rectangular flanged outlet at right, silver scroll casing, dark impeller and mounting rails. Preserve its orientation, hole locations and every part. Remove small temporary white dots. Do not change its mechanical design.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-11-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-11-v1.webp"
+    },
+    {
+      "id": 47,
+      "file": "product-47-v1.png",
+      "source": "47-0.jpeg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact short cylindrical axial fan with the same six broad metal fan blades, central round motor hub, two circular flanges with bolt holes and top junction box with black cable. Preserve all parts and the short casing length. No extra legs or guards.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-47-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-47-v1.webp"
+    },
+    {
+      "id": 49,
+      "file": "product-49-v1.png",
+      "source": "49-0.jpeg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact long cylindrical axial fan with the same metal fan blades, central round hub, long cylindrical casing, two circular flanges with bolt holes and top junction box. Preserve long casing length, construction and parts. No extra legs or guards.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-49-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-49-v1.webp"
+    },
+    {
+      "id": 5,
+      "file": "product-5-v1.png",
+      "source": "5-0.jpeg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The subject is exactly the thin rectangular metal SHEET shown in this photo, not any feet or legs. Remove all the white/blue printed protective plastic film and reveal the same fine brushed metal beneath. Preserve flat sheet geometry and finish, show the complete rectangular sheet in a modest elevated oblique view.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-5-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-5-v1.webp"
+    },
+    {
+      "id": 12,
+      "file": "product-12-v1.png",
+      "source": "12-0.webp",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact flat rectangular 430 brushed stainless steel sheet, 0.8mm thin. Maintain its flat geometry, length-width ratio, sharp thin edge and fine brushed grain. No holes, folds, circular pattern or mounting hardware. Even neutral silver reflections.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-12-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-12-v1.webp"
+    },
+    {
+      "id": 13,
+      "file": "product-13-v1.png",
+      "source": "13-0.webp",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact flat rectangular stainless steel sheet with the closely spaced overlapping CIRCULAR polished/engine-turned surface pattern shown. Preserve the original repeated circle pattern and density, long rectangular aspect ratio and very thin flat edges. NOT a round sheet. No folds, holes or hardware.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-13-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-13-v1.webp"
+    },
+    {
+      "id": 14,
+      "file": "product-14-v1.png",
+      "source": "14-0.jpg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact long stainless sink unit in foreground: two large rectangular bowls on one side, flat drainer on the other, rear upstand, four square legs, full lower undershelf and deep front apron. Preserve exact bowl placement, proportions, leg design, underside and shelf. Remove ALL white protective film/blue printing on top, bowls, aprons and shelf to reveal stainless. Remove people and workshop completely. No taps, pipes, extra sinks, doors or wheels.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-14-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-14-v1.webp"
+    },
+    {
+      "id": 15,
+      "file": "product-15-v1.png",
+      "source": "15-0.jpg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact compact stainless sink unit: one ROUND bowl set in a square top, rear upstand, four straight square legs, lower undershelf and boxed apron. Keep original dimensions and round bowl shape. Remove all white protective film and printing. Do not add taps, handles, pipes, doors, wheels or extra bowls.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-15-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-15-v1.webp"
+    },
+    {
+      "id": 16,
+      "file": "product-16-v1.png",
+      "source": "16-0.jpg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact long stainless sink cabinet with its large rectangular bowl and adjoining small bowl, drainer to left, rear/side upstands and sliding front doors with original handles. Preserve the layout, proportions, open side piece seen in source and cabinet construction. Remove all white protective film, blue printing and handwritten markings from every panel and bowl. No taps or added parts.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-16-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-16-v1.webp"
+    },
+    {
+      "id": 35,
+      "file": "product-35-v1.png",
+      "source": "35-0.jpeg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact square inset stainless steel sink bowl with a broad flat rectangular flange, rounded inner corners and one circular drain opening. Preserve width/depth proportions. Modest elevated oblique view showing the entire rim and inside. No taps, strainer, plumbing, cabinet or legs.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-35-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-35-v1.webp"
+    },
+    {
+      "id": 36,
+      "file": "product-36-v1.png",
+      "source": "36-0.jpeg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact deep square stainless steel bowl with no broad overhanging rim, rounded vertical corner seams, straight tall walls and one circular drain opening in bottom. Preserve depth/width proportions. Remove protective film inside to reveal stainless. No added wide rim, tap, plumbing, stand or strainer.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-36-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-36-v1.webp"
+    },
+    {
+      "id": 37,
+      "file": "product-37-v1.png",
+      "source": "37-0.jpeg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. Exact long stainless sink TOP only (no legs/cabinet), two deep square bowls in the MIDDLE with flat draining areas at BOTH ends and raised rear upstand. Preserve bowl placement and end area lengths, rectangular edge profiles and one visible round drain. Remove white/blue protective film. Keep the long narrow plan, rotate modestly to fit diagonally in square frame. No taps, legs, extra drain holes or invented fittings.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-37-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-37-v1.webp"
+    },
+    {
+      "id": 38,
+      "file": "product-38-v1.png",
+      "source": "38-0.jpeg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. Exact long stainless sink TOP only (no legs/cabinet), two deep square bowls at the LEFT end when viewed from front, with the large flat draining area at RIGHT and raised rear upstand. Preserve original orientation, position and proportions; do not mirror. Remove white protective film. Fit diagonally with full product in frame. No taps, legs, invented drain holes or added fittings.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-38-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-38-v1.webp"
+    },
+    {
+      "id": 39,
+      "file": "product-39-v1.png",
+      "source": "39-0.jpeg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. Exact long stainless sink TOP only (no legs/cabinet), two deep square bowls at the RIGHT end when viewed from front, with the large flat draining area at LEFT and raised rear upstand. Preserve original orientation, position and proportions; do not mirror. Remove white protective film. Fit diagonally with full product in frame. No taps, legs, invented drain holes or added fittings.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-39-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-39-v1.webp"
+    },
+    {
+      "id": 19,
+      "file": "product-19-v1.png",
+      "source": "19-0.jpg",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact three red polyurethane castor wheels shown together with polished metal fixed yokes, square mounting plates and axle bolts. Preserve red colour, number of wheels, yoke/plate geometry and holes. Do NOT invent brakes or change into blue swivel wheels. Make a modest camera-angle change only. No new branding or accessories.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-19-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-19-v1.webp"
+    },
+    {
+      "id": 45,
+      "file": "product-45-v1.png",
+      "source": "45-0.webp",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact flat rectangular 430 brushed stainless steel sheet, 0.9mm thin. Maintain flat geometry, length-width ratio, sharp thin edge and fine brushed grain. No holes, folds, circular pattern or hardware.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-45-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-45-v1.webp"
+    },
+    {
+      "id": 42,
+      "file": "product-42-v1.png",
+      "source": "42-0.webp",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact thin flat rectangular 430 stainless steel sheet, 0.8mm, with closely spaced overlapping CIRCULAR polished/engine-turned surface pattern as shown. Preserve original pattern and density, rectangular aspect ratio and thin flat edges. NOT a circular sheet. No holes, folds or hardware.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-42-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-42-v1.webp"
+    },
+    {
+      "id": 44,
+      "file": "product-44-v1.png",
+      "source": "44-0.webp",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. The exact flat rectangular 304 brushed stainless steel sheet, 0.9mm thin. Maintain flat geometry, length-width ratio, sharp thin edge and fine brushed grain. No holes, folds, circular pattern or hardware.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-44-v1.png",
+      "web_asset": "/images/products/reference-catalogue/product-44-v1.webp"
+    },
+    {
+      "id": 26,
+      "file": "product-26-v2.png",
+      "source": "26-0.webp",
+      "prompt": "Use case: precise-object-edit. Asset type: square ecommerce product photograph. Edit the attached actual product photograph into a professional photorealistic studio catalogue image. Use a very pale grey seamless backdrop and a soft natural contact shadow; soft large studio lights and realistic material texture. Make only a modest 5–10 degree camera-angle adjustment, keeping the recognizable face and same visible construction. Show the entire product, centred with generous margins. Preserve exact shape, proportions, material, colour, all structural parts, holes and joins. Remove temporary white stickers/protective adhesive film where present and reveal matching metal beneath; retain real manufacturer markings and safety information. Remove the workshop/background clutter. Do not add accessories, parts, unsupported details, text or watermarks. Fidelity takes precedence over a dramatic perspective change. Exact countertop stainless steel mangal housing. CRITICAL: rectangular bottom sits FLAT DIRECTLY ON THE FLOOR, there are ZERO legs, ZERO feet, ZERO supports beneath it. The wooden workbench and caster wheels are background only, remove them. Preserve tall sloping upper canopy, wide open front chamber and deep lower rectangular body. Remove ALL WHITE protective film and red/blue printing to reveal brushed stainless. Do NOT invent a single foot, leg, grill bar, chimney or handle. Entire body with margins.",
+      "master": "backend/storage/app/private/reference-generated-masters/product-26-v2.png",
+      "web_asset": "/images/products/reference-catalogue/product-26-v2.webp"
+    }
+  ],
+  "reused": {
+    "29": 25,
+    "43": 13,
+    "54": 5,
+    "55": 5
+  }
+}

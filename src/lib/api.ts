@@ -1,5 +1,12 @@
 export const API_URL = import.meta.env.PUBLIC_API_URL || "/api";
 
+export class ApiError extends Error {
+    constructor(message: string, public readonly status: number) {
+        super(message);
+        this.name = "ApiError";
+    }
+}
+
 const isLocalApiUrl = (value: string) => value.startsWith("http://127.0.0.1:") || value.startsWith("http://localhost:");
 
 const getResolvedApiUrl = () => {
@@ -139,7 +146,7 @@ export const apiFetch = async <T = unknown>(endpoint: string, options: RequestIn
             import("sonner").then(({ toast }) => {
                 toast.error("Too many requests. Please wait a moment and try again.");
             });
-            throw new Error("Too many requests. Please wait a moment and try again.");
+            throw new ApiError("Too many requests. Please wait a moment and try again.", response.status);
         }
 
         const errorData = await response.json().catch(() => ({ message: "An error occurred" }));
@@ -147,11 +154,11 @@ export const apiFetch = async <T = unknown>(endpoint: string, options: RequestIn
         if (response.status === 422 && errorData.errors) {
             const firstErrorList = Object.values(errorData.errors)[0] as string[];
             if (firstErrorList && firstErrorList.length > 0) {
-                throw new Error(firstErrorList[0]);
+                throw new ApiError(firstErrorList[0], response.status);
             }
         }
         
-        throw new Error(errorData.message || "An error occurred");
+        throw new ApiError(errorData.message || "An error occurred", response.status);
     }
 
     return response.json() as Promise<T>;

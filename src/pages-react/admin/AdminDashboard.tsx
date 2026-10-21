@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import { Copy, Users, ShoppingCart, DollarSign, Activity, Package } from "lucide-react";
+import { Users, ShoppingCart, DollarSign, Activity, Package, Clock3, RotateCcw } from "lucide-react";
 import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 export default function AdminDashboard() {
@@ -31,8 +31,13 @@ export default function AdminDashboard() {
     if (loading) return <div className="text-center py-20">Loading dashboard...</div>;
     if (!data) return <div className="text-center py-20 text-red-500">Failed to load data</div>;
 
+    const money = (value: number | string) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(Number(value || 0));
+    const paymentStats = [
+        { name: "Net Collected", value: money(data.payments.net_collected), icon: DollarSign, description: "Successful payments less completed refunds" },
+        { name: "Awaiting Payment", value: money(data.payments.pending_payments), icon: Clock3, description: "Outstanding amounts on unpaid orders" },
+        { name: "Completed Refunds", value: money(data.payments.completed_refunds), icon: RotateCcw, description: "Returned to customers; excluded from net collected" },
+    ];
     const stats = [
-        { name: "Total Revenue", value: `£${data.stats.monthly_revenue || 0}`, icon: DollarSign },
         { name: "Total Products", value: data.stats.total_products, icon: Package },
         { name: "Pending Orders", value: data.stats.pending_orders, icon: ShoppingCart },
         { name: "Unread Messages", value: data.stats.unread_messages, icon: Activity },
@@ -43,18 +48,39 @@ export default function AdminDashboard() {
         <div className="space-y-6">
             <h1 className="text-3xl font-bold text-[#10275c] font-sans">Dashboard</h1>
 
+            <section aria-labelledby="payment-summary-title" className="space-y-4">
+                <div>
+                    <h2 id="payment-summary-title" className="text-lg font-semibold text-gray-900">Payments · {data.period.label}</h2>
+                    <p className="text-sm text-gray-500">Orders placed during this month, using their current payment status. Amounts include VAT and delivery, before payment processing fees.</p>
+                </div>
+                {data.payments.unreconciled_orders > 0 && (
+                    <p role="status" className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                        {data.payments.unreconciled_orders} order(s) have an unverified refund amount and are excluded from the payment totals and product revenue until reconciled.
+                    </p>
+                )}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    {paymentStats.map((stat) => (
+                        <div key={stat.name} className="min-w-0 rounded-lg bg-white p-5 shadow">
+                            <div className="flex items-center gap-2 text-sm font-medium text-gray-500"><stat.icon className="h-5 w-5 shrink-0 text-[#22a3e6]" />{stat.name}</div>
+                            <div className="mt-3 break-words text-2xl font-semibold tabular-nums text-gray-900">{stat.value}</div>
+                            <p className="mt-2 text-xs text-gray-500">{stat.description}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {stats.map((stat, idx) => {
                     const Icon = stat.icon || Users;
                     return (
-                        <div key={idx} className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 flex items-center gap-4">
-                            <div className="rounded-md bg-[#22a3e6]/10 p-3">
+                        <div key={idx} className="min-w-0 rounded-lg bg-white px-4 py-5 shadow sm:p-6 flex items-center gap-4">
+                            <div className="shrink-0 rounded-md bg-[#22a3e6]/10 p-3">
                                 <Icon className="h-6 w-6 text-[#22a3e6]" />
                             </div>
-                            <div>
-                                <dt className="truncate text-sm font-medium text-gray-500">{stat.name}</dt>
-                                <dd className="mt-1 text-2xl font-semibold tracking-tight text-gray-900">{stat.value}</dd>
+                            <div className="min-w-0">
+                                <dt className="text-sm font-medium text-gray-500">{stat.name}</dt>
+                                <dd className="mt-1 break-words text-2xl font-semibold tracking-tight text-gray-900">{stat.value}</dd>
                             </div>
                         </div>
                     );
@@ -124,17 +150,18 @@ export default function AdminDashboard() {
 
             {/* Top Products */}
             <div className="rounded-lg bg-white shadow overflow-hidden">
-                <div className="border-b border-gray-200 px-4 py-5 sm:px-6 flex justify-between items-center">
+                <div className="border-b border-gray-200 px-4 py-5 sm:px-6 flex flex-wrap justify-between items-center gap-2">
                     <h3 className="text-base font-semibold leading-6 text-gray-900">Top Selling Products</h3>
-                    <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Historical Performance</span>
+                    <span className="text-xs text-gray-500 font-medium">{data.period.label}</span>
                 </div>
+                <p className="px-4 py-3 text-xs text-gray-500 sm:px-6">Paid orders only; fully refunded orders are excluded. Revenue excludes delivery and includes discounts. Partial refunds are allocated proportionally; unit counts are not adjusted for partial refunds.</p>
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
                                 <SortableTableHeader label="Product Name" sortKey="product_name" sort={sort} onSort={toggleSort} className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" />
-                                <SortableTableHeader label="Units Sold" sortKey="total_sold" sort={sort} onSort={toggleSort} className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider" buttonClassName="justify-center w-full" />
-                                <SortableTableHeader label="Revenue" sortKey="total_revenue" sort={sort} onSort={toggleSort} className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider" buttonClassName="justify-end w-full" />
+                                <SortableTableHeader label="Paid Units" sortKey="total_sold" sort={sort} onSort={toggleSort} className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider" buttonClassName="justify-center w-full" />
+                                <SortableTableHeader label="Estimated Net Revenue" sortKey="total_revenue" sort={sort} onSort={toggleSort} className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider" buttonClassName="justify-end w-full" />
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
@@ -147,7 +174,7 @@ export default function AdminDashboard() {
                                     <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-[#10275c]">{p.product_name}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-[#22a3e6] font-medium">{p.total_sold}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">£{parseFloat(p.total_revenue).toFixed(2)}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">{money(p.total_revenue)}</td>
                                     </tr>
                                 ))
                             )}

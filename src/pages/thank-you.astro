@@ -93,6 +93,16 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
         </div>
       </div>
 
+      <section id="stripe-transfer-details" class="hidden border border-[#cad4e4] bg-white p-6 mb-8" aria-labelledby="transfer-heading">
+        <h2 id="transfer-heading" class="text-xl font-semibold text-primary mb-3">Bank Transfer Details</h2>
+        <p class="text-sm text-[#6e7a92] mb-4">Use the account details and reference below to pay through Stripe. Your order will await payment until the full amount is received.</p>
+        <dl id="transfer-fields" class="grid grid-cols-2 gap-3 text-sm text-primary"></dl>
+        <a id="stripe-transfer-link" class="hidden mt-5 inline-block text-orange underline" target="_blank" rel="noopener noreferrer">View transfer instructions on Stripe</a>
+      </section>
+      <div class="text-center mb-6">
+        <p id="order-payment-status" class="text-primary font-semibold mb-3" aria-live="polite"></p>
+        <button id="refresh-payment-status" type="button" class="hidden text-sm text-orange underline disabled:opacity-50">Refresh payment status</button>
+      </div>
       <div class="flex flex-col sm:flex-row gap-3 justify-center">
         <a
           href="/"
@@ -111,157 +121,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
   </div>
 
   <script>
-    const orderNumberEl = document.getElementById('order-number');
-    const orderDateEl = document.getElementById('order-date');
-    const paymentMethodEl = document.getElementById('payment-method');
-    const orderTotalEl = document.getElementById('order-total');
-    const itemsEl = document.getElementById('order-items');
-    const statusEl = document.getElementById('order-recovery-status');
-
-    /** @param {string} message @param {boolean} isError */
-    function setStatus(message, isError) {
-      if (!statusEl) return;
-      statusEl.textContent = message;
-      statusEl.classList.remove('hidden', 'text-[#6f7c95]', 'text-[#c2410c]');
-      statusEl.classList.add(isError ? 'text-[#c2410c]' : 'text-[#6f7c95]');
-    }
-
-    function clearStatus() {
-      if (!statusEl) return;
-      statusEl.textContent = '';
-      statusEl.classList.add('hidden');
-    }
-
-    /** @param {string | number | null | undefined} value */
-    function formatCurrency(value) {
-      if (typeof value === 'number') {
-        return new Intl.NumberFormat('en-GB', {
-          style: 'currency',
-          currency: 'GBP',
-        }).format(value);
-      }
-
-      return value || 'Unavailable';
-    }
-
-    /** @param {string | null | undefined} value */
-    function formatDate(value) {
-      if (!value) {
-        return 'Unavailable';
-      }
-
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) {
-        return 'Unavailable';
-      }
-
-      return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    }
-
-    /** @param {Array<{ name?: string; quantity?: number; qty?: number }> | null | undefined} items */
-    function renderItems(items) {
-      if (!itemsEl) return;
-
-      if (!Array.isArray(items) || items.length === 0) {
-        itemsEl.replaceChildren();
-        const fallbackItem = document.createElement('span');
-        fallbackItem.textContent = 'Unavailable';
-        itemsEl.appendChild(fallbackItem);
-        return;
-      }
-
-      itemsEl.replaceChildren();
-
-      items.forEach(function(item) {
-        const quantity = item.quantity ?? item.qty ?? 1;
-        const itemRow = document.createElement('span');
-        itemRow.textContent = `${item.name || 'Item'} x ${quantity}`;
-        itemsEl.appendChild(itemRow);
-      });
-    }
-
-    /** @param {{ orderNumber?: string; order_number?: string; createdAt?: string; created_at?: string; method?: string; payment_method?: string; total?: string | number; items?: Array<{ name?: string; quantity?: number; qty?: number }> }} data */
-    function renderOrder(data) {
-      if (orderNumberEl) {
-        orderNumberEl.textContent = data.orderNumber || data.order_number || 'Unavailable';
-      }
-
-      if (orderDateEl) {
-        orderDateEl.textContent = formatDate(data.createdAt || data.created_at);
-      }
-
-      if (paymentMethodEl) {
-        paymentMethodEl.textContent = data.method || data.payment_method || 'Unavailable';
-      }
-
-      if (orderTotalEl) {
-        orderTotalEl.textContent = formatCurrency(data.total);
-      }
-
-      renderItems(data.items);
-      clearStatus();
-    }
-
-    /** @param {string} message */
-    function showRecoveryFailure(message) {
-      if (orderNumberEl) orderNumberEl.textContent = 'Unavailable';
-      if (orderDateEl) orderDateEl.textContent = 'Unavailable';
-      if (paymentMethodEl) paymentMethodEl.textContent = 'Unavailable';
-      if (orderTotalEl) orderTotalEl.textContent = 'Unavailable';
-      if (itemsEl) itemsEl.innerHTML = '<span>Unable to load order details.</span>';
-      setStatus(message, true);
-    }
-
-    async function recoverOrderFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const order = params.get('order');
-      const token = params.get('token');
-
-      if (!order || !token) {
-        return false;
-      }
-
-      try {
-        setStatus('Reloading your order details…', false);
-        const response = await fetch(`/api/v1/orders/confirmation?order=${encodeURIComponent(order)}&token=${encodeURIComponent(token)}`, {
-          credentials: 'same-origin',
-        });
-
-        if (!response.ok) {
-          throw new Error(`Order recovery failed with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        renderOrder(data);
-        window.history.replaceState(null, '', window.location.pathname);
-        return true;
-      } catch (_error) {
-        showRecoveryFailure("We couldn't reload your order details. Please contact support if you need help with this order.");
-        return false;
-      }
-    }
-
-    let renderedFromSession = false;
-    const stored = sessionStorage.getItem('lastOrder');
-
-    if (stored) {
-      try {
-        const raw = JSON.parse(stored);
-        const data = raw.orderDetails || raw;
-        renderOrder(data);
-        renderedFromSession = true;
-        sessionStorage.removeItem('lastOrder');
-      } catch (_error) {
-        sessionStorage.removeItem('lastOrder');
-      }
-    }
-
-    if (!renderedFromSession) {
-      recoverOrderFromUrl().then(function(recovered) {
-        if (!recovered) {
-          showRecoveryFailure("We couldn't find the order details for this confirmation page.");
-        }
-      });
-    }
+    import { initialiseOrderConfirmation } from '@/lib/order-confirmation';
+    initialiseOrderConfirmation();
+    document.addEventListener('astro:page-load', initialiseOrderConfirmation);
   </script>
 </BaseLayout>

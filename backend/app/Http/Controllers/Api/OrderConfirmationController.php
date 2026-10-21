@@ -32,7 +32,7 @@ class OrderConfirmationController extends Controller
 
         $order = Order::query()
             ->with(['items:id,order_id,product_name,quantity'])
-            ->select(['id', 'order_number', 'created_at', 'payment_method', 'total'])
+            ->select(['id', 'order_number', 'created_at', 'payment_method', 'total', 'payment_status', 'bank_transfer_details'])
             ->where('order_number', $validated['order'])
             ->first();
 
@@ -44,6 +44,8 @@ class OrderConfirmationController extends Controller
             'order_number' => $order->order_number,
             'created_at' => optional($order->created_at)?->toIso8601String(),
             'payment_method' => $order->payment_method,
+            'payment_status' => $order->payment_status,
+            'bank_transfer_details' => $order->payment_status === 'pending' ? $order->bank_transfer_details : null,
             'total' => (float) $order->total,
             'items' => $order->items->map(fn ($item) => [
                 'name' => $item->product_name,

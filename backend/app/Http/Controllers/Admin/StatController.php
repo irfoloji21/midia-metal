@@ -3,38 +3,28 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Models\OrderItem;
-use Illuminate\Support\Facades\DB;
+use App\Services\OrderRevenue;
 
 class StatController extends Controller
 {
-    public function salesOverview()
+    public function salesOverview(OrderRevenue $revenue)
     {
-        $sales = Order::select(
-            DB::raw('SUM(total) as revenue'),
-            DB::raw('COUNT(*) as orders'),
-            DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month")
-        )
-            ->groupBy('month')
-            ->orderBy('month', 'desc')
-            ->take(12)
-            ->get();
+        $sales = [];
+        $month = now()->startOfMonth();
+        for ($i = 0; $i < 12; $i++) {
+            $query = $revenue->orders($month, $month->copy()->addMonth());
+            $totals = $revenue->totals(clone $query);
+            $sales[] = $totals + ['month' => $month->format('Y-m'), 'revenue' => $totals['net_collected'], 'orders' => $query->count()];
+            $month->subMonth();
+        }
 
         return response()->json($sales);
     }
 
-    public function topProducts()
+    public function topProducts(OrderRevenue $revenue)
     {
-        $products = OrderItem::select(
-            'product_name',
-            DB::raw("SUM(CAST(REPLACE(REPLACE(product_price, '£', ''), ',', '') AS DECIMAL(10,2)) * quantity) as total_revenue"),
-            DB::raw('SUM(quantity) as total_sold')
-        )
-            ->groupBy('product_name')
-            ->orderBy('total_sold', 'desc')
-            ->take(5)
-            ->get();
+        $period = $revenue->period();
+        $products = $revenue->topProducts($revenue->orders($period['start'], $period['end']));
 
         return response()->json($products);
     }

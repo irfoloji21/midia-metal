@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\CustomerOrderRequestNotificationService;
 use App\Services\CustomerOrderStatusNotificationService;
+use App\Services\StripeGateway;
+use App\Services\StripeRefundAccounting;
 use App\Shipping\ShippingManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Stripe\Exception\ApiErrorException;
-use Stripe\Refund;
-use Stripe\Stripe;
 
 class OrderController extends Controller
 {
@@ -86,7 +86,7 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order deleted']);
     }
 
-    public function refund(Request $request, Order $order)
+    public function refund(Request $request, Order $order, StripeGateway $gateway, StripeRefundAccounting $refundAccounting)
     {
         $validated = $request->validate([
             'amount' => 'nullable|numeric|min:0.01',
@@ -100,8 +100,6 @@ class OrderController extends Controller
             return response()->json(['message' => 'No Stripe payment intent found for this order.'], 400);
         }
 
-        Stripe::setApiKey(config('services.stripe.secret'));
-
         try {
             $refundParams = [
                 'payment_intent' => $order->stripe_payment_intent_id,
@@ -112,23 +110,28 @@ class OrderController extends Controller
                 $refundParams['amount'] = (int) round($validated['amount'] * 100);
             }
 
-            $refund = Refund::create($refundParams);
+            $attempt = hash('sha256', json_encode([$order->id, $order->refunded_amount, $refundParams]));
+            $refund = $gateway->createRefund($refundParams, 'admin-refund-'.$attempt);
 
-            if ($refund->status === 'succeeded' || $refund->status === 'pending') {
-                $isFullRefund = ! isset($validated['amount']) || round($validated['amount'], 2) >= round($order->total, 2);
-                $newStatus = $isFullRefund ? 'refunded' : 'partially_refunded';
+            if (in_array($refund->status, ['succeeded', 'pending', 'requires_action'], true)) {
+                $requestedFullRefund = ! isset($validated['amount'])
+                    || round($validated['amount'], 2) >= round((float) $order->total - (float) $order->refunded_amount, 2);
                 $previousOrderStatus = $order->status;
-
-                $order->update([
-                    'payment_status' => $newStatus,
-                    'status' => $isFullRefund ? 'cancelled' : $order->status,
-                ]);
+                // If reconciliation fails, leave the order pending and let the
+                // webhook retry; do not invite another refund for the same request.
+                $order->update(['payment_status' => 'refund_pending', 'refunded_amount' => null]);
+                $order = $refundAccounting->sync($order, $refund);
+                $newStatus = $order->payment_status;
+                $isFullRefund = $newStatus === 'refunded' || ($newStatus === 'refund_pending' && $requestedFullRefund);
+                if ($isFullRefund) {
+                    $order->update(['status' => 'cancelled']);
+                }
                 if ($order->status !== $previousOrderStatus) {
                     $this->orderStatusNotifications->send($order, $previousOrderStatus);
                 }
                 $this->orderRequestNotifications->sendLatestForOrder(
                     $order,
-                    $isFullRefund ? 'refund_completed' : 'partial_refund_completed',
+                    $newStatus === 'refund_pending' ? 'refund_processing' : ($isFullRefund ? 'refund_completed' : 'partial_refund_completed'),
                 );
 
                 // Void the shipping label on full refund

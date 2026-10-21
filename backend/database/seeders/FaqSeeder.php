@@ -29,8 +29,8 @@ class FaqSeeder extends Seeder
                 'order' => 3,
             ],
             [
-                'question' => 'Do you deliver across the UK?',
-                'answer' => 'Yes. Delivery coverage depends on product size, access requirements, and courier or transport arrangements.',
+                'question' => 'Where is your factory?',
+                'answer' => 'Our factory is in London.',
                 'order' => 4,
             ],
             [

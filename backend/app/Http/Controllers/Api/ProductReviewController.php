@@ -4,15 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Mail\AdminNotification;
-use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductReview;
 use App\Models\SiteSetting;
+use App\Services\ProductReviewEligibility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class ProductReviewController extends Controller
 {
+    public function __construct(private ProductReviewEligibility $eligibility) {}
+
     public function canReview(Request $request, $productId)
     {
         $product = Product::where('id', $productId)->orWhere('slug', $productId)->firstOrFail();
@@ -20,19 +22,9 @@ class ProductReviewController extends Controller
 
         $customerId = $request->user()->id;
 
-        $hasPurchased = Order::where('customer_id', $customerId)
-            ->whereIn('status', ['delivered', 'collected'])
-            ->whereHas('items', function ($query) use ($productId) {
-                $query->where('product_id', $productId);
-            })->exists();
-
-        if (! $hasPurchased) {
-            return response()->json(['can_review' => false, 'reason' => 'not_delivered']);
-        }
-
-        $existing = ProductReview::where('product_id', $productId)->where('customer_id', $customerId)->first();
-        if ($existing) {
-            return response()->json(['can_review' => false, 'reason' => 'already_reviewed']);
+        $reason = $this->eligibility->reason($customerId, $productId);
+        if ($reason !== null) {
+            return response()->json(['can_review' => false, 'reason' => $reason]);
         }
 
         return response()->json(['can_review' => true]);
@@ -50,21 +42,12 @@ class ProductReviewController extends Controller
 
         $customerId = $request->user()->id;
 
-        // A completed delivery or collection makes the order eligible for review.
-        $hasPurchased = Order::where('customer_id', $customerId)
-            ->whereIn('status', ['delivered', 'collected'])
-            ->whereHas('items', function ($query) use ($productId) {
-                $query->where('product_id', $productId);
-            })->exists();
-
-        if (! $hasPurchased) {
-            return response()->json(['message' => 'You can only review products after your order has been delivered or collected.'], 403);
-        }
-
-        // Check if already reviewed
-        $existing = ProductReview::where('product_id', $productId)->where('customer_id', $customerId)->first();
-        if ($existing) {
-            return response()->json(['message' => 'You have already reviewed this product.'], 400);
+        $reason = $this->eligibility->reason($customerId, $productId);
+        if ($reason !== null) {
+            return response()->json([
+                'message' => $this->eligibility->message($reason),
+                'reason' => $reason,
+            ], $reason === 'already_reviewed' ? 400 : 403);
         }
 
         $review = ProductReview::create([

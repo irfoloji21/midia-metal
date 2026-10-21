@@ -121,7 +121,7 @@ class ContactController extends Controller
             $order->status = 'cancelled';
 
             if ($contactMessage->request_type === 'cancel_refund' && $order->payment_status === 'paid') {
-                $order->payment_status = $isBankTransfer ? 'manual_refund_pending' : 'refund_pending';
+                $order->payment_status = ($isBankTransfer && ! $order->stripe_payment_intent_id) ? 'manual_refund_pending' : 'refund_pending';
             }
 
             $order->save();

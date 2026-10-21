@@ -143,10 +143,10 @@ export default function AdminServices() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button onClick={() => openEdit(service)} className="text-indigo-600 hover:text-indigo-900 mr-4">
+                                        <button aria-label={`Edit ${service.title}`} onClick={() => openEdit(service)} className="text-indigo-600 hover:text-indigo-900 mr-4">
                                             <Edit2 className="h-4 w-4" />
                                         </button>
-                                        <button onClick={() => handleDelete(service.id)} className="text-red-600 hover:text-red-900">
+                                        <button aria-label={`Delete ${service.title}`} onClick={() => handleDelete(service.id)} className="text-red-600 hover:text-red-900">
                                             <Trash2 className="h-4 w-4" />
                                         </button>
                                     </td>
@@ -159,7 +159,7 @@ export default function AdminServices() {
 
             {isEditing && (
                 <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mt-20 md:mt-0 max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl mt-20 md:mt-0 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
                             <h2 className="text-xl font-bold font-sans text-[#10275c]">{currentService.id ? "Edit Service" : "New Service"}</h2>
                             <button onClick={() => setIsEditing(false)} className="text-gray-400 hover:text-gray-500">
@@ -197,9 +197,10 @@ export default function AdminServices() {
                                 <div className="col-span-2">
                                     <RichTextEditor
                                         label="Content"
+                                        serviceLayout
                                         value={currentService.content || ""}
                                         onChange={(value) => setCurrentService({ ...currentService, content: value })}
-                                        helperText="This content is saved as HTML and shown on the service detail page."
+                                        helperText="Edit text directly. Add image + text creates a section; click inside it to swap sides. Select a photo to replace it or edit its description. Sections stack automatically on mobile."
                                     />
                                 </div>
                                 <div className="col-span-2">

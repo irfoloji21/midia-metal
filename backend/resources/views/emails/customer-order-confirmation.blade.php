@@ -24,7 +24,7 @@
                                 Hi {{ $order->customer_name }},
                             </p>
                             <p style="color:#555555;font-size:14px;margin:0 0 30px;">
-                                Thank you for your order! We have received your order and it is now being processed.
+                                {{ $order->payment_status === 'paid' ? 'Thank you for your order. Your payment has been received.' : 'Thank you for your order. We will begin processing it once payment has been received in full.' }}
                             </p>
 
                             <!-- Order Details Box -->
@@ -50,22 +50,30 @@
                                 </tr>
                             </table>
 
-                            @if($order->bank_transfer_details)
+                            @if($order->bank_transfer_details && $order->payment_status === 'pending')
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff7ed;border:1px solid #fed7aa;border-radius:6px;margin-bottom:30px;">
                                 <tr>
                                     <td style="padding:20px;">
                                         <h2 style="color:#10275c;font-size:16px;margin:0 0 12px;">Bank Transfer Details</h2>
+                                        @if(!empty($order->bank_transfer_details['bank_name']))
                                         <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>Bank:</strong> {{ $order->bank_transfer_details['bank_name'] }}</p>
+                                        @endif
                                         <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>Account Name:</strong> {{ $order->bank_transfer_details['account_name'] }}</p>
                                         <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>Sort Code:</strong> {{ $order->bank_transfer_details['sort_code'] }}</p>
                                         <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>Account Number:</strong> {{ $order->bank_transfer_details['account_number'] }}</p>
+                                        @if(isset($order->bank_transfer_details['amount_remaining']))
+                                        <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>Amount to transfer:</strong> £{{ number_format($order->bank_transfer_details['amount_remaining'] / 100, 2) }}</p>
+                                        @endif
+                                        @if(!empty($order->bank_transfer_details['hosted_instructions_url']))
+                                        <p><a href="{{ $order->bank_transfer_details['hosted_instructions_url'] }}">View transfer instructions on Stripe</a></p>
+                                        @endif
                                         @if(!empty($order->bank_transfer_details['iban']))
                                         <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>IBAN:</strong> {{ $order->bank_transfer_details['iban'] }}</p>
                                         @endif
                                         @if(!empty($order->bank_transfer_details['bic_swift']))
                                         <p style="color:#333333;font-size:14px;margin:5px 0;"><strong>BIC / SWIFT:</strong> {{ $order->bank_transfer_details['bic_swift'] }}</p>
                                         @endif
-                                        <p style="color:#555555;font-size:13px;margin:14px 0 0;">Please use {{ $order->order_number }} as your payment reference.</p>
+                                        <p style="color:#555555;font-size:13px;margin:14px 0 0;">Please use {{ $order->bank_transfer_details['reference'] ?? $order->order_number }} as your payment reference.</p>
                                     </td>
                                 </tr>
                             </table>

@@ -18,6 +18,16 @@ class OrderPlacementTest extends TestCase
     {
         parent::setUp();
         Mail::fake();
+        config(['services.stripe.webhook_secret' => 'whsec_test_only']);
+        $this->app->instance(\App\Services\StripeGateway::class, new \Tests\Fakes\StripeGatewayFake);
+    }
+
+    private function postStripeOrder(array $payload)
+    {
+        $setup = $this->postJson('/api/v1/payment/intent', $payload + ['payment_attempt_id' => (string) \Illuminate\Support\Str::uuid()])->assertOk()->json();
+        return $this->postJson('/api/v1/orders', $payload + [
+            'stripe_payment_intent_id' => $setup['payment_intent_id'], 'payment_token' => $setup['payment_token'],
+        ]);
     }
 
     private function issueShippingQuote(array $option = []): string
@@ -50,7 +60,7 @@ class OrderPlacementTest extends TestCase
         $product = Product::factory()->create(['price' => '£100.00']);
         $token = $this->issueShippingQuote();
 
-        $response = $this->postJson('/api/v1/orders', [
+        $response = $this->postStripeOrder([
             'customer_name' => 'John Doe',
             'customer_email' => 'john@example.com',
             'customer_phone' => '07700900000',
@@ -95,7 +105,7 @@ class OrderPlacementTest extends TestCase
         $this->seedNotificationEmail();
         $product = Product::factory()->create(['price' => '£75.00']);
 
-        $response = $this->postJson('/api/v1/orders', [
+        $response = $this->postStripeOrder([
             'customer_name' => 'Jane Doe',
             'customer_email' => 'jane@example.com',
             'shipping_address' => 'Collection from store',
@@ -123,7 +133,7 @@ class OrderPlacementTest extends TestCase
         $product = Product::factory()->tracked(10)->create(['price' => '£25.00']);
         $token = $this->issueShippingQuote();
 
-        $response = $this->postJson('/api/v1/orders', [
+        $response = $this->postStripeOrder([
             'customer_name' => 'Stock Buyer',
             'customer_email' => 'stock@example.com',
             'shipping_address' => '789 Elm Lane',
@@ -150,7 +160,7 @@ class OrderPlacementTest extends TestCase
         ]);
         $token = $this->issueShippingQuote();
 
-        $response = $this->postJson('/api/v1/orders', [
+        $response = $this->postStripeOrder([
             'customer_name' => 'No Track Buyer',
             'customer_email' => 'notrack@example.com',
             'shipping_address' => '101 Pine St',
@@ -244,7 +254,7 @@ class OrderPlacementTest extends TestCase
         $productB = Product::factory()->create(['price' => '£30.00']);
         $token = $this->issueShippingQuote(['rate' => 9.99]);
 
-        $response = $this->postJson('/api/v1/orders', [
+        $response = $this->postStripeOrder([
             'customer_name' => 'Multi Buyer',
             'customer_email' => 'multi@example.com',
             'shipping_address' => '123 Multi Lane',
@@ -278,7 +288,7 @@ class OrderPlacementTest extends TestCase
         ])->create(['price' => '£50.00']);
         $token = $this->issueShippingQuote();
 
-        $response = $this->postJson('/api/v1/orders', [
+        $response = $this->postStripeOrder([
             'customer_name' => 'Variant Buyer',
             'customer_email' => 'variant@example.com',
             'shipping_address' => '123 Variant St',

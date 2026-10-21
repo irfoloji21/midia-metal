@@ -131,7 +131,7 @@ export interface Product extends ShippingDimensions {
 
   // Computed / appended (frontend-only helpers from API)
   share_url?: string;
-  share_links?: { facebook: string; twitter: string; whatsapp: string };
+  share_links?: { facebook: string; twitter: string };
 }
 
 /** Lightweight product card shape (e.g. related products). */

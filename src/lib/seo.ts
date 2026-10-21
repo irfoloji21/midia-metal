@@ -260,14 +260,12 @@ export function buildServiceJsonLd({
   image,
   url,
   providerName = DEFAULT_SITE_NAME,
-  areaServed = "United Kingdom",
 }: {
   name: string;
   description?: string;
   image?: string;
   url: string;
   providerName?: string;
-  areaServed?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -277,6 +275,5 @@ export function buildServiceJsonLd({
     ...(image ? { image } : {}),
     url,
     provider: { "@type": "Organization", name: providerName },
-    areaServed: { "@type": "Country", name: areaServed },
   };
 }

@@ -112,7 +112,7 @@ export default function SelectionTableSection({
   const selectedVariantKey = variantOptions
     .map((optionName) => `${optionName}:${String(selectedVariants?.[optionName]?.value ?? "").trim()}`)
     .join("|");
-  const contactPhone = siteSettings.contact_phone || siteSettings.company_phone || "";
+  const contactPhone = siteSettings.contact_phone || "";
   const quotePhoneLabel = contactPhone || "+44 123 456 7890";
   const activeTabIntroText = activeTabConfig.intro_text || (isQuoteTab ? selectionTableConfig.quote_intro_text : "");
   const showPriceColumn = !isCallTab && activeRows.some((variant: Record<string, any>) => {
@@ -312,17 +312,17 @@ export default function SelectionTableSection({
         ? [
           `Selection table enquiry for ${product?.name || "Product"}.`,
           safeActiveTab && tabOption ? `${tabSourceLabel}: ${safeActiveTab}` : "",
-          quoteForm.name.trim() ? `Your Name: ${quoteForm.name.trim()}` : "",
-          `Company Name: ${quoteForm.companyName.trim()}`,
+          quoteForm.name.trim() ? `Full name: ${quoteForm.name.trim()}` : "",
+          `Company name: ${quoteForm.companyName.trim()}`,
           `Email: ${quoteForm.email.trim()}`,
           quoteForm.phone.trim() ? `Telephone: ${quoteForm.phone.trim()}` : "",
-          `Post Code: ${quoteForm.postcode.trim()}`,
-          `Filter Type: ${quoteForm.filterType.trim()}`,
-          quoteForm.filterHeight.trim() ? `Filter Height (mm): ${quoteForm.filterHeight.trim()}` : "",
-          quoteForm.filterWidth.trim() ? `Filter Width (mm): ${quoteForm.filterWidth.trim()}` : "",
-          quoteForm.filterDepth.trim() ? `Filter Depth (Thickness) mm: ${quoteForm.filterDepth.trim()}` : "",
-          quoteForm.quantity.trim() ? `Your Quantity: ${quoteForm.quantity.trim()}` : "",
-          quoteForm.message.trim() ? `Additional Requirements: ${quoteForm.message.trim()}` : "",
+          `Postcode: ${quoteForm.postcode.trim()}`,
+          `Filter type: ${quoteForm.filterType.trim()}`,
+          quoteForm.filterHeight.trim() ? `Filter height (mm): ${quoteForm.filterHeight.trim()}` : "",
+          quoteForm.filterWidth.trim() ? `Filter width (mm): ${quoteForm.filterWidth.trim()}` : "",
+          quoteForm.filterDepth.trim() ? `Filter depth (mm): ${quoteForm.filterDepth.trim()}` : "",
+          quoteForm.quantity.trim() ? `Quantity: ${quoteForm.quantity.trim()}` : "",
+          quoteForm.message.trim() ? `Additional requirements: ${quoteForm.message.trim()}` : "",
         ].filter(Boolean)
         : [
           `Selection table enquiry for ${product?.name || "Product"}.`,
@@ -398,16 +398,10 @@ export default function SelectionTableSection({
               </div>
             )}
 
-            {selectionTableConfig.quote_form_layout === "baffle_non_standard" && (
-              <p className="mt-3 text-[15px] leading-8 text-[#6e7a92]">
-                Fields marked with an <span className="font-semibold text-red-600">*</span> are required
-              </p>
-            )}
-
             {selectionTableConfig.quote_form_layout === "baffle_non_standard" ? (
               <form onSubmit={handleQuoteSubmit} className="mt-8 grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
                 <div>
-                  <label className="mb-3 block text-[14px] font-semibold text-primary">Your Name</label>
+                  <label className="mb-3 block text-[14px] font-semibold text-primary">Full name</label>
                   <input
                     type="text"
                     value={quoteForm.name}
@@ -416,7 +410,7 @@ export default function SelectionTableSection({
                   />
                 </div>
                 <div>
-                  <label className="mb-3 block text-[14px] font-semibold text-primary">Company Name <span className="text-red-600">*</span></label>
+                  <label className="mb-3 block text-[14px] font-semibold text-primary">Company name <span className="text-red-600">*</span></label>
                   <input
                     type="text"
                     value={quoteForm.companyName}
@@ -434,7 +428,7 @@ export default function SelectionTableSection({
                   />
                 </div>
                 <div>
-                  <label className="mb-3 block text-[14px] font-semibold text-primary">Post Code <span className="text-red-600">*</span></label>
+                  <label className="mb-3 block text-[14px] font-semibold text-primary">Postcode <span className="text-red-600">*</span></label>
                   <input
                     type="text"
                     value={quoteForm.postcode}
@@ -452,7 +446,7 @@ export default function SelectionTableSection({
                   />
                 </div>
                 <div>
-                  <label className="mb-3 block text-[14px] font-semibold text-primary">Filter Type <span className="text-red-600">*</span></label>
+                  <label className="mb-3 block text-[14px] font-semibold text-primary">Filter type <span className="text-red-600">*</span></label>
                   <input
                     type="text"
                     value={quoteForm.filterType}
@@ -461,7 +455,7 @@ export default function SelectionTableSection({
                   />
                 </div>
                 <div>
-                  <label className="mb-3 block text-[14px] font-semibold text-primary">Filter Height (mm)</label>
+                  <label className="mb-3 block text-[14px] font-semibold text-primary">Filter height (mm)</label>
                   <input
                     type="text"
                     value={quoteForm.filterHeight}
@@ -470,7 +464,7 @@ export default function SelectionTableSection({
                   />
                 </div>
                 <div>
-                  <label className="mb-3 block text-[14px] font-semibold text-primary">Filter Width (mm)</label>
+                  <label className="mb-3 block text-[14px] font-semibold text-primary">Filter width (mm)</label>
                   <input
                     type="text"
                     value={quoteForm.filterWidth}
@@ -479,7 +473,7 @@ export default function SelectionTableSection({
                   />
                 </div>
                 <div>
-                  <label className="mb-3 block text-[14px] font-semibold text-primary">Filter Depth (Thickness) mm</label>
+                  <label className="mb-3 block text-[14px] font-semibold text-primary">Filter depth (mm)</label>
                   <input
                     type="text"
                     value={quoteForm.filterDepth}
@@ -488,7 +482,7 @@ export default function SelectionTableSection({
                   />
                 </div>
                 <div>
-                  <label className="mb-3 block text-[14px] font-semibold text-primary">Your Quantity</label>
+                  <label className="mb-3 block text-[14px] font-semibold text-primary">Quantity</label>
                   <input
                     type="text"
                     value={quoteForm.quantity}
@@ -497,7 +491,7 @@ export default function SelectionTableSection({
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="mb-3 block text-[14px] font-semibold text-primary">Additional Requirements</label>
+                  <label className="mb-3 block text-[14px] font-semibold text-primary">Additional requirements</label>
                   <textarea
                     rows={5}
                     value={quoteForm.message}
@@ -520,7 +514,7 @@ export default function SelectionTableSection({
             ) : (
               <form onSubmit={handleQuoteSubmit} className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-[13px] font-semibold text-primary">Your Name *</label>
+                  <label className="mb-2 block text-[13px] font-semibold text-primary">Full name *</label>
                   <input
                     type="text"
                     value={quoteForm.name}

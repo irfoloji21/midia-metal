@@ -7,7 +7,6 @@ use App\Models\PortfolioProject;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Service;
-use App\Models\SiteSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -83,13 +82,13 @@ class SeoMetaService
         $path = trim($request->path(), '/');
         $baseUrl = $this->resolveBaseUrl($request);
         $settings = Schema::hasTable('site_settings')
-            ? SiteSetting::pluck('value', 'key')
+            ? SharedSiteSettings::published()->pluck('value', 'key')
             : collect();
         $siteName = $settings->get('site_name', 'Midia M Metal');
         $defaultImage = $this->absoluteUrl($baseUrl, $settings->get('site_logo') ?: '/logo.png');
-        $contactPhone = $settings->get('contact_phone') ?: $settings->get('company_phone');
-        $contactEmail = $settings->get('contact_email') ?: $settings->get('company_email');
-        $contactAddress = $settings->get('contact_address') ?: $settings->get('company_address');
+        $contactPhone = $settings->get('contact_phone');
+        $contactEmail = $settings->get('contact_email');
+        $contactAddress = $settings->get('contact_address');
         $twitterHandle = trim((string) $settings->get('social_twitter', '@midiametal'));
         if ($twitterHandle !== '' && ! Str::startsWith($twitterHandle, '@')) {
             $twitterHandle = preg_match('~twitter\.com/([^/?#]+)~i', $twitterHandle, $matches) ? '@'.$matches[1] : '@midiametal';
@@ -97,7 +96,7 @@ class SeoMetaService
 
         $meta = [
             'title' => $settings->get('meta_title', $siteName.' | Commercial Kitchen Ventilation & Fabrication'),
-            'description' => $this->normalizeText($settings->get('meta_description', 'Commercial kitchen ventilation, stainless steel fabrication, canopy systems, and custom metalwork across the UK.')),
+            'description' => $this->normalizeText($settings->get('meta_description', 'Commercial kitchen equipment, stainless steel fabrication, ventilation systems and canopy installation. Our factory is in London.')),
             'canonical' => $path === '' ? $baseUrl.'/' : $this->absoluteUrl($baseUrl, $path),
             'type' => 'website',
             'image' => $defaultImage,
@@ -338,8 +337,8 @@ class SeoMetaService
                 'description' => 'Read insights on commercial kitchen ventilation, stainless steel fabrication, hygiene, and maintenance.',
             ],
             'get-a-quote' => [
-                'title' => 'Request a Quote | '.$siteName,
-                'description' => 'Request a quote for canopies, ventilation systems, custom fabrication, and stainless steel catering equipment.',
+                'title' => 'Request a Quotation | '.$siteName,
+                'description' => 'Request a quotation for commercial kitchen equipment, ventilation systems, canopy installation, stainless steel wall cladding or bespoke fabrication.',
             ],
             'faq' => [
                 'title' => ($settings->get('faq_page_title') ?: 'Frequently Asked Questions').' | '.$siteName,

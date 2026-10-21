@@ -11,6 +11,7 @@
  */
 import { ViewTransitions } from 'astro:transitions';
 import HeaderIsland from '@/islands/HeaderIsland';
+import CustomerSessionIsland from '@/islands/CustomerSessionIsland';
 import FooterIsland from '@/islands/FooterIsland';
 import CookieBannerIsland from '@/islands/CookieBannerIsland';
 import ToasterIsland from '@/islands/ToasterIsland';
@@ -26,24 +27,26 @@ interface Props {
   structuredData?: object[];
 }
 
+const layoutSettings = await fetchSettings();
+const siteName = layoutSettings.site_name || 'Midia M Metal';
+const siteLogo = layoutSettings.site_logo || '/logo.png';
+
 const {
-  title = 'Midia M Metal | Commercial Kitchen Ventilation & Fabrication',
-  description = 'Midia M Metal supplies commercial kitchen ventilation, stainless steel fabrication, canopy systems, grease filters, and custom metalwork across the UK.',
-  image = '/logo.png',
+  title = `${siteName} | Commercial Kitchen Ventilation & Fabrication`,
+  description = 'Commercial kitchen equipment, stainless steel fabrication, ventilation systems and canopy installation. Our factory is in London.',
+  image = siteLogo,
   canonicalPath,
   noindex = false,
   structuredData = [],
 } = Astro.props;
 
 const siteUrl = import.meta.env.SITE;
-const fullTitle = title.includes('Midia') ? title : `${title} | Midia M Metal`;
+const fullTitle = title.includes(siteName) || title.includes(' | ') ? title : `${title} | ${siteName}`;
 const canonicalUrl = canonicalPath ? `${siteUrl}${canonicalPath}` : undefined;
 const safeImage = typeof image === 'string' && image.trim().length > 0 ? image.trim() : '/logo.png';
 const normalizedOgImagePath = safeImage.startsWith('/') ? safeImage : `/${safeImage}`;
 const ogImage = safeImage.startsWith('http') ? safeImage : `${siteUrl}${normalizedOgImagePath}`;
 
-// Pre-fetch settings server-side so Header/Footer don't need client-side API calls
-const layoutSettings = await fetchSettings();
 ---
 
 <!doctype html>
@@ -53,21 +56,21 @@ const layoutSettings = await fetchSettings();
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <meta name="author" content="Midia M Metal" />
+    <meta name="author" content={siteName} />
     <meta name="theme-color" content="#10275c" />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="apple-touch-icon" href={siteLogo} />
 
     <!-- DNS Prefetch for backend API (images served from /storage) -->
     <link rel="dns-prefetch" href="https://midiammetal.com" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Midia M Metal" />
+    <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
@@ -119,11 +122,12 @@ const layoutSettings = await fetchSettings();
       Skip to main content
     </a>
     <!-- transition:persist keeps these islands alive across page navigations -->
+    <CustomerSessionIsland client:load transition:persist />
     <HeaderIsland initialSettings={layoutSettings} client:idle transition:persist />
     <main id="main-content">
       <slot />
     </main>
-    <FooterIsland initialSettings={layoutSettings} client:visible transition:persist />
+      <FooterIsland initialSettings={layoutSettings} client:load transition:persist />
     <CookieBannerIsland client:idle transition:persist />
     <ToasterIsland client:idle transition:persist />
   </body>

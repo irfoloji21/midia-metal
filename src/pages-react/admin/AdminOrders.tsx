@@ -242,7 +242,8 @@ export default function AdminOrders() {
     const requiresManualRefundAcknowledgement = requestStatus === "approved"
       && request?.request_type === "cancel_refund"
       && viewingOrder.payment_status === "paid"
-      && isBankTransferPayment(viewingOrder.payment_method);
+      && isBankTransferPayment(viewingOrder.payment_method)
+      && !viewingOrder.stripe_payment_intent_id;
 
     if (requiresManualRefundAcknowledgement && !acknowledgeBankRefund) {
       setBankRefundRequest(request);
@@ -561,7 +562,8 @@ export default function AdminOrders() {
                 <section className="rounded-xl border border-[#fed7aa] bg-[#fff7ed] p-6">
                   <h3 className="text-lg font-semibold text-[#10275c] mb-3">Selected Bank Account</h3>
                   <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                    <div><dt className="text-gray-500">Bank</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.bank_name}</dd></div>
+                    {viewingOrder.bank_transfer_details.bank_name && <div><dt className="text-gray-500">Bank</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.bank_name}</dd></div>}
+                    {viewingOrder.bank_transfer_details.reference && <div><dt className="text-gray-500">Stripe Payment Reference</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.reference}</dd></div>}
                     <div><dt className="text-gray-500">Account Name</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.account_name}</dd></div>
                     <div><dt className="text-gray-500">Sort Code</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.sort_code}</dd></div>
                     <div><dt className="text-gray-500">Account Number</dt><dd className="font-medium text-gray-900">{viewingOrder.bank_transfer_details.account_number}</dd></div>

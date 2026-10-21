@@ -1,0 +1,80 @@
+[
+  {
+    "title": "Kitchen Canopy and Wall Cladding",
+    "slug": "kitchen-canopy-and-wall-cladding",
+    "category_slug": "installation",
+    "image": "/images/portfolio/approved-kitchens/01-canopy-and-wall-cladding-cover.webp",
+    "description": "Metal canopy sections and fitted wall panels frame a long serving hatch within a commercial kitchen.\n\nThe metalwork follows the room's perimeter and returns around the central column, bringing the overhead canopy and wall cladding together at the opening to the adjoining space. Horizontal panel joints, formed edges and corner returns define the arrangement. The selected view shows how these elements sit within the existing room, with the serving opening retained as a clear connection between the two areas. The portfolio focus is the canopy and wall cladding visible around this opening.",
+    "services_list": ["Canopy Installation", "Wall Cladding"],
+    "gallery": [],
+    "photos": [
+      {
+        "file": "01-canopy-and-wall-cladding-cover.jpg",
+        "role": "cover",
+        "alt": "Metal kitchen canopy and fitted wall cladding surrounding a long serving hatch and central column.",
+        "source_video": "https://www.youtube.com/watch?v=6ovJSfSMlIM",
+        "source_timestamp": "00:04"
+      }
+    ]
+  },
+  {
+    "title": "Cooking-Line Canopy Installation",
+    "slug": "cooking-line-canopy-installation",
+    "category_slug": "installation",
+    "image": "/images/portfolio/approved-kitchens/02-long-cooking-line-canopy-cover.webp",
+    "description": "A continuous canopy, metal wall panels and fitted enclosures define the cooking side of this kitchen.\n\nThe canopy extends along the cooking-line position, with a sloping filter bank above the work area and an arched oven opening at the far end. Beneath it, metal panels and framed surfaces follow the length of the wall. A separate counter stands opposite, leaving an aisle between the two sides. The wider view shows the overall arrangement, while the second angle gives a closer view of the canopy, filter panels and lower metalwork. Both photographs show the same installation within its existing room layout.",
+    "services_list": ["Canopy Installation", "Wall Cladding"],
+    "gallery": ["/images/portfolio/approved-kitchens/02-long-cooking-line-canopy-gallery-1.webp"],
+    "photos": [
+      {
+        "file": "02-long-cooking-line-canopy-cover.jpg",
+        "role": "cover",
+        "alt": "Long metal cooking-line canopy facing a dark preparation counter, with an arched oven opening at the rear.",
+        "source_video": "https://www.youtube.com/watch?v=7gkBsV0SxoU",
+        "source_timestamp": "00:08"
+      },
+      {
+        "file": "02-long-cooking-line-canopy-gallery-1.jpg",
+        "role": "gallery",
+        "alt": "Side view of the canopy filter bank, fitted metal enclosures and open framework below the cooking line.",
+        "source_video": "https://www.youtube.com/watch?v=7gkBsV0SxoU",
+        "source_timestamp": "00:00"
+      }
+    ]
+  },
+  {
+    "title": "Central Kitchen Pass and Preparation Island",
+    "slug": "central-kitchen-pass-and-preparation-island",
+    "category_slug": "custom-work",
+    "image": "/images/portfolio/approved-kitchens/03-central-kitchen-pass-cover.webp",
+    "description": "A central metal preparation and service pass with an illuminated overhead frame forms the focus of this kitchen.\n\nSquare uprights support the upper structure above a long run of work surfaces. The end view follows the length of the pass, while the side view shows the worktop joints, supporting frame and lighting arrangement. A wider angle places the installation between the surrounding cooking areas and open wall shelving. Together, the three views show the proportions of the central structure and the working space on either side. The project presentation focuses on this pass and its visible fabricated components.",
+    "services_list": ["Custom Fabrication"],
+    "gallery": [
+      "/images/portfolio/approved-kitchens/03-central-kitchen-pass-gallery-1.webp",
+      "/images/portfolio/approved-kitchens/03-central-kitchen-pass-gallery-2.webp"
+    ],
+    "photos": [
+      {
+        "file": "03-central-kitchen-pass-cover.jpg",
+        "role": "cover",
+        "alt": "End view along a central metal kitchen pass with square supports and an illuminated overhead frame.",
+        "source_video": "https://www.youtube.com/watch?v=Ln-C8o57cBw",
+        "source_timestamp": "00:03"
+      },
+      {
+        "file": "03-central-kitchen-pass-gallery-1.jpg",
+        "role": "gallery",
+        "alt": "Side view of the central pass showing joined work surfaces, square uprights and overhead light units.",
+        "source_video": "https://www.youtube.com/watch?v=Ln-C8o57cBw",
+        "source_timestamp": "00:18"
+      },
+      {
+        "file": "03-central-kitchen-pass-gallery-2.jpg",
+        "role": "gallery",
+        "alt": "Wide view of the central kitchen pass between the cooking line and open metal wall shelving.",
+        "source_video": "https://www.youtube.com/watch?v=Ln-C8o57cBw",
+        "source_timestamp": "00:34"
+      }
+    ]
+  }
+]

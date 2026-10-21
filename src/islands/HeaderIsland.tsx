@@ -7,6 +7,7 @@
  * Header.tsx as-is and just provide it the cart data it needs.
  */
 import { useEffect, useRef, useState } from 'react';
+import { useSiteSettings } from '@/lib/use-site-settings';
 import { useStore } from '@nanostores/react';
 import { $cartCount } from '@/stores/cart';
 
@@ -29,7 +30,7 @@ export default function HeaderIsland({ initialSettings }: HeaderIslandProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isInfoSidebarOpen, setIsInfoSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [settings] = useState<Record<string, string>>(initialSettings ?? {});
+  const settings = useSiteSettings(initialSettings);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -243,17 +244,17 @@ export default function HeaderIsland({ initialSettings }: HeaderIslandProps) {
             <div className="mt-14 border-t border-[#c9d3e4] pt-10 space-y-6">
               <div className="flex items-start gap-3 text-[#6f7c95] text-[15px] leading-7">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#2f9cea] mt-0.5 flex-shrink-0"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
-                <p>{t('contact_address', 'Unit 8A Cromwell Centre\nRoebuck Road, Hainaut Business Park\nILFORD, IG6 3UG')}</p>
+                <p>{t('contact_address', '')}</p>
               </div>
               <div className="space-y-2">
-                <a href={`tel:${t('contact_phone', '07545888522')}`} className="flex items-start gap-3 text-primary hover:text-orange transition-colors">
+                <a href={`tel:${t('contact_phone', '')}`} className="flex items-start gap-3 text-primary hover:text-orange transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#2f9cea] mt-1 flex-shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
-                  <span className="text-[30px] xl:text-[34px] leading-[1.05] font-semibold tracking-tight whitespace-nowrap">{t('contact_phone', '07545888522')}</span>
+                  <span className="text-[30px] xl:text-[34px] leading-[1.05] font-semibold tracking-tight whitespace-nowrap">{t('contact_phone', '')}</span>
                 </a>
               </div>
-              <a href={`mailto:${t('contact_email', 'softwaredevelopment2181@gmail.com')}`} className="flex items-center gap-3 text-[18px] text-[#6f7c95] hover:text-orange transition-colors">
+              <a href={`mailto:${t('contact_email', '')}`} className="flex items-center gap-3 text-[18px] text-[#6f7c95] hover:text-orange transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#2f9cea] flex-shrink-0"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
-                {t('contact_email', 'softwaredevelopment2181@gmail.com')}
+                {t('contact_email', '')}
               </a>
             </div>
           </aside>

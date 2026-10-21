@@ -69,7 +69,6 @@ class ProductController extends Controller
         $payload['share_links'] = [
             'facebook' => 'https://www.facebook.com/sharer/sharer.php?u='.urlencode($shareUrl),
             'twitter' => 'https://twitter.com/intent/tweet?url='.urlencode($shareUrl).'&text='.urlencode($shareText),
-            'whatsapp' => 'https://wa.me/?text='.urlencode($shareText.' '.$shareUrl),
             'instagram' => $instagramUrl !== '' ? $instagramUrl : 'https://www.instagram.com/',
         ];
 

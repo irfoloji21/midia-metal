@@ -4,13 +4,13 @@ namespace App\Jobs;
 
 use App\Models\ContactMessage;
 use App\Services\CustomerOrderRequestNotificationService;
+use App\Services\StripeGateway;
+use App\Services\StripeRefundAccounting;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use Stripe\Exception\InvalidRequestException;
-use Stripe\Refund;
-use Stripe\Stripe;
 use Throwable;
 
 class RefundStripePayment implements ShouldQueue
@@ -24,7 +24,7 @@ class RefundStripePayment implements ShouldQueue
         public int $contactMessageId,
     ) {}
 
-    public function handle(CustomerOrderRequestNotificationService $notifications): void
+    public function handle(CustomerOrderRequestNotificationService $notifications, StripeGateway $gateway, StripeRefundAccounting $refundAccounting): void
     {
         $contactMessage = ContactMessage::with('order')->find($this->contactMessageId);
         if (! $contactMessage || $contactMessage->message_type !== 'order_request') {
@@ -40,25 +40,26 @@ class RefundStripePayment implements ShouldQueue
             return;
         }
 
-        Stripe::setApiKey(config('services.stripe.secret'));
-
         try {
-            Refund::create([
+            $refund = $gateway->createRefund([
                 'payment_intent' => $order->stripe_payment_intent_id,
                 'metadata' => [
                     'order_id' => (string) $order->id,
                     'order_number' => (string) $order->order_number,
                     'request_id' => (string) $contactMessage->id,
                 ],
-            ]);
+            ], 'cancellation-refund-'.$contactMessage->id);
 
-            $order->update(['payment_status' => 'refunded']);
-            $notifications->sendForRequest($contactMessage, 'refund_completed');
+            $order->update(['payment_status' => 'refund_pending', 'refunded_amount' => null]);
+            $order = $refundAccounting->sync($order, $refund);
+            $completed = $order->payment_status === 'refunded';
+            $pending = $order->payment_status === 'refund_pending';
+            $notifications->sendForRequest($contactMessage, $completed ? 'refund_completed' : ($pending ? 'refund_processing' : 'refund_failed'));
         } catch (InvalidRequestException $exception) {
             $message = strtolower($exception->getMessage());
 
             if (str_contains($message, 'already been refunded')) {
-                $order->update(['payment_status' => 'refunded']);
+                $order = $refundAccounting->sync($order);
                 $notifications->sendForRequest($contactMessage, 'refund_completed');
 
                 return;

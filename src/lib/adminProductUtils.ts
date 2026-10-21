@@ -654,31 +654,6 @@ export const getVariantSuggestion = (product: any): VariantSuggestion => {
         };
     }
 
-    if (name.includes("air conditioner")) {
-        const option = "BTU Rating";
-        return {
-            option,
-            description: "Suggested capacity variants for air conditioning units.",
-            variants: [
-                createSuggestedVariant(option, "12000 BTU", {
-                    shipping_weight_kg: scaleWeight(baseWeight, 0.8),
-                    shipping_class: "freight",
-                    ships_separately: true,
-                }),
-                createSuggestedVariant(option, "18000 BTU", {
-                    shipping_weight_kg: scaleWeight(baseWeight, 1),
-                    shipping_class: "freight",
-                    ships_separately: true,
-                }),
-                createSuggestedVariant(option, "24000 BTU", {
-                    shipping_weight_kg: scaleWeight(baseWeight, 1.2),
-                    shipping_class: "freight",
-                    ships_separately: true,
-                }),
-            ],
-        };
-    }
-
     return {
         option: "Model",
         description: "Generic starter variant. Rename and replace values to match the real product range.",

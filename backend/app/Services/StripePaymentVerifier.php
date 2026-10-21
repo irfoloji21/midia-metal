@@ -8,57 +8,75 @@ use Illuminate\Support\Facades\Log;
 use Stripe\PaymentIntent;
 use Stripe\PaymentMethod as StripePaymentMethod;
 use Stripe\Stripe;
-use Stripe\StripeClient;
 
 /**
  * Verifies Stripe PaymentIntents and manages card save/detach after checkout.
  *
  * Extracted from FormController::order() to keep the controller thin
- * and allow reuse (e.g. from a future webhook reconciliation flow).
+ * and share verification with webhook reconciliation.
  */
 class StripePaymentVerifier
 {
-    /**
-     * Verify a PaymentIntent succeeded and its amount matches the order total.
-     *
-     * @param  string  $paymentIntentId  The Stripe PaymentIntent ID
-     * @param  float  $expectedTotal  The order total in GBP (e.g. 150.00)
-     * @return array{status: string, receipt_url: string|null}
-     *
-     * @throws \App\Exceptions\PaymentVerificationException
-     */
-    public function verify(string $paymentIntentId, float $expectedTotal): array
+    public function __construct(private StripeGateway $gateway) {}
+
+    public function verify(string $paymentIntentId, float $expectedTotal, string $method = 'card', ?string $fingerprint = null): array
     {
         try {
-            $stripe = new StripeClient(config('services.stripe.secret'));
-            $intent = $stripe->paymentIntents->retrieve(
-                $paymentIntentId,
-                ['expand' => ['latest_charge']]
-            );
-
-            if ($intent->status !== 'succeeded') {
-                throw PaymentVerificationException::notSucceeded($intent->status);
-            }
-
-            if ((int) $intent->amount !== (int) round($expectedTotal * 100)) {
-                throw PaymentVerificationException::amountMismatch(
-                    (int) $intent->amount,
-                    (int) round($expectedTotal * 100)
-                );
-            }
-
-            $receiptUrl = $intent->latest_charge?->receipt_url;
-
-            return [
-                'status' => 'paid',
-                'receipt_url' => $receiptUrl,
-            ];
+            return $this->inspect($this->gateway->retrieveIntent($paymentIntentId), $expectedTotal, $method, $fingerprint);
         } catch (PaymentVerificationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            Log::error('Payment Intent Verification Failed: '.$e->getMessage()."\n".$e->getTraceAsString());
+            report($e);
             throw PaymentVerificationException::verificationFailed($e);
         }
+    }
+
+    public function inspect(PaymentIntent $intent, float $expectedTotal, string $method, ?string $fingerprint = null): array
+    {
+        $data = $intent->toArray();
+        $expectedAmount = (int) round($expectedTotal * 100);
+        if (($data['currency'] ?? '') !== 'gbp' || (int) $data['amount'] !== $expectedAmount
+            || ($data['status'] === 'succeeded' && (int) ($data['amount_received'] ?? 0) !== $expectedAmount)) {
+            throw PaymentVerificationException::amountMismatch((int) $data['amount'], $expectedAmount);
+        }
+        if ($fingerprint !== null && ! hash_equals($fingerprint, $data['metadata']['checkout_fingerprint'] ?? '')) {
+            throw new PaymentVerificationException('Payment does not belong to this checkout.', 'checkout_mismatch');
+        }
+        $bank = $method === 'bank_transfer';
+        if (($data['payment_method_types'] ?? []) !== [$bank ? 'customer_balance' : 'card']) {
+            throw new PaymentVerificationException('The payment method does not match this order.', 'method_mismatch');
+        }
+        if ($bank && empty($data['customer'])) {
+            throw new PaymentVerificationException('The bank transfer has no customer.', 'missing_customer');
+        }
+        $instructions = $data['next_action']['display_bank_transfer_instructions'] ?? null;
+        $validPendingBank = $bank && ($data['status'] === 'processing'
+            || ($data['status'] === 'requires_action' && $instructions));
+        if ($data['status'] !== 'succeeded' && ! $validPendingBank) {
+            throw PaymentVerificationException::notSucceeded($data['status']);
+        }
+        $details = null;
+        if ($bank && $instructions) {
+            $address = collect($instructions['financial_addresses'] ?? [])->firstWhere('type', 'sort_code');
+            $gb = $address['sort_code'] ?? [];
+            $details = [
+                'provider' => 'stripe',
+                'bank_name' => $gb['bank_name'] ?? '',
+                'account_name' => $gb['account_holder_name'] ?? '',
+                'sort_code' => $gb['sort_code'] ?? '',
+                'account_number' => $gb['account_number'] ?? '',
+                'reference' => $instructions['reference'] ?? '',
+                'amount_remaining' => (int) ($instructions['amount_remaining'] ?? $expectedAmount),
+                'currency' => 'gbp',
+                'hosted_instructions_url' => $instructions['hosted_instructions_url'] ?? null,
+            ];
+        }
+
+        return [
+            'status' => $data['status'] === 'succeeded' ? 'paid' : 'pending',
+            'receipt_url' => is_array($data['latest_charge'] ?? null) ? ($data['latest_charge']['receipt_url'] ?? null) : null,
+            'bank_transfer_details' => $details,
+        ];
     }
 
     /**

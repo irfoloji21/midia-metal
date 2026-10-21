@@ -46,11 +46,11 @@ const weldingPrimaryImage = t("home_welding_image", "/images/welding.jpg");
 const weldingSecondaryImage = t("home_welding_secondary_image", "/images/workshop.jpg");
 const weldingServiceSlug = (t("home_welding_service_slug", "custom-fabrication") || "custom-fabrication").trim();
 const weldingServicePath = `/services/${encodeURIComponent(weldingServiceSlug || "custom-fabrication")}`;
-const kitchenSystemsCtaLabel = t("home_learn_more_label", "Explore Kitchen Systems");
+const kitchenSystemsCtaLabel = t("home_learn_more_label", "Browse Products");
 
-const title = getPageTitle(settings, 'meta_title', 'Midia M Metal | Commercial Kitchen Ventilation & Fabrication');
-const description = getPageDescription(settings, 'meta_description', 'Specialist in commercial kitchen ventilation, stainless steel fabrication, and canopy installation across the UK.');
-const image = '/logo.png';
+const title = getPageTitle(settings, 'meta_title', "Midia M Metal | Commercial Kitchen Equipment & Welding");
+const description = getPageDescription(settings, 'meta_description', "Commercial kitchen equipment, stainless steel fabrication, ventilation systems and canopy installation. Our factory is in London.");
+const image = settings.site_logo || '/logo.png';
 const normalizeImage = (value: unknown, fallback = '/logo.png') => {
   if (typeof value !== 'string' || value.trim().length === 0) return fallback;
   const trimmed = value.trim();
@@ -60,18 +60,12 @@ const normalizeImage = (value: unknown, fallback = '/logo.png') => {
   return `/${trimmed}`;
 };
 
-// TODO (client): Replace placeholder phone with real number in Admin > Settings > contact_phone
-// or update the hardcoded fallback below before go-live.
 const contactPhone = settings['contact_phone'] || '';
-const phoneDigits = contactPhone.replace(/\D/g, '');
-const whatsappPhone = phoneDigits.startsWith('00')
-  ? phoneDigits.slice(2)
-  : phoneDigits.startsWith('0') ? `44${phoneDigits.slice(1)}` : phoneDigits;
 const organizationJsonLd = buildOrganizationJsonLd({
-  name: 'Midia M Metal',
+  name: settings.site_name || 'Midia M Metal',
   url: `${siteUrl}/`,
-  logo: `${siteUrl}/logo.png`,
-  email: settings['contact_email'] || 'softwaredevelopment2181@gmail.com',
+  logo: new URL(image, siteUrl).href,
+  email: settings['contact_email'] || '',
   ...(contactPhone ? { telephone: contactPhone } : {}),
   sameAs: [],
 });
@@ -79,7 +73,7 @@ const organizationJsonLd = buildOrganizationJsonLd({
 const websiteJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'Midia M Metal',
+  name: settings.site_name || 'Midia M Metal',
   url: `${siteUrl}/`,
   description: truncateText(stripHtml(description)),
 };
@@ -101,23 +95,18 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     <section class="container mx-auto px-4 lg:px-8 pt-4 md:pt-6">
       <div class="relative isolate overflow-hidden bg-primary md:min-h-[540px]">
         <HeroCarousel slides={heroSlides} client:idle />
-        <div aria-hidden="true" class="absolute inset-0 z-10 pointer-events-none bg-[#031946]/25 bg-gradient-to-r from-[#031946]/95 via-[#031946]/75 to-[#031946]/10" />
+        <div aria-hidden="true" class="absolute inset-0 z-10 pointer-events-none bg-gradient-to-r from-[#031946]/75 via-[#031946]/60 to-[#031946]/35 md:via-[#031946]/45 md:to-transparent" />
         <div class="relative z-20 max-w-[780px] px-6 pt-10 pb-28 sm:px-10 md:px-16 md:pt-16 md:pb-24">
         <h1 class="max-w-[650px] font-sans text-[36px] sm:text-[44px] md:text-[56px] lg:text-[60px] leading-[1.06] tracking-[-0.025em] font-semibold text-white mb-5">
-          {t("home_hero_title", "Commercial kitchen equipment, made to measure.")}
+          {t("home_hero_title", "Bespoke commercial kitchen equipment.")}
         </h1>
         <p class="max-w-[600px] text-[15px] md:text-[17px] leading-7 text-white/85">
-          {t("home_hero_desc", "From a single sink unit to a full kitchen fit-out, we make the metalwork your kitchen needs. At Midia M Metal, our own team handles the measurements, fabrication and installation. We’re based in London and take on projects across the UK, depending on the work involved.")}
+          {t("home_hero_desc", "We manufacture stainless steel kitchen equipment and bespoke metalwork at our London factory. Our team manages site measurements, fabrication and installation, with every component made to your project specifications.")}
         </p>
         <div class="mt-6 flex flex-wrap items-center gap-3 md:gap-4">
           {contactPhone && (
             <a href={`tel:${contactPhone.replace(/\s/g, '')}`} class="inline-flex items-center justify-center px-7 py-3 bg-orange text-white text-sm font-semibold hover:bg-orange-hover transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
               {t("home_hero_phone_label", "Call Us")}
-            </a>
-          )}
-          {whatsappPhone && (
-            <a href={`https://wa.me/${whatsappPhone}`} target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3 border border-white/50 bg-white/5 text-white text-sm font-semibold hover:bg-white hover:text-primary transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
-              {t("home_hero_whatsapp_label", "WhatsApp Us")}
             </a>
           )}
           <a href="/get-a-quote" class="px-3 py-3 text-sm font-semibold text-white underline decoration-white/50 underline-offset-4 hover:decoration-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
@@ -136,32 +125,32 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
           <div class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 md:h-8 md:w-8 flex-shrink-0 text-[#7a8293]"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
             <div class="leading-tight">
-              <p class="font-sans text-[13px] md:text-[17px] font-semibold text-[#15264b]">{t("home_reward_title", "Commercial-grade fabrication")}</p>
-              <p class="mt-1 text-[10px] md:text-xs text-[#5d6982]">{t("home_reward_desc", "Built for demanding kitchen and ventilation environments.")}</p>
+              <p class="font-sans text-[13px] md:text-[17px] font-semibold text-[#15264b]">{t("home_reward_title", "Made to measure")}</p>
+              <p class="mt-1 text-[10px] md:text-xs text-[#5d6982]">{t("home_reward_desc", "Equipment manufactured to your dimensions and layout.")}</p>
             </div>
           </div>
           <!-- Feature 2: CirclePercent -->
           <div class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 md:h-8 md:w-8 flex-shrink-0 text-[#7a8293]"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="M9 9h.01"/><path d="M15 15h.01"/></svg>
             <div class="leading-tight">
-              <p class="font-sans text-[13px] md:text-[17px] font-semibold text-[#15264b]">{t("home_discount_title", "Fast quote turnaround")}</p>
-              <p class="mt-1 text-[10px] md:text-xs text-[#5d6982]">{t("home_discount_desc", "Clear commercial pricing and lead times for every enquiry.")}</p>
+              <p class="font-sans text-[13px] md:text-[17px] font-semibold text-[#15264b]">{t("home_discount_title", "In-house fabrication")}</p>
+              <p class="mt-1 text-[10px] md:text-xs text-[#5d6982]">{t("home_discount_desc", "Your project is handled by our own fabrication team.")}</p>
             </div>
           </div>
           <!-- Feature 3: ShoppingBag -->
           <div class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 md:h-8 md:w-8 flex-shrink-0 text-[#7a8293]"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             <div class="leading-tight">
-              <p class="font-sans text-[13px] md:text-[17px] font-semibold text-[#15264b]">{t("home_shipping_title", "UK-wide delivery")}</p>
-              <p class="mt-1 text-[10px] md:text-xs text-[#5d6982]">{t("home_shipping_desc", "Reliable dispatch for stocked products and fabricated components.")}</p>
+              <p class="font-sans text-[13px] md:text-[17px] font-semibold text-[#15264b]">{t("home_shipping_title", "Clear project pricing")}</p>
+              <p class="mt-1 text-[10px] md:text-xs text-[#5d6982]">{t("home_shipping_desc", "An initial estimate, with the final price agreed before production.")}</p>
             </div>
           </div>
           <!-- Feature 4: WalletMinimal -->
           <div class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 md:h-8 md:w-8 flex-shrink-0 text-[#7a8293]"><path d="M17 14h.01"/><path d="M7 7h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14"/></svg>
             <div class="leading-tight">
-              <p class="font-sans text-[13px] md:text-[17px] font-semibold text-[#15264b]">{t("home_prices_title", "Installation support")}</p>
-              <p class="mt-1 text-[10px] md:text-xs text-[#5d6982]">{t("home_prices_desc", "Supply, fabrication, installation, and aftercare in one workflow.")}</p>
+              <p class="font-sans text-[13px] md:text-[17px] font-semibold text-[#15264b]">{t("home_prices_title", "Installation services")}</p>
+              <p class="mt-1 text-[10px] md:text-xs text-[#5d6982]">{t("home_prices_desc", "Fabrication and installation coordinated by one team.")}</p>
             </div>
           </div>
         </div>
@@ -171,25 +160,22 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     <!-- Metal Welding -->
     <section class="container mx-auto px-4 lg:px-8 pt-4 md:pt-8 pb-8 md:pb-12">
       <p class="text-center text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase mb-2">
-        {t("home_fabrication_section_label", "OUR FABRICATION")}
+        {t("home_fabrication_section_label", "Welding & Fabrication")}
       </p>
       <h2 class="text-[30px] md:text-[40px] leading-tight font-semibold text-[#10275c] font-sans text-center mb-6 md:mb-8">
-        {t("home_fabrication_section_title", "Fabrication")}
+        {t("home_fabrication_section_title", "Metalwork built to specification")}
       </h2>
       <div class="grid grid-cols-1 xl:grid-cols-[0.9fr_1.1fr] gap-4 md:gap-6">
         <div class="bg-primary p-6 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[440px]">
           <div>
             <p class="text-[10px] font-bold tracking-[0.2em] text-white/70 uppercase mb-3 md:mb-4">
-              {t("home_welding_label", "Metal welding services")}
+              {t("home_welding_label", "Custom Metalwork")}
             </p>
             <h2 class="font-sans text-[34px] md:text-[50px] leading-[0.95] font-semibold text-white mb-5 md:mb-6">
-              {t("home_welding_title", "Metal welding & bespoke fabrication")}
+              {t("home_welding_title", "Stainless steel fabrication & welding")}
             </h2>
             <p class="text-sm md:text-[15px] leading-6 md:leading-7 text-white/80 max-w-xl whitespace-pre-line">
-              {t(
-                "home_welding_desc",
-                "Custom stainless steel builds, repair work, on-site modifications, and workshop welding for commercial kitchens, industrial spaces, and made-to-order metalwork."
-              )}
+              {t("home_welding_desc", "We manufacture worktops, cupboards, sink units, grills, extraction canopies and ductwork for commercial kitchens. Each item is fabricated to the agreed dimensions, material and finish.")}
             </p>
           </div>
 
@@ -198,13 +184,13 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
               href="/get-a-quote"
               class="inline-flex items-center justify-center px-6 md:px-7 py-3 bg-orange text-white text-xs md:text-sm font-semibold hover:bg-orange-hover transition-colors"
             >
-              {t("home_welding_primary_cta", "Request Welding Quote")}
+              {t("home_welding_primary_cta", "Request a Quote")}
             </a>
             <a
               href={weldingServicePath}
               class="inline-flex items-center justify-center px-6 md:px-7 py-3 border border-white/30 text-white text-xs md:text-sm font-semibold hover:bg-white hover:text-primary transition-colors"
             >
-              {t("home_welding_secondary_cta", "View More")}
+              {t("home_welding_secondary_cta", "View Fabrication Services")}
             </a>
           </div>
         </div>
@@ -231,13 +217,13 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
             </div>
             <div class="bg-[#f4f6f8] border border-[#d4dce6] px-4 md:px-5 py-4 md:py-5 max-w-[340px]">
               <p class="text-[10px] font-bold tracking-[0.18em] text-[#56637d] uppercase mb-2">
-                {t("home_welding_card_label", "Workshop + site support")}
+                {t("home_welding_card_label", "Project Preparation")}
               </p>
               <p class="font-sans text-[18px] md:text-[22px] leading-[1.05] font-semibold text-primary mb-2">
-                {t("home_welding_card_title", "From fabrication bench to final install")}
+                {t("home_welding_card_title", "Confirmed specifications before production")}
               </p>
               <p class="text-[12px] md:text-[13px] leading-5 text-[#536079]">
-                {t("home_welding_card_desc", "Built for projects that need custom metalwork, fast adjustments, and practical welding support on the job.")}
+                {t("home_welding_card_desc", "We verify site measurements and confirm the design, materials and final price with you before fabrication begins.")}
               </p>
             </div>
           </div>
@@ -248,10 +234,10 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     <!-- Categories -->
     <section class="container mx-auto px-4 lg:px-8 pt-4 md:pt-8 pb-8 md:pb-12">
       <p class="text-center text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase mb-2">
-        {t("home_categories_section_label", "OUR CATEGORIES")}
+        {t("home_categories_section_label", "Product Categories")}
       </p>
       <h2 class="text-[30px] md:text-[40px] leading-tight font-semibold text-[#10275c] font-sans text-center mb-6 md:mb-8">
-        {t("home_categories_section_title", "Product Categories")}
+        {t("home_categories_section_title", "Equipment, parts & materials")}
       </h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         {categories.map((cat) => (
@@ -270,8 +256,8 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
 
     <!-- Trending Items -->
     <section class="container mx-auto px-4 lg:px-8 py-10 md:py-20">
-      <p class="text-center text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase mb-2">{t("home_catalog_label", "OUR CATALOG")}</p>
-      <h2 class="text-center text-[44px] leading-none md:text-[38px] font-semibold text-[#10275c] mb-8 md:mb-12 font-sans">{t("home_trending_title", "Best-selling products")}</h2>
+      <p class="text-center text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase mb-2">{t("home_catalog_label", "Our Range")}</p>
+      <h2 class="text-center text-[44px] leading-none md:text-[38px] font-semibold text-[#10275c] mb-8 md:mb-12 font-sans">{t("home_trending_title", "Products & spare parts")}</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         {trendingItems.map((item) => (
           <a href={`/shop/${item.slug}`} class="product-card">
@@ -297,7 +283,7 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
       </div>
       <div class="text-center mt-8 md:mt-10">
         <a href="/shop" class="inline-flex items-center justify-center px-8 md:px-10 py-3 md:py-4 bg-primary text-primary-foreground font-semibold text-xs md:text-sm hover:bg-navy-light transition-colors">
-          {t("home_view_more_label", "View More Products")}
+          {t("home_view_more_label", "View All Products")}
         </a>
       </div>
     </section>
@@ -306,22 +292,22 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     <section class="container mx-auto px-4 lg:px-8 py-10 md:py-16">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="relative overflow-hidden min-h-[200px] md:min-h-[240px] bg-gradient-to-r from-[#eb5c10] to-[#ff7d1b] p-6 md:p-10 flex flex-col justify-center">
-          <h3 class="text-[42px] md:text-5xl leading-[0.95] font-semibold text-white mb-4 md:mb-5 font-sans">{t("home_installation_title", "Installation services")}</h3>
-          <p class="text-white/85 text-xs md:text-sm mb-5 md:mb-7 max-w-md">{t("home_installation_desc", "Dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia.")}</p>
+          <h3 class="text-[42px] md:text-5xl leading-[0.95] font-semibold text-white mb-4 md:mb-5 font-sans">{t("home_installation_title", "Commercial kitchen installation")}</h3>
+          <p class="text-white/85 text-xs md:text-sm mb-5 md:mb-7 max-w-md">{t("home_installation_desc", "We install equipment for new kitchens and upgrades to existing premises. Our team coordinates the measurements, fitting requirements and installation schedule for your project.")}</p>
           <a href="/get-a-quote" class="inline-flex items-center justify-center w-fit px-5 md:px-7 py-2.5 md:py-3 border border-white text-white text-xs md:text-sm font-semibold hover:bg-white hover:text-orange transition-all">
-            {t("home_request_quote_label", "Request a Quote")}
+            {t("home_request_quote_label", "Request an Installation Quote")}
           </a>
         </div>
         <div class="relative overflow-hidden min-h-[200px] md:min-h-[240px] bg-[#e8edf1] flex items-center">
           <div class="flex-1 p-6 md:p-10 flex flex-col justify-center z-10">
-          <h3 class="text-[48px] md:text-[35px] leading-[0.95] md:leading-[1.02] font-semibold text-[#10275c] mb-3 md:mb-4 font-sans">{t("home_comfort_title", "Built for commercial kitchens")}</h3>
-          <p class="text-[#6f7e9a] text-xs md:text-sm mb-5 md:mb-7">{t("home_comfort_desc", "Stainless steel products and systems designed for hygiene, durability, and compliance.")}</p>
+          <h3 class="text-[48px] md:text-[35px] leading-[0.95] md:leading-[1.02] font-semibold text-[#10275c] mb-3 md:mb-4 font-sans">{t("home_comfort_title", "Equipment, components & spare parts")}</h3>
+          <p class="text-[#6f7e9a] text-xs md:text-sm mb-5 md:mb-7">{t("home_comfort_desc", "Explore our range of kitchen equipment, replacement parts and fabrication materials. Bespoke sizes and components are available on request.")}</p>
             <a href="/shop" class="inline-flex items-center justify-center w-fit px-5 md:px-7 py-2.5 md:py-3 bg-[#0d79b8] text-white text-xs md:text-sm font-semibold hover:bg-[#0a689f] transition-colors">
               {kitchenSystemsCtaLabel}
             </a>
           </div>
           <div class="w-[32%] h-full flex-shrink-0 hidden md:block">
-            <img src={t("home_comfort_image", "/images/air-conditioner.jpg")} alt="Our products" width="400" height="300" loading="lazy" decoding="async" class="w-full h-full object-cover" />
+            <img src={t("home_comfort_image", "/images/products/prep-table.webp")} alt="Our products" width="400" height="300" loading="lazy" decoding="async" class="w-full h-full object-cover" />
           </div>
         </div>
       </div>

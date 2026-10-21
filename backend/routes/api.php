@@ -66,8 +66,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/quote', [Api\FormController::class, 'quote'])->middleware(['customer.cookie', 'throttle:6,1']);
     Route::post('/coupons/apply', [Api\FormController::class, 'applyCoupon'])->middleware('throttle:20,1');
     Route::post('/payment/intent', [Api\PaymentController::class, 'createIntent'])->middleware(['customer.cookie', 'throttle:10,1']);
+    Route::post('/payment/status', [Api\PaymentController::class, 'status'])->middleware(['customer.cookie', 'throttle:20,1']);
     Route::post('/shipping/options', [Api\ShippingController::class, 'options'])->middleware('throttle:20,1');
     Route::post('/webhooks/easypost', [Api\EasyPostWebhookController::class, 'handle'])->middleware('throttle:60,1');
+    Route::post('/webhooks/stripe', [Api\StripeWebhookController::class, 'handle']);
     // Testimonials
     Route::get('/testimonials', [Api\TestimonialController::class, 'index']);
     // FAQs

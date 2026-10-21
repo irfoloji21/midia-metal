@@ -6,8 +6,8 @@ import QuoteForm from '@/islands/QuoteForm';
 import { fetchSettings, getPageTitle, getPageDescription } from '@/lib/settings';
 
 const settings = await fetchSettings();
-const pageTitle = getPageTitle(settings, undefined, 'Get a Quote');
-const pageDescription = getPageDescription(settings, undefined, 'Request a free quote for custom stainless steel fabrication, kitchen canopy systems, and more from Midia M Metal.');
+const pageTitle = getPageTitle(settings, undefined, 'Request a Quotation | Midia M Metal');
+const pageDescription = getPageDescription(settings, undefined, 'Request a quotation for commercial kitchen equipment, ventilation systems, canopy installation, stainless steel wall cladding or bespoke fabrication.');
 ---
 
 <BaseLayout
@@ -17,6 +17,11 @@ const pageDescription = getPageDescription(settings, undefined, 'Request a free 
 >
   <div class="min-h-screen bg-[#eaf0f3]">
     <section class="container mx-auto px-4 lg:px-8 pt-16 md:pt-24 pb-20 md:pb-28 max-w-3xl">
+      <div class="mb-10">
+        <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#10275c] mb-4">Midia M Metal</p>
+        <h1 class="font-sans text-[38px] md:text-[52px] leading-[1.05] font-semibold text-[#10275c] mb-6">Request a quotation.</h1>
+        <p class="text-[#58657f] text-[16px] leading-8">Share your requirements for commercial kitchen equipment, ventilation systems, canopy installation, stainless steel wall cladding or bespoke fabrication. Include the dimensions and quantities needed for your quotation.</p>
+      </div>
       <QuoteForm client:idle />
     </section>
   </div>

@@ -1,11 +1,11 @@
 ---
-export const prerender = true;
+export const prerender = false;
 
 /**
  * terms-of-service.astro — Terms & Conditions page (PURE ASTRO)
  *
  * Converted from React island (LegalIsland.tsx) to pure Astro.
- * All data fetching happens at build time via frontmatter.
+ * All data fetching happens on each request via frontmatter.
  * Zero client-side JavaScript for page content.
  *
  * Original: src/islands/LegalIsland.tsx
@@ -16,7 +16,7 @@ import { fetchSettings, getPageTitle, getPageDescription } from '@/lib/settings'
 
 const siteUrl = import.meta.env.SITE;
 
-// --- Data Fetching (runs at build time) ---
+// --- Data Fetching (runs on each request) ---
 const settings = await fetchSettings();
 
 const title = settings['terms_conditions_title'] || 'Terms & Conditions';

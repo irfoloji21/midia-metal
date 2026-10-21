@@ -6,7 +6,8 @@ import {
     MessageSquare, Lock, ChevronRight, ChevronUp, ShoppingCart,
     Trash2, RotateCcw, Clock, Truck, CheckCheck, MapPin, CreditCard
 } from "lucide-react";
-import { $customer, $isAuthLoading, fetchCurrentCustomer, logoutCustomer, updateCustomer, type Customer } from "@/stores/auth";
+import { $customer, $isAuthLoading, $authError, logoutCustomer, updateCustomer, type Customer } from "@/stores/auth";
+import CustomerSessionError from "@/components/CustomerSessionError";
 import { $wishlist, removeFromWishlist } from "@/stores/wishlist";
 import { addToCart } from "@/stores/cart";
 import { apiFetch } from "@/lib/api";
@@ -88,6 +89,7 @@ const getLatestOrderRequest = (order: any) => order?.customer_requests?.[0] ?? n
 function AccountIsland() {
     const customer = useStore($customer);
     const isLoading = useStore($isAuthLoading);
+    const authError = useStore($authError);
     const wishlist = useStore($wishlist);
     const [activeTab, setActiveTab] = useState<Tab>("orders");
     const [orders, setOrders] = useState<any[]>([]);
@@ -130,12 +132,8 @@ function AccountIsland() {
     const [secForm, setSecForm] = useState({ current_password: "", password: "", password_confirmation: "" });
     const [savingPassword, setSavingPassword] = useState(false);
 
-    useEffect(() => {
-        fetchCurrentCustomer();
-    }, []);
-
     const wishlistIds = wishlist.map((item) => String(item.id)).join(",");
-    useEffect(() => {
+    useEffect((): void | (() => void) => {
         if (activeTab !== "wishlist" || !wishlistIds) return;
         let cancelled = false;
         Promise.allSettled(wishlistIds.split(",").map((id) => apiFetch<Product>(`/v1/products/${id}`)))
@@ -151,7 +149,7 @@ function AccountIsland() {
     }, [activeTab, wishlistIds]);
 
     useEffect(() => {
-        if (isLoading) {
+        if (isLoading || authError) {
             return;
         }
 
@@ -186,7 +184,7 @@ function AccountIsland() {
                 company_vat_number: customer.company_vat_number || "",
             });
         }
-    }, [customer, isLoading, activeTab]);
+    }, [customer, isLoading, authError, activeTab]);
 
     const fetchOrders = async () => {
         try {
@@ -367,7 +365,7 @@ function AccountIsland() {
         }
     };
 
-    const handleSaveProfile = async (e: React.FormEvent) => {
+    const handleSaveProfile = async (e: React.FormEvent, section: "profile" | "addresses" = "profile") => {
         e.preventDefault();
         setSavingProfile(true);
         try {
@@ -376,7 +374,7 @@ function AccountIsland() {
                 body: JSON.stringify(form)
             });
             updateCustomer(updated);
-            toast.success("Profile updated successfully!");
+            toast.success(section === "addresses" ? "Addresses updated successfully!" : "Profile updated successfully!");
         } catch (error: unknown) { toast.error(error instanceof Error ? error.message : "Failed to save profile"); }
         finally { setSavingProfile(false); }
     };
@@ -407,6 +405,7 @@ function AccountIsland() {
         );
     }
 
+    if (authError) return <section className="container mx-auto px-4 py-20"><CustomerSessionError /></section>;
     if (!customer) return null;
 
     const sidebarItems: { id: Tab; icon: any; label: string }[] = [
@@ -799,7 +798,7 @@ function AccountIsland() {
                             <h2 className="font-sans text-[28px] font-semibold text-primary mb-2">Addresses</h2>
                             <p className="text-[#6e7a92] mb-8 text-sm">Your saved addresses are pre-filled at checkout.</p>
 
-                            <form onSubmit={handleSaveProfile} className="space-y-8 max-w-2xl">
+                            <form onSubmit={(e) => handleSaveProfile(e, "addresses")} className="space-y-8 max-w-2xl">
                                 {/* Billing Address */}
                                 <div>
                                     <h3 className="font-semibold text-primary mb-4 text-lg">Billing Address</h3>

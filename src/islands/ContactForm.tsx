@@ -3,19 +3,19 @@ import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 
 const defaultContactFormCopy = {
-  nameLabel: "Your Name",
+  nameLabel: "Full Name",
   emailLabel: "Email Address",
   phoneLabel: "Phone Number (optional)",
-  subjectLabel: "Subject (optional)",
+  subjectLabel: "Enquiry Subject (optional)",
   sendingLabel: "Sending...",
-  successMessage: "Thanks, we’ve received your message. We’ll get back to you using the contact details you provided.",
-  errorMessage: "Your message couldn’t be sent. Please try again, or contact us by phone or WhatsApp.",
-  privacyError: "Please tick the privacy policy box before sending your message.",
+  successMessage: "Your enquiry has been received. Our team will review the details and contact you using the information provided.",
+  errorMessage: "Your enquiry could not be sent. Please try again or contact us by phone or email.",
+  privacyError: "Please confirm your agreement to the privacy policy before sending your enquiry.",
   privacyPrefix: "I agree to the",
-  privacyLinkLabel: "privacy policy.",
+  privacyLinkLabel: "Privacy Policy.",
 };
 
-export default function ContactForm({ messagePlaceholder = "Tell us about the work you need.", buttonLabel = "Send Message", copy }: { messagePlaceholder?: string; buttonLabel?: string; copy?: Partial<typeof defaultContactFormCopy> }) {
+export default function ContactForm({ messagePlaceholder = "Enter your message.", buttonLabel = "Send Enquiry", copy }: { messagePlaceholder?: string; buttonLabel?: string; copy?: Partial<typeof defaultContactFormCopy> }) {
   const text = { ...defaultContactFormCopy, ...copy };
   const [formData, setFormData] = useState({
     name: "", email: "", phone: "", subject: "", message: "",

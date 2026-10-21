@@ -5,6 +5,7 @@ import { Upload, X, Loader2 } from "lucide-react";
 import ProductImage from "@/components/ProductImage";
 
 interface ImageUploadProps {
+    id?: string;
     value: string;
     onChange: (url: string) => void;
     label?: string;
@@ -15,7 +16,7 @@ interface ImageUploadProps {
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 const MAX_IMAGE_SIZE_LABEL = "2MB";
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label, hidePreview = false, adaptiveBackground = false }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ id, value, onChange, label, hidePreview = false, adaptiveBackground = false }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -58,7 +59,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label, hideP
 
     return (
         <div className={hidePreview ? "inline-block" : "space-y-4"}>
-            {label && <label className="block text-sm font-semibold text-[#10275c]">{label}</label>}
+            {label && <label htmlFor={id} className="block text-sm font-semibold text-[#10275c]">{label}</label>}
             <div className={hidePreview ? "flex flex-col" : "flex items-center gap-6"}>
                 {!hidePreview && (
                     <div className="relative group w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50 bg-[#F9FBFC]">
@@ -71,6 +72,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label, hideP
                                 )}
                                 <button
                                     type="button"
+                                    aria-label="Remove image"
                                     onClick={handleRemove}
                                     className="absolute top-2 right-2 p-1.5 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                                 >
@@ -92,6 +94,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label, hideP
                 )}
                 <div className={hidePreview ? "w-full" : ""}>
                     <input
+                        id={id}
                         type="file"
                         ref={fileInputRef}
                         onChange={handleUpload}

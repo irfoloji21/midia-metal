@@ -1,0 +1,3231 @@
+{
+  "source": "https://support.midiawork.com/shop",
+  "retrieved_on": "2026-10-15",
+  "notes": [
+    "All 27 reference products and prices retained as explicitly requested.",
+    "Source IDs are provenance only; local database IDs are assigned independently.",
+    "Unverified options and contradictory dimensions are withheld from the public catalogue with user approval; original records remain in the private source archive. Product prices and stock/shipping values are preserved.",
+    "Descriptions and titles edited for professional English. Category URLs are mapped by meaning, not misleading source slugs.",
+    "Original image/title mismatch for source IDs 5,54,55 retained: their reference photos show sheet metal, not conveyor feet.",
+    "Source ID 19 title specifies four 4-inch castors with two brakes, but the main reference image shows three red fixed castors; gallery shows different blue 5-inch castors. Original main product appearance preserved.",
+    "Contradictory sheet variant dimensions are hidden; specifications use the grade, finish and nominal thickness stated in the source product titles.",
+    "Identical source photos share one edited image: 25/29, 5/54/55, 13/43. Raw source images and galleries archived locally; public galleries use the edited hero images only."
+  ],
+  "categories": [
+    {
+      "source_id": 7,
+      "slug": "equipment-parts",
+      "name": "Wheels & Castors",
+      "description": "Castor wheels for commercial equipment.",
+      "image": "/images/products/reference-catalogue/product-19-v1.webp",
+      "order": 0,
+      "active": true
+    },
+    {
+      "source_id": 9,
+      "slug": "baffle-filters",
+      "name": "Baffle Filters",
+      "description": "Stainless steel baffle filters for commercial kitchen extraction canopies.",
+      "image": "/images/products/reference-catalogue/baffle-grease-filters-v1.webp",
+      "order": 1,
+      "active": true
+    },
+    {
+      "source_id": 10,
+      "slug": "commercial-kitchen-fans",
+      "name": "Commercial Kitchen Fans",
+      "description": "Cased fans for commercial kitchen ventilation systems.",
+      "image": "/images/products/reference-catalogue/product-49-v1.webp",
+      "order": 2,
+      "active": true
+    },
+    {
+      "source_id": 1,
+      "slug": "kitchen-worktables",
+      "name": "Tables",
+      "description": "Stainless steel tables for commercial kitchens.",
+      "image": "/images/products/prep-table.webp",
+      "order": 3,
+      "active": true
+    },
+    {
+      "source_id": 2,
+      "slug": "canopies",
+      "name": "Canopies",
+      "description": "Stainless steel extraction canopies for commercial kitchens.",
+      "image": "/images/canopy.jpg",
+      "order": 4,
+      "active": true
+    },
+    {
+      "source_id": 3,
+      "slug": "commercial-grills",
+      "name": "Barbecue Grills",
+      "description": "Stainless steel mangal barbecue grills.",
+      "image": "/images/products/reference-catalogue/product-26-v2.webp",
+      "order": 5,
+      "active": true
+    },
+    {
+      "source_id": 4,
+      "slug": "sinks-wash-stations",
+      "name": "Sinks",
+      "description": "Stainless steel sink units, sink tops and individual bowls.",
+      "image": "/images/products/reference-catalogue/product-14-v1.webp",
+      "order": 6,
+      "active": true
+    },
+    {
+      "source_id": 5,
+      "slug": "ventilation-components",
+      "name": "Ventilation Fans",
+      "description": "Centrifugal and axial fans for ventilation systems.",
+      "image": "/images/products/reference-catalogue/product-11-v1.webp",
+      "order": 7,
+      "active": true
+    },
+    {
+      "source_id": 6,
+      "slug": "stainless-steel-sheets",
+      "name": "Stainless Steel Sheets",
+      "description": "Grades 304 and 430 stainless steel sheets with brushed and circle finishes.",
+      "image": "/images/products/reference-catalogue/product-13-v1.webp",
+      "order": 8,
+      "active": true
+    }
+  ],
+  "products": [
+    {
+      "name": "Metal Divider Bar",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "divide-bar-srBX",
+      "price": "£10.00",
+      "old_price": "£15.00",
+      "image": "/images/products/reference-catalogue/product-24-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-24-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-24-angle-b-v1.webp"
+      ],
+      "description": "<p>Metal divider bar with a formed profile for fabrication and finishing work. Its narrow section provides a defined separation between adjoining surfaces and a consistent detail along the joint.</p>\n<p>The available sizes offer a choice of profiles for different layouts. Match the bar dimensions to the adjoining materials and the space available within the assembly.</p>",
+      "tags": [],
+      "specifications": {
+        "Profile": "Formed divider bar"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 0,
+      "stock_quantity": 3,
+      "track_stock": false,
+      "shipping_weight_kg": 1,
+      "shipping_length_cm": 2,
+      "shipping_width_cm": 3,
+      "shipping_height_cm": 4,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 24,
+      "source_url": "https://support.midiawork.com/shop/divide-bar-srBX",
+      "source_name": "Divide bar",
+      "category_slug": null,
+      "price_on_request": false
+    },
+    {
+      "name": "FASTCUT Metal Cutting Disc",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "cutting-disk-2wFM",
+      "price": "£0.60",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-25-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-25-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-25-angle-b-v1.webp"
+      ],
+      "description": "<p>FASTCUT cutting disc for metal and stainless steel, with a 115 mm diameter, 1.0 mm thickness and 22.2 mm bore. The thin profile is intended for cutting tasks where a narrow cut is required.</p>\n<p>Suitable for use with a compatible angle grinder. Check the disc dimensions and the speed rating printed on the label against your tool before fitting.</p>",
+      "tags": [],
+      "specifications": {
+        "Brand": "FASTCUT",
+        "Disc type": "Metal cutting disc",
+        "Diameter": "115 mm",
+        "Thickness": "1.0 mm",
+        "Bore diameter": "22.2 mm"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": [
+          {
+            "key": "custom:depth",
+            "label": "depth",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ]
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 1,
+      "stock_quantity": 22,
+      "track_stock": false,
+      "shipping_weight_kg": 1,
+      "shipping_length_cm": 2,
+      "shipping_width_cm": 2,
+      "shipping_height_cm": 2,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 25,
+      "source_url": "https://support.midiawork.com/shop/cutting-disk-2wFM",
+      "source_name": "Cutting Disk",
+      "category_slug": null,
+      "price_on_request": false
+    },
+    {
+      "name": "Stainless Steel Mangal Barbecue Grill",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "barbeque-mangal-grill-mFkd",
+      "price": "£20.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-26-v2.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-26-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-26-angle-b-v1.webp"
+      ],
+      "description": "<p>Stainless steel mangal barbecue grill with an integrated canopy and an open front cooking chamber. The enclosed sides define the cooking area, while the wide front opening provides direct access during use.</p>\n<p>The canopy and lower body form a single unit for a commercial cooking layout. Overall dimensions should be coordinated with the available workspace and the planned extraction arrangement.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "Stainless steel",
+        "Design": "Open front with integrated canopy"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 2,
+      "stock_quantity": 4,
+      "track_stock": false,
+      "shipping_weight_kg": 1,
+      "shipping_length_cm": 20,
+      "shipping_width_cm": 10,
+      "shipping_height_cm": 20,
+      "shipping_class": "freight",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 26,
+      "source_url": "https://support.midiawork.com/shop/barbeque-mangal-grill-mFkd",
+      "source_name": "Barbeque mangal grill",
+      "category_slug": "commercial-grills",
+      "price_on_request": false
+    },
+    {
+      "name": "Metal Cutting Disc – 115 mm",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "cutting-disk-test-bT9H",
+      "price": "£10.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-25-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-25-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-25-angle-b-v1.webp"
+      ],
+      "description": "<p>A 115 mm cutting disc for stainless steel and other metals, with a 1 mm profile and a 22.2 mm bore. Its thin section is intended for cutting rather than grinding, making it a practical consumable for metal fabrication work.</p>\n<p>Use with a compatible angle grinder and match the disc specification and marked speed rating to the tool.</p>",
+      "tags": [],
+      "specifications": {
+        "Disc type": "Metal cutting disc",
+        "Diameter": "115 mm",
+        "Thickness": "1.0 mm",
+        "Bore diameter": "22.2 mm"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 3,
+      "stock_quantity": 2,
+      "track_stock": false,
+      "shipping_weight_kg": 3,
+      "shipping_length_cm": 2,
+      "shipping_width_cm": 3,
+      "shipping_height_cm": 4,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 29,
+      "source_url": "https://support.midiawork.com/shop/cutting-disk-test-bT9H",
+      "source_name": "Cutting Disk test",
+      "category_slug": null,
+      "price_on_request": false
+    },
+    {
+      "name": "Baffle Grease Filters",
+      "show_variant_in_title": false,
+      "variant_mode": "combination",
+      "variant_options": [
+        "Material",
+        "Nominal size (in)"
+      ],
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "baffle-grease-filters-36dW",
+      "price": "£84.99",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/baffle-grease-filters-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-1-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-1-angle-b-v1.webp"
+      ],
+      "description": "<p>Stainless steel baffle grease filters for commercial kitchen extraction canopies. The baffles change the direction of the airflow to collect grease droplets, which drain towards the canopy's collection system. Handles allow the filters to be removed for routine cleaning.</p>\n<p>Choose 430 stainless steel with a mirror finish or 304 stainless steel with a brushed finish. Select a material and nominal size to view the corresponding metric dimensions, airflow and part number.</p>",
+      "tags": [],
+      "specifications": {
+        "Filter type": "Baffle grease filter",
+        "Application": "Commercial kitchen extraction",
+        "Care": "Dishwasher safe"
+      },
+      "variants": [
+        {
+          "attributes": {
+            "Material": "430 stainless steel — mirror finish",
+            "Nominal size (in)": "16 × 16 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.25",
+            "part_number": "1321119",
+            "dimensions_mm": "394 × 394 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "430 stainless steel — mirror finish",
+            "Nominal size (in)": "20 × 10 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.19",
+            "part_number": "1321120",
+            "dimensions_mm": "495 × 242 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "430 stainless steel — mirror finish",
+            "Nominal size (in)": "20 × 16 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.31",
+            "part_number": "1321121",
+            "dimensions_mm": "495 × 394 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "430 stainless steel — mirror finish",
+            "Nominal size (in)": "20 × 20 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.39",
+            "part_number": "1321122",
+            "dimensions_mm": "495 × 495 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "430 stainless steel — mirror finish",
+            "Nominal size (in)": "18 × 18 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.31",
+            "part_number": "1321123",
+            "dimensions_mm": "445 × 445 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "430 stainless steel — mirror finish",
+            "Nominal size (in)": "24 × 24 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.54",
+            "part_number": "1321124",
+            "dimensions_mm": "597 × 597 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "304 stainless steel — brushed finish",
+            "Nominal size (in)": "16 × 16 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.25",
+            "part_number": "1320119",
+            "dimensions_mm": "394 × 394 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "304 stainless steel — brushed finish",
+            "Nominal size (in)": "20 × 10 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.19",
+            "part_number": "1320120",
+            "dimensions_mm": "495 × 242 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "304 stainless steel — brushed finish",
+            "Nominal size (in)": "20 × 16 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.31",
+            "part_number": "1320121",
+            "dimensions_mm": "495 × 394 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "304 stainless steel — brushed finish",
+            "Nominal size (in)": "20 × 20 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.39",
+            "part_number": "1320122",
+            "dimensions_mm": "495 × 495 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "304 stainless steel — brushed finish",
+            "Nominal size (in)": "18 × 18 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.31",
+            "part_number": "1320123",
+            "dimensions_mm": "445 × 445 × 47"
+          }
+        },
+        {
+          "attributes": {
+            "Material": "304 stainless steel — brushed finish",
+            "Nominal size (in)": "24 × 24 × 2"
+          },
+          "price": "£84.99",
+          "stock": 1,
+          "shipping_weight_kg": null,
+          "shipping_length_cm": null,
+          "shipping_width_cm": null,
+          "shipping_height_cm": null,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": {
+            "pd_pa": "125",
+            "airflow": "0.54",
+            "part_number": "1320124",
+            "dimensions_mm": "597 × 597 × 47"
+          }
+        }
+      ],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": [
+          {
+            "key": "custom:dimensions_mm",
+            "label": "Dimensions (mm)",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "custom:airflow",
+            "label": "Airflow (m³/s)",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "custom:pd_pa",
+            "label": "Pressure drop (Pa)",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "custom:part_number",
+            "label": "Part number",
+            "visible": true,
+            "frontendVisible": true
+          }
+        ]
+      },
+      "badge": null,
+      "featured": true,
+      "active": true,
+      "order": 4,
+      "stock_quantity": 12,
+      "track_stock": false,
+      "shipping_weight_kg": 2,
+      "shipping_length_cm": 30,
+      "shipping_width_cm": 20,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 1,
+      "source_url": "https://support.midiawork.com/shop/baffle-grease-filters-36dW",
+      "source_name": "Baffle Grease Filters",
+      "category_slug": "baffle-filters",
+      "price_on_request": false
+    },
+    {
+      "name": "Aluminium Conveyor Feet for Commercial Kitchens",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "aluminium-conveyor-feet-commercial-kitchens-jNFE",
+      "price": "£1.00",
+      "old_price": "£150.00",
+      "image": "/images/products/reference-catalogue/product-5-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-5-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-5-angle-b-v1.webp"
+      ],
+      "description": "<p>Aluminium conveyor feet for conveyor equipment used in commercial kitchens. These support components are intended to form part of the equipment's base arrangement, with the appropriate configuration determined by the conveyor design.</p>\n<p>When specifying replacement feet, match the component dimensions and attachment details to the existing assembly. The selected configuration should suit the equipment it will support.</p>",
+      "tags": [],
+      "specifications": {
+        "Application": "Commercial kitchen equipment"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 5,
+      "stock_quantity": 6,
+      "track_stock": true,
+      "shipping_weight_kg": 1,
+      "shipping_length_cm": 1,
+      "shipping_width_cm": 1,
+      "shipping_height_cm": 1,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 5,
+      "source_url": "https://support.midiawork.com/shop/aluminium-conveyor-feet-commercial-kitchens-jNFE",
+      "source_name": "Aluminium Conveyor Feet Commercial Kitchens",
+      "category_slug": "stainless-steel-sheets",
+      "price_on_request": false
+    },
+    {
+      "name": "GOL Conveyor Feet for Commercial Kitchens",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "gol-conveyor-feet-commercial-kitchens-j8ZX",
+      "price": "£1.00",
+      "old_price": "£150.00",
+      "image": "/images/products/reference-catalogue/product-5-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-5-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-5-angle-b-v1.webp"
+      ],
+      "description": "<p>GOL conveyor feet for commercial kitchen conveyor equipment. Intended for use within a conveyor support assembly, these components should be selected to match the equipment's base layout and connection points.</p>\n<p>For replacement work, compare the required dimensions and fitting arrangement with the existing feet. This helps identify the appropriate configuration for the conveyor.</p>",
+      "tags": [],
+      "specifications": {},
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 6,
+      "stock_quantity": 3,
+      "track_stock": true,
+      "shipping_weight_kg": 1,
+      "shipping_length_cm": 1,
+      "shipping_width_cm": 1,
+      "shipping_height_cm": 1,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 54,
+      "source_url": "https://support.midiawork.com/shop/gol-conveyor-feet-commercial-kitchens-j8ZX",
+      "source_name": "gol Conveyor Feet Commercial Kitchens",
+      "category_slug": "stainless-steel-sheets",
+      "price_on_request": false
+    },
+    {
+      "name": "Gold Conveyor Feet for Commercial Kitchens",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "gold-conveyor-feet-commercial-kitchens-R0ey",
+      "price": "£1.00",
+      "old_price": "£150.00",
+      "image": "/images/products/reference-catalogue/product-5-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-5-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-5-angle-b-v1.webp"
+      ],
+      "description": "<p>Gold conveyor feet for conveyor equipment in commercial kitchens. These support components are selected as part of the conveyor's overall base arrangement, taking account of the available space and attachment points.</p>\n<p>Match the required size and fitting details to the equipment specification. For an existing installation, the original support arrangement provides the reference for selecting a replacement.</p>",
+      "tags": [],
+      "specifications": {},
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 7,
+      "stock_quantity": 3,
+      "track_stock": true,
+      "shipping_weight_kg": 1,
+      "shipping_length_cm": 1,
+      "shipping_width_cm": 1,
+      "shipping_height_cm": 1,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 55,
+      "source_url": "https://support.midiawork.com/shop/gold-conveyor-feet-commercial-kitchens-R0ey",
+      "source_name": "gold  Conveyor Feet Commercial Kitchens",
+      "category_slug": "stainless-steel-sheets",
+      "price_on_request": false
+    },
+    {
+      "name": "Stainless Steel Baffle Filters",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "baffle-filters-zm0Y",
+      "price": "£1.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-7-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-7-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-7-angle-b-v1.webp"
+      ],
+      "description": "<p>Stainless steel baffle filters for commercial kitchen extraction canopies. Their formed metal baffles separate grease droplets from the passing airflow, helping to collect grease before it reaches the ductwork.</p>\n<p>The framed design and handles allow the filters to be removed for routine cleaning. Choose dimensions that match the canopy's filter housing and the arrangement of the existing filters.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "Stainless steel",
+        "Filter type": "Baffle filter"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": [
+          {
+            "key": "custom:dimention",
+            "label": "depth",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ]
+      },
+      "badge": null,
+      "featured": true,
+      "active": true,
+      "order": 8,
+      "stock_quantity": 3,
+      "track_stock": false,
+      "shipping_weight_kg": 2,
+      "shipping_length_cm": 30,
+      "shipping_width_cm": 20,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 7,
+      "source_url": "https://support.midiawork.com/shop/baffle-filters-zm0Y",
+      "source_name": "Baffle  Filters",
+      "category_slug": "baffle-filters",
+      "price_on_request": false
+    },
+    {
+      "name": "D7 Centrifugal Fan",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "centrifugal-fan-d-7-J3VG",
+      "price": "£540.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-11-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-11-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-11-angle-b-v1.webp"
+      ],
+      "description": "<p>D7 centrifugal fan with a metal scroll housing, circular inlet and flanged outlet. The casing directs air from the inlet through the impeller and towards the outlet connection, forming part of a ducted ventilation system.</p>\n<p>The mounting rails provide connection points for the support structure. Match the fan specification and connection dimensions to the airflow and pressure requirements of the installation.</p>",
+      "tags": [],
+      "specifications": {
+        "Model": "D7",
+        "Fan type": "Centrifugal",
+        "Outlet": "Rectangular, flanged"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 9,
+      "stock_quantity": 0,
+      "track_stock": false,
+      "shipping_weight_kg": 2,
+      "shipping_length_cm": 30,
+      "shipping_width_cm": 20,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 11,
+      "source_url": "https://support.midiawork.com/shop/centrifugal-fan-d-7-J3VG",
+      "source_name": "Centrifugal fan D 7",
+      "category_slug": "ventilation-components",
+      "price_on_request": false
+    },
+    {
+      "name": "Fläkt Woods Ventilation Fan",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "flakt-woods-W7wt",
+      "price": "£749.99",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-47-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-47-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-47-angle-b-v1.webp"
+      ],
+      "description": "<p>Fläkt Woods ventilation fan with a circular metal casing, flanged connections and a metal impeller. Its cylindrical form provides an inline arrangement for a ventilation system, with the mounting and duct connections planned around the casing.</p>\n<p>Select the fan specification to suit the installation's airflow requirements, available space and electrical supply. Connection dimensions should be checked against the adjoining ductwork.</p>",
+      "tags": [],
+      "specifications": {
+        "Brand": "Fläkt Woods",
+        "Fan type": "Axial",
+        "Casing": "Short cylindrical casing"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 10,
+      "stock_quantity": 0,
+      "track_stock": false,
+      "shipping_weight_kg": 2,
+      "shipping_length_cm": 30,
+      "shipping_width_cm": 20,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 47,
+      "source_url": "https://support.midiawork.com/shop/flakt-woods-W7wt",
+      "source_name": "flakt woods",
+      "category_slug": "ventilation-components",
+      "price_on_request": false
+    },
+    {
+      "name": "Fläkt Woods MaxFan High Pressure Long Cased Fan",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "flakt-woods-maxfan-high-pressure-long-cased-2-C4zg",
+      "price": "£1499.99",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-49-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-49-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-49-angle-b-v1.webp"
+      ],
+      "description": "<p>Fläkt Woods MaxFan high pressure fan with a long cylindrical casing and flanged connections. The extended housing encloses the impeller and provides a defined section within the ventilation ductwork.</p>\n<p>Choose the configuration to match the system's required airflow, pressure and electrical supply. Allow for the casing length, mounting arrangement and access needed around the installed fan.</p>",
+      "tags": [],
+      "specifications": {
+        "Brand": "Fläkt Woods",
+        "Range": "MaxFan",
+        "Casing": "Long cylindrical casing"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": true,
+      "active": true,
+      "order": 11,
+      "stock_quantity": 16,
+      "track_stock": true,
+      "shipping_weight_kg": 21,
+      "shipping_length_cm": 30,
+      "shipping_width_cm": 20,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 49,
+      "source_url": "https://support.midiawork.com/shop/flakt-woods-maxfan-high-pressure-long-cased-2-C4zg",
+      "source_name": "flakt woods MaxFan High pressure long cased 2",
+      "category_slug": "commercial-kitchen-fans",
+      "price_on_request": false
+    },
+    {
+      "name": "430 Stainless Steel Sheet – Brushed, 0.8 mm",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "stainless-steel-sheet-brush-430-08-irnQ",
+      "price": "£60.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-12-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-12-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-12-angle-b-v1.webp"
+      ],
+      "description": "<p>Grade 430 stainless steel sheet with a brushed finish and a nominal thickness of 0.8 mm. The fine directional grain gives the surface a consistent appearance for visible panels, cladding and fabricated metalwork.</p>\n<p>The sheet can be incorporated into a wider fabrication layout. Plan the panel sizes and grain direction together to achieve a coordinated finish across adjoining sections.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "430 stainless steel",
+        "Finish": "Brushed",
+        "Nominal thickness": "0.8 mm"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 12,
+      "stock_quantity": 0,
+      "track_stock": false,
+      "shipping_weight_kg": 32,
+      "shipping_length_cm": 250,
+      "shipping_width_cm": 125,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": true,
+      "freight_delivery_price": null,
+      "source_id": 12,
+      "source_url": "https://support.midiawork.com/shop/stainless-steel-sheet-brush-430-08-irnQ",
+      "source_name": "Stainless steel sheet brush 430 ( 0.8 )",
+      "category_slug": "stainless-steel-sheets",
+      "price_on_request": false
+    },
+    {
+      "name": "430 Stainless Steel Sheet – Brushed, 0.9 mm",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "stainless-steel-sheet-brush-430-09-zMQC",
+      "price": "£60.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-45-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-45-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-45-angle-b-v1.webp"
+      ],
+      "description": "<p>Brushed grade 430 stainless steel sheet with a nominal thickness of 0.9 mm. Its directional surface finish provides a uniform appearance for panels, cladding and metal fabrication projects.</p>\n<p>The brushed grain is part of the finished design, particularly where several panels sit alongside one another. Select the sheet dimensions and panel orientation to suit the layout of the work.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "430 stainless steel",
+        "Finish": "Brushed",
+        "Nominal thickness": "0.9 mm"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 13,
+      "stock_quantity": 0,
+      "track_stock": false,
+      "shipping_weight_kg": 32,
+      "shipping_length_cm": 250,
+      "shipping_width_cm": 125,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": true,
+      "freight_delivery_price": null,
+      "source_id": 45,
+      "source_url": "https://support.midiawork.com/shop/stainless-steel-sheet-brush-430-09-zMQC",
+      "source_name": "Stainless steel sheet brush 430 ( 0.9 )",
+      "category_slug": "stainless-steel-sheets",
+      "price_on_request": false
+    },
+    {
+      "name": "304 Stainless Steel Sheet – Circle Finish, 0.9 mm",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "stainless-steel-sheet-circle-304-09-1UWo",
+      "price": "£90.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-13-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-13-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-13-angle-b-v1.webp"
+      ],
+      "description": "<p>Grade 304 stainless steel sheet with a decorative circle finish and a nominal thickness of 0.9 mm. The overlapping circular pattern creates a textured visual effect for exposed panels and fabricated surfaces.</p>\n<p>Use the pattern as part of the overall panel layout, allowing for joints and edges. The sheet dimensions and finish should be matched to the requirements of the fabrication.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "304 stainless steel",
+        "Finish": "Circle polished",
+        "Nominal thickness": "0.9 mm"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 14,
+      "stock_quantity": 0,
+      "track_stock": false,
+      "shipping_weight_kg": 2,
+      "shipping_length_cm": 30,
+      "shipping_width_cm": 20,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 13,
+      "source_url": "https://support.midiawork.com/shop/stainless-steel-sheet-circle-304-09-1UWo",
+      "source_name": "Stainless steel sheet circle 304 (0.9)",
+      "category_slug": "stainless-steel-sheets",
+      "price_on_request": false
+    },
+    {
+      "name": "430 Stainless Steel Sheet – Circle Finish, 0.8 mm",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "stainless-steel-sheet-circle-430-08-jqpe",
+      "price": "£70.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-42-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-42-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-42-angle-b-v1.webp"
+      ],
+      "description": "<p>Grade 430 stainless steel sheet with a circle finish and a nominal thickness of 0.8 mm. The repeating circular pattern gives visible metal surfaces a distinctive decorative appearance.</p>\n<p>A practical material option for panel and cladding designs where the finish forms part of the overall look. Plan the sheet layout around panel sizes, joints and the direction of the pattern.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "430 stainless steel",
+        "Finish": "Circle polished",
+        "Nominal thickness": "0.8 mm"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 15,
+      "stock_quantity": 0,
+      "track_stock": false,
+      "shipping_weight_kg": 2,
+      "shipping_length_cm": 30,
+      "shipping_width_cm": 20,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 42,
+      "source_url": "https://support.midiawork.com/shop/stainless-steel-sheet-circle-430-08-jqpe",
+      "source_name": "Stainless steel sheet circle 430 (0.8)",
+      "category_slug": "stainless-steel-sheets",
+      "price_on_request": false
+    },
+    {
+      "name": "430 Stainless Steel Sheet – Circle Finish, 2500 × 1250 × 0.9 mm",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "stainless-steel-sheet-circle-430-l-2500mm-w-1250mm-thickness-09mm-HEE2",
+      "price": "£65.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-13-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-13-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-13-angle-b-v1.webp"
+      ],
+      "description": "<p>Grade 430 stainless steel sheet with a decorative circle finish, measuring 2500 × 1250 mm with a nominal thickness of 0.9 mm. The repeating circular pattern gives exposed panels a defined visual texture.</p>\n<p>The full sheet format allows the material to be planned around the required panel layout. Account for joints, edges and pattern alignment when preparing the fabrication.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "430 stainless steel",
+        "Finish": "Circle polished",
+        "Sheet dimensions": "2500 × 1250 mm",
+        "Nominal thickness": "0.9 mm"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 16,
+      "stock_quantity": 10,
+      "track_stock": false,
+      "shipping_weight_kg": 22,
+      "shipping_length_cm": 250,
+      "shipping_width_cm": 125,
+      "shipping_height_cm": 9,
+      "shipping_class": "standard",
+      "ships_separately": true,
+      "freight_delivery_price": null,
+      "source_id": 43,
+      "source_url": "https://support.midiawork.com/shop/stainless-steel-sheet-circle-430-l-2500mm-w-1250mm-thickness-09mm-HEE2",
+      "source_name": "Stainless steel  sheet circle 430 (L 2500mm W 1250mm thickness 0.9mm)",
+      "category_slug": "stainless-steel-sheets",
+      "price_on_request": false
+    },
+    {
+      "name": "304 Stainless Steel Sheet – Brushed, 0.9 mm",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "stainless-steel-sheet-brush-304-09-SJXm",
+      "price": "£85.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-44-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-44-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-44-angle-b-v1.webp"
+      ],
+      "description": "<p>Grade 304 stainless steel sheet with a brushed finish and a nominal thickness of 0.9 mm. Its fine directional grain provides a clean, consistent appearance for visible panels and fabricated stainless steel components.</p>\n<p>Suitable for specifying as part of a panel or cladding layout. Keep the grain direction consistent across adjoining sections and select the sheet dimensions to suit the work.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "304 stainless steel",
+        "Finish": "Brushed",
+        "Nominal thickness": "0.9 mm"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 17,
+      "stock_quantity": 0,
+      "track_stock": false,
+      "shipping_weight_kg": 32,
+      "shipping_length_cm": 250,
+      "shipping_width_cm": 125,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": true,
+      "freight_delivery_price": null,
+      "source_id": 44,
+      "source_url": "https://support.midiawork.com/shop/stainless-steel-sheet-brush-304-09-SJXm",
+      "source_name": "Stainless steel sheet brush 304 (0.9)",
+      "category_slug": "stainless-steel-sheets",
+      "price_on_request": false
+    },
+    {
+      "name": "Stainless Steel Double Bowl Sink Unit",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "sink-0gRD",
+      "price": "£1.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-14-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-14-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-14-angle-b-v1.webp"
+      ],
+      "description": "<p>Stainless steel sink unit with two rectangular bowls, an adjoining draining area and a rear upstand. The twin bowls provide separate washing spaces, with the drainer alongside for items after washing.</p>\n<p>A lower shelf makes use of the space beneath the sink for storage. The open frame keeps the unit accessible, while the rear upstand helps contain splashes along the back edge.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "Stainless steel",
+        "Bowls": "Two rectangular bowls",
+        "Upstand": "Rear",
+        "Lower shelf": "Included"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": true,
+      "active": true,
+      "order": 18,
+      "stock_quantity": 8,
+      "track_stock": false,
+      "shipping_weight_kg": 1,
+      "shipping_length_cm": 1,
+      "shipping_width_cm": 1,
+      "shipping_height_cm": 1,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 14,
+      "source_url": "https://support.midiawork.com/shop/sink-0gRD",
+      "source_name": "Sink",
+      "category_slug": "sinks-wash-stations",
+      "price_on_request": false
+    },
+    {
+      "name": "Stainless Steel Round Bowl Sink Unit",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "sink-WMQU",
+      "price": "£470.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-15-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-15-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-15-angle-b-v1.webp"
+      ],
+      "description": "<p>Compact stainless steel sink unit with a round bowl, rear upstand and lower shelf. The circular bowl provides a single washing point within a small footprint, making the unit a practical option where workspace is limited.</p>\n<p>The framed base supports the sink and leaves accessible storage underneath. A raised rear edge helps contain splashes behind the bowl.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "Stainless steel",
+        "Bowl": "Round",
+        "Upstand": "Rear",
+        "Lower shelf": "Included"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 19,
+      "stock_quantity": 1,
+      "track_stock": false,
+      "shipping_weight_kg": 2,
+      "shipping_length_cm": 30,
+      "shipping_width_cm": 20,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 15,
+      "source_url": "https://support.midiawork.com/shop/sink-WMQU",
+      "source_name": "Sink",
+      "category_slug": "sinks-wash-stations",
+      "price_on_request": false
+    },
+    {
+      "name": "Stainless Steel Sink Cabinet with Sliding Doors",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "sink-with-sliding-doors-b6x3",
+      "price": "£1200.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-16-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-16-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-16-angle-b-v1.webp"
+      ],
+      "description": "<p>Stainless steel sink cabinet combining adjoining bowls, a draining area and enclosed storage beneath. The bowls and drainer keep washing and draining spaces together, while raised upstands help contain splashes around the work surface.</p>\n<p>Sliding front doors provide access to the cabinet without requiring clearance for swinging doors. The enclosed base gives the washing area a coordinated finish and keeps stored items behind the front panels.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "Stainless steel",
+        "Cabinet doors": "Sliding",
+        "Draining area": "Included"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 20,
+      "stock_quantity": 1,
+      "track_stock": false,
+      "shipping_weight_kg": 2,
+      "shipping_length_cm": 30,
+      "shipping_width_cm": 20,
+      "shipping_height_cm": 10,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 16,
+      "source_url": "https://support.midiawork.com/shop/sink-with-sliding-doors-b6x3",
+      "source_name": "sink with sliding doors",
+      "category_slug": "sinks-wash-stations",
+      "price_on_request": false
+    },
+    {
+      "name": "Stainless Steel Sink Bowl – 430 × 430 × 220 mm",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "sink-bowl-stainless-steel-w76T",
+      "price": "£85.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-35-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-35-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-35-angle-b-v1.webp"
+      ],
+      "description": "<p>Stainless steel sink bowl measuring 430 × 430 × 220 mm, with a square form, rounded internal corners and a flat mounting flange. A circular waste opening is positioned in the base.</p>\n<p>The bowl is intended for integration into a sink top or work surface. Check the opening, supporting structure and waste connection against the bowl dimensions when planning the installation.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "Stainless steel",
+        "Bowl shape": "Square with rounded internal corners"
+      },
+      "variants": [
+        {
+          "option": "Dimensions",
+          "value": "430 × 430 × 220 mm",
+          "price": "£85.00",
+          "stock": 1,
+          "shipping_weight_kg": 2,
+          "shipping_length_cm": 43,
+          "shipping_width_cm": 43,
+          "shipping_height_cm": 22,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": null
+        }
+      ],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": true,
+      "active": true,
+      "order": 21,
+      "stock_quantity": 1,
+      "track_stock": false,
+      "shipping_weight_kg": 2,
+      "shipping_length_cm": 43,
+      "shipping_width_cm": 43,
+      "shipping_height_cm": 22,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 35,
+      "source_url": "https://support.midiawork.com/shop/sink-bowl-stainless-steel-w76T",
+      "source_name": "sink bowl stainless steel",
+      "category_slug": "sinks-wash-stations",
+      "price_on_request": false
+    },
+    {
+      "name": "Stainless Steel Sink Bowl – 400 × 400 × 300 mm",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "sink-bowl-stainless-steel-2-kTCb",
+      "price": "£75.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-36-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-36-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-36-angle-b-v1.webp"
+      ],
+      "description": "<p>Deep stainless steel sink bowl measuring 400 × 400 × 300 mm. Its square form, rounded internal corners and circular waste opening provide a compact bowl with additional depth for washing tasks.</p>\n<p>Designed to form part of a sink or work surface assembly. Allow for the bowl depth beneath the surface and check the mounting and waste connection details against the planned layout.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "Stainless steel",
+        "Bowl shape": "Square with rounded internal corners"
+      },
+      "variants": [
+        {
+          "option": "Dimensions",
+          "value": "400 × 400 × 300 mm",
+          "price": "£75.00",
+          "stock": 1,
+          "shipping_weight_kg": 2,
+          "shipping_length_cm": 40,
+          "shipping_width_cm": 40,
+          "shipping_height_cm": 30,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": null
+        }
+      ],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": true,
+      "active": true,
+      "order": 22,
+      "stock_quantity": 1,
+      "track_stock": false,
+      "shipping_weight_kg": 2,
+      "shipping_length_cm": 40,
+      "shipping_width_cm": 40,
+      "shipping_height_cm": 30,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 36,
+      "source_url": "https://support.midiawork.com/shop/sink-bowl-stainless-steel-2-kTCb",
+      "source_name": "sink bowl stainless steel 2",
+      "category_slug": "sinks-wash-stations",
+      "price_on_request": false
+    },
+    {
+      "name": "Stainless Steel Double Bowl Sink – Centre Bowls",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "stainless-steel-double-bowl-sink-in-the-middle-5v6y",
+      "price": "£700.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-37-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-37-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-37-angle-b-v1.webp"
+      ],
+      "description": "<p>Stainless steel sink top with two centrally positioned bowls and draining areas at both ends. The balanced layout places the washing area in the middle, with space on either side for organising items before and after washing.</p>\n<p>A rear upstand helps contain splashes along the back edge. The top can be incorporated into a support frame or cabinet arrangement suited to the kitchen layout.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "Stainless steel",
+        "Bowl position": "Centre",
+        "Draining areas": "Both ends",
+        "Upstand": "Rear"
+      },
+      "variants": [
+        {
+          "option": "Dimensions",
+          "value": "2450 × 700 × 350 mm",
+          "price": "£700.00",
+          "stock": 1,
+          "shipping_weight_kg": 10,
+          "shipping_length_cm": 245,
+          "shipping_width_cm": 70,
+          "shipping_height_cm": 35,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": null
+        }
+      ],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": true,
+      "active": true,
+      "order": 23,
+      "stock_quantity": 1,
+      "track_stock": false,
+      "shipping_weight_kg": 10,
+      "shipping_length_cm": 245,
+      "shipping_width_cm": 70,
+      "shipping_height_cm": 35,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 37,
+      "source_url": "https://support.midiawork.com/shop/stainless-steel-double-bowl-sink-in-the-middle-5v6y",
+      "source_name": "stainless steel Double Bowl sink in the middle",
+      "category_slug": "sinks-wash-stations",
+      "price_on_request": false
+    },
+    {
+      "name": "Stainless Steel Double Bowl Sink – Left Hand Bowls",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "stainless-steel-double-bowl-sink-in-left-side-OKg0",
+      "price": "£650.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-38-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-38-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-38-angle-b-v1.webp"
+      ],
+      "description": "<p>Stainless steel sink top with two bowls on the left and a draining area on the right. This arrangement keeps the washing spaces together while providing a dedicated area alongside for draining and handling items.</p>\n<p>The rear upstand helps contain splashes behind the work surface. Specify the bowl position and overall dimensions to suit the supporting unit and the direction of work through the kitchen.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "Stainless steel",
+        "Bowl position": "Left",
+        "Drainer position": "Right",
+        "Upstand": "Rear"
+      },
+      "variants": [
+        {
+          "option": "Dimensions",
+          "value": "2000 × 700 × 350 mm",
+          "price": "£650.00",
+          "stock": 1,
+          "shipping_weight_kg": 10,
+          "shipping_length_cm": 200,
+          "shipping_width_cm": 70,
+          "shipping_height_cm": 35,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": null
+        }
+      ],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": true,
+      "active": true,
+      "order": 24,
+      "stock_quantity": 1,
+      "track_stock": false,
+      "shipping_weight_kg": 10,
+      "shipping_length_cm": 200,
+      "shipping_width_cm": 70,
+      "shipping_height_cm": 35,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 38,
+      "source_url": "https://support.midiawork.com/shop/stainless-steel-double-bowl-sink-in-left-side-OKg0",
+      "source_name": "stainless steel Double Bowl sink in left side",
+      "category_slug": "sinks-wash-stations",
+      "price_on_request": false
+    },
+    {
+      "name": "Stainless Steel Double Bowl Sink – Right Hand Bowls",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "stainless-steel-double-bowl-sink-in-right-side-HZGc",
+      "price": "£650.00",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-39-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-39-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-39-angle-b-v1.webp"
+      ],
+      "description": "<p>Stainless steel sink top with two bowls on the right and a draining area on the left. The layout provides separate washing spaces beside a clear draining surface, supporting a practical arrangement of items around the sink.</p>\n<p>A raised rear upstand helps contain splashes. Match the bowl orientation and overall dimensions to the supporting cabinet or frame and the surrounding workspace.</p>",
+      "tags": [],
+      "specifications": {
+        "Material": "Stainless steel",
+        "Bowl position": "Right",
+        "Drainer position": "Left",
+        "Upstand": "Rear"
+      },
+      "variants": [
+        {
+          "option": "Dimensions",
+          "value": "2450 × 700 × 350 mm",
+          "price": "£650.00",
+          "stock": 1,
+          "shipping_weight_kg": 10,
+          "shipping_length_cm": 245,
+          "shipping_width_cm": 70,
+          "shipping_height_cm": 35,
+          "shipping_class": "standard",
+          "ships_separately": false,
+          "custom_fields": null
+        }
+      ],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": true,
+      "active": true,
+      "order": 25,
+      "stock_quantity": 1,
+      "track_stock": false,
+      "shipping_weight_kg": 10,
+      "shipping_length_cm": 245,
+      "shipping_width_cm": 70,
+      "shipping_height_cm": 35,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 39,
+      "source_url": "https://support.midiawork.com/shop/stainless-steel-double-bowl-sink-in-right-side-HZGc",
+      "source_name": "stainless steel Double Bowl sink in right side",
+      "category_slug": "sinks-wash-stations",
+      "price_on_request": false
+    },
+    {
+      "name": "Steelton 4\" Poly Castors – Set of 4, 2 Braked",
+      "show_variant_in_title": false,
+      "variant_mode": "legacy",
+      "variant_options": null,
+      "frontend_variant_layout": "default",
+      "selection_table_config": null,
+      "slug": "steelton-4-poly-casters-2-with-brakes-4set-8sKk",
+      "price": "£28.90",
+      "old_price": null,
+      "image": "/images/products/reference-catalogue/product-19-v1.webp",
+      "gallery": [
+        "/images/products/reference-catalogue/product-19-angle-a-v1.webp",
+        "/images/products/reference-catalogue/product-19-angle-b-v1.webp"
+      ],
+      "description": "<p>Set of four Steelton 4-inch polyurethane castors for compatible shelving units, including two with brakes. The wheels allow the shelving to be repositioned locally for access beneath and behind the unit, while the brakes help hold it in place when stationary.</p>\n<p>Intended for occasional repositioning within the same area rather than transporting loaded shelving between spaces. Check the fittings and load requirements against the shelving specification.</p>",
+      "tags": [],
+      "specifications": {
+        "Brand": "Steelton",
+        "Wheel diameter": "4 in",
+        "Wheel material": "Polyurethane",
+        "Set quantity": "4 castors",
+        "Brakes": "2 braked castors",
+        "Mobile load capacity": "400 lb per set",
+        "Static load capacity": "500 lb per set",
+        "Assembly": "Required"
+      },
+      "variants": [],
+      "variant_table_columns": {
+        "size": [
+          {
+            "key": "price",
+            "label": "Price",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_weight_kg",
+            "label": "Weight (kg)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_length_cm",
+            "label": "Length (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_width_cm",
+            "label": "Width (cm)",
+            "visible": true,
+            "frontendVisible": false
+          },
+          {
+            "key": "shipping_height_cm",
+            "label": "Height (cm)",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "general": [
+          {
+            "key": "option",
+            "label": "Option",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "value",
+            "label": "Value",
+            "visible": true,
+            "frontendVisible": true
+          },
+          {
+            "key": "stock",
+            "label": "Stock",
+            "visible": true,
+            "frontendVisible": false
+          }
+        ],
+        "combination": []
+      },
+      "badge": null,
+      "featured": false,
+      "active": true,
+      "order": 26,
+      "stock_quantity": null,
+      "track_stock": false,
+      "shipping_weight_kg": 1.737,
+      "shipping_length_cm": 10,
+      "shipping_width_cm": 5.72,
+      "shipping_height_cm": 15.88,
+      "shipping_class": "standard",
+      "ships_separately": false,
+      "freight_delivery_price": null,
+      "source_id": 19,
+      "source_url": "https://support.midiawork.com/shop/steelton-4-poly-casters-2-with-brakes-4set-8sKk",
+      "source_name": "Steelton 4\" Poly Casters - 2 with Brakes - 4/Set",
+      "category_slug": "equipment-parts",
+      "price_on_request": false
+    }
+  ]
+}

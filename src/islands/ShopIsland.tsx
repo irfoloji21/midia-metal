@@ -462,7 +462,7 @@ export default function ShopIsland({
                 </div>
               )}
 
-              <div>
+              {tags.length > 0 && <div>
                 <h3 className="text-[16px] leading-none font-semibold text-primary mb-5 font-sans">Tags</h3>
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => (
@@ -480,7 +480,7 @@ export default function ShopIsland({
                     </button>
                   ))}
                 </div>
-              </div>
+              </div>}
             </div>
           </aside>
         </div>

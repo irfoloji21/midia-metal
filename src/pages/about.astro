@@ -18,46 +18,29 @@ const siteUrl = import.meta.env.SITE;
 const settings = await fetchSettings({ bypassCache: true });
 
 // SEO — title/description from API with hardcoded fallbacks
-const pageTitle = getPageTitle(settings, 'about_meta_title', 'About Midia M Metal | London Fabrication & Welding Team');
-const pageDescription = getPageDescription(settings, 'about_meta_description', 'Meet Midia M Metal, a London-based team making and fitting commercial kitchen equipment. Custom stainless steel fabrication, welding, alterations and repairs.');
+const pageTitle = getPageTitle(settings, 'about_meta_title', "About Midia M Metal | Stainless Steel Fabrication");
+const pageDescription = getPageDescription(settings, 'about_meta_description', "Stainless steel kitchen equipment, bespoke fabrication, ventilation systems, canopy installation and wall cladding. Our factory is in London.");
 
 // Helper: get setting
 const t = (key: string, fallback = '') => settings[key] || fallback;
 const contactPhone = t('contact_phone');
-const phoneDigits = contactPhone.replace(/\D/g, '');
-const whatsappPhone = phoneDigits.startsWith('00')
-  ? phoneDigits.slice(2)
-  : phoneDigits.startsWith('0') ? `44${phoneDigits.slice(1)}` : phoneDigits;
 const contactActions = [
-  ...(contactPhone ? [{ kind: 'phone', href: `tel:${contactPhone.replace(/\s/g, '')}`, label: t('about_phone_label', 'Call Us') }] : []),
-  ...(whatsappPhone ? [{ kind: 'whatsapp', href: `https://wa.me/${whatsappPhone}`, label: t('about_whatsapp_label', 'WhatsApp Us') }] : []),
-];
-
-// Highlights data
-const highlights = [
-  { value: t('about_exp_value'), label: t('about_exp_label') },
-  { value: t('about_proj_value'), label: t('about_proj_label') },
-  { value: t('about_satisfaction_value'), label: t('about_satisfaction_label') },
-  { value: t('about_support_value'), label: t('about_support_label') },
+  ...(contactPhone ? [{ kind: 'phone', href: `tel:${contactPhone.replace(/\s/g, '')}`, label: t('about_phone_label', "Call Us") }] : []),
 ];
 
 // Core values data
 const values = [
   {
-    title: t('about_value_1_title'),
-    text: t('about_value_1_desc'),
+    title: t('about_value_1_title', "Workmanship"),
+    text: t('about_value_1_desc', "We pay close attention to weld quality, joints and surface finishes throughout fabrication."),
   },
   {
-    title: t('about_value_2_title'),
-    text: t('about_value_2_desc'),
+    title: t('about_value_2_title', "Clear quotations"),
+    text: t('about_value_2_desc', "We define the materials, dimensions and scope of work so you can see what your quotation includes."),
   },
   {
-    title: t('about_value_3_title'),
-    text: t('about_value_3_desc'),
-  },
-  {
-    title: t('about_value_4_title'),
-    text: t('about_value_4_desc'),
+    title: t('about_value_3_title', "Planned installation"),
+    text: t('about_value_3_desc', "We coordinate fitting around site access, the kitchen layout and the position of existing equipment."),
   },
 ];
 ---
@@ -73,9 +56,9 @@ const values = [
       { name: 'About Us', url: `${siteUrl}/about` },
     ]),
     buildOrganizationJsonLd({
-      name: 'Midia M Metal',
+      name: t('site_name', 'Midia M Metal'),
       url: `${siteUrl}/`,
-      logo: `${siteUrl}/logo.png`,
+      logo: new URL(t('site_logo', '/logo.png'), siteUrl).href,
       email: t('contact_email'),
       ...(contactPhone ? { telephone: contactPhone } : {}),
     }),
@@ -87,25 +70,25 @@ const values = [
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-14 items-center">
         <div>
           <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#10275c] mb-4">
-            {t('about_who_label')}
+            {t('about_who_label', "About Midia M Metal")}
           </p>
           <h1 class="font-sans text-[38px] sm:text-[46px] md:text-[56px] leading-[1.05] font-semibold text-[#10275c] mb-6 whitespace-pre-wrap">
-            {t('about_title')}
+            {t('about_title', "Stainless steel fabrication for commercial kitchens.")}
           </h1>
           <p class="text-[#58657f] text-[15px] leading-8 mb-5 whitespace-pre-wrap">
-            {t('about_content_1')}
+            {t('about_content_1', "Midia M Metal manufactures and supplies stainless steel equipment for commercial kitchens. Our factory is in London.")}
           </p>
           <p class="text-[#58657f] text-[15px] leading-8 mb-8 whitespace-pre-wrap">
-            {t('about_content_2')}
+            {t('about_content_2', "Our in-house team carries out bespoke fabrication and on-site installation. We work from drawings and measurements to produce equipment suited to the available space and its intended use.")}
           </p>
           <div class="flex flex-wrap items-center gap-3">
             {contactActions.map((action) => (
-              <a href={action.href} target={action.kind === 'whatsapp' ? '_blank' : undefined} rel={action.kind === 'whatsapp' ? 'noopener noreferrer' : undefined}
-                class={`inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors ${action.kind === 'phone' ? 'bg-orange text-white hover:bg-orange-hover' : 'border border-primary text-primary hover:bg-primary hover:text-white'}`}>
+              <a href={action.href}
+                class="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors bg-orange text-white hover:bg-orange-hover">
                 {action.label}
               </a>
             ))}
-            <a href="/contact" class="px-3 py-3 text-sm font-semibold text-primary underline underline-offset-4 hover:text-orange transition-colors">{t('about_discuss_label', 'Discuss Your Job')}</a>
+            <a href="/contact" class="px-3 py-3 text-sm font-semibold text-primary underline underline-offset-4 hover:text-orange transition-colors">{t('about_discuss_label', "Contact Us")}</a>
           </div>
         </div>
 
@@ -118,50 +101,32 @@ const values = [
       </div>
     </section>
 
-    <!-- Highlights -->
-    <section class="container mx-auto px-4 lg:px-8 pb-16 md:pb-24">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {highlights.map((item) => (
-          <div class="bg-[#f4f5f7] border border-[#d7dfeb] p-4 sm:p-6 lg:p-8 text-center">
-            <h3 class="font-sans text-[23px] md:text-[28px] leading-tight break-words font-semibold text-[#10275c]">{item.value}</h3>
-            <p class="text-[#58657f] text-[13px] md:text-[14px] leading-6 mt-3">{item.label}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-
     <!-- Core Values -->
     <section class="container mx-auto px-4 lg:px-8 pb-16 md:pb-24">
       <p class="text-center text-[10px] font-bold tracking-[0.24em] text-muted-foreground uppercase mb-3">
-        {t('about_values_label')}
+        {t('about_values_label', "Our Work")}
       </p>
       <h2 class="text-center font-sans text-[36px] md:text-[52px] leading-[1.08] font-semibold text-[#10275c] mb-12 md:mb-14">
-        {t('about_values_title')}
+        {t('about_values_title', "From specification to installation.")}
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <!-- Value 1: ShieldCheck -->
         <div class="bg-[#f4f5f7] border border-[#d7dfeb] p-7">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-orange mb-5"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
           <h3 class="font-sans text-[28px] leading-[1.05] font-semibold text-[#10275c] mb-3">{values[0].title}</h3>
           <p class="text-[#58657f] text-[14px] leading-7">{values[0].text}</p>
         </div>
-        <!-- Value 2: Wrench -->
+        <!-- Value 2: FileText -->
         <div class="bg-[#f4f5f7] border border-[#d7dfeb] p-7">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-orange mb-5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-orange mb-5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>
           <h3 class="font-sans text-[28px] leading-[1.05] font-semibold text-[#10275c] mb-3">{values[1].title}</h3>
           <p class="text-[#58657f] text-[14px] leading-7">{values[1].text}</p>
         </div>
-        <!-- Value 3: Factory -->
+        <!-- Value 3: Wrench -->
         <div class="bg-[#f4f5f7] border border-[#d7dfeb] p-7">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-orange mb-5"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-orange mb-5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
           <h3 class="font-sans text-[28px] leading-[1.05] font-semibold text-[#10275c] mb-3">{values[2].title}</h3>
           <p class="text-[#58657f] text-[14px] leading-7">{values[2].text}</p>
-        </div>
-        <!-- Value 4: Clock3 -->
-        <div class="bg-[#f4f5f7] border border-[#d7dfeb] p-7">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-orange mb-5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16.5 12"/></svg>
-          <h3 class="font-sans text-[28px] leading-[1.05] font-semibold text-[#10275c] mb-3">{values[3].title}</h3>
-          <p class="text-[#58657f] text-[14px] leading-7">{values[3].text}</p>
         </div>
       </div>
     </section>
@@ -170,16 +135,16 @@ const values = [
     <section class="bg-gradient-to-r from-[#0c63a4] to-[#1296df]">
       <div class="container mx-auto px-4 lg:px-8 py-9 md:py-11 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         <h3 class="max-w-xl font-sans text-[32px] md:text-[40px] leading-[1.1] font-semibold text-white whitespace-pre-line">
-          {t('about_cta_title')}
+          {t('about_cta_title', "Request a quotation for your kitchen project.")}
         </h3>
         <div class="flex flex-wrap gap-3 shrink-0">
           {contactActions.map((action) => (
-            <a href={action.href} target={action.kind === 'whatsapp' ? '_blank' : undefined} rel={action.kind === 'whatsapp' ? 'noopener noreferrer' : undefined}
-              class={`inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors ${action.kind === 'phone' ? 'bg-white text-primary hover:bg-[#edf3f9]' : 'border border-white text-white hover:bg-white hover:text-primary'}`}>
+            <a href={action.href}
+              class="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors bg-white text-primary hover:bg-[#edf3f9]">
               {action.label}
             </a>
           ))}
-          <a href="/get-a-quote" class="inline-flex items-center justify-center px-6 py-3 border border-white text-white text-sm font-semibold hover:bg-white hover:text-primary transition-colors">{t('about_quote_label', 'Request a Quote')}</a>
+          <a href="/get-a-quote" class="inline-flex items-center justify-center px-6 py-3 border border-white text-white text-sm font-semibold hover:bg-white hover:text-primary transition-colors">{t('about_quote_label', "Request a Quote")}</a>
         </div>
       </div>
     </section>

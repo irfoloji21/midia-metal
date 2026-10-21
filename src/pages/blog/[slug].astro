@@ -12,9 +12,11 @@ import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getApiBase } from '@/lib/api-base';
 import { buildBreadcrumbJsonLd, buildBlogPostingJsonLd } from '@/lib/seo';
+import { fetchSettings } from '@/lib/settings';
 
 const siteUrl = import.meta.env.SITE;
 const API = `${getApiBase()}/v1`;
+const settings = await fetchSettings();
 
 const { slug } = Astro.params;
 
@@ -67,7 +69,8 @@ const blogPostingJsonLd = buildBlogPostingJsonLd({
   dateModified: post?.updated_at || publishedDate,
   authorName: post?.author || 'Admin',
   url: postUrl,
-  publisherLogo: `${siteUrl}/logo.png`,
+  publisherName: settings.site_name || 'Midia M Metal',
+  publisherLogo: new URL(settings.site_logo || '/logo.png', siteUrl).href,
 });
 ---
 

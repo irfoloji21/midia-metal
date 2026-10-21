@@ -35,6 +35,8 @@ class OrderConfirmationTest extends TestCase
         $response->assertOk()->assertExactJson([
             'order_number' => 'ORD-CONFIRM-001',
             'created_at' => $order->created_at->toIso8601String(),
+            'payment_status' => $order->payment_status,
+            'bank_transfer_details' => null,
             'payment_method' => 'Credit / Debit Card',
             'total' => 123.45,
             'items' => [

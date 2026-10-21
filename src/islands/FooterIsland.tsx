@@ -5,33 +5,17 @@
  * Standalone version that uses <a> tags instead of react-router-dom <Link>.
  * Faithfully reproduces src/components/Footer.tsx layout and behaviour.
  *
- * Settings are passed as props from BaseLayout (server-side fetched) to
- * eliminate redundant client-side API calls.
+ * Server-rendered settings are refreshed after client navigation so shared
+ * company details stay current even when this island persists.
  */
-import { useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { useSiteSettings } from '@/lib/use-site-settings';
 
 interface FooterIslandProps {
   initialSettings?: Record<string, string>;
 }
 
 export default function FooterIsland({ initialSettings }: FooterIslandProps) {
-  const [settings, setSettings] = useState<Record<string, string>>(initialSettings ?? {});
-
-  useEffect(() => {
-    let isCurrent = true;
-
-    apiFetch<Array<{ key: string; value: string }>>('/v1/settings')
-      .then((items) => {
-        if (!isCurrent) return;
-        setSettings(Object.fromEntries(items.map(({ key, value }) => [key, String(value ?? '')])));
-      })
-      .catch((error) => console.error('Failed to refresh footer settings', error));
-
-    return () => {
-      isCurrent = false;
-    };
-  }, []);
+  const settings = useSiteSettings(initialSettings);
 
   const t = (key: string, def: string) => settings[key] || def;
 
@@ -51,30 +35,30 @@ export default function FooterIsland({ initialSettings }: FooterIslandProps) {
             </div>
           </div>
 
-          {/* Office */}
+          {/* Factory */}
           <div>
             <h4 className="font-sans text-xl font-semibold mb-6">
-              {t('footer_label_office', 'Office')}
+              {t('footer_label_office', 'Factory')}
             </h4>
             <div className="space-y-2">
               <p className="text-white/70 text-sm whitespace-pre-line">
-                {t('contact_address', 'Unit 8A Cromwell Centre\nRoebuck Road, Hainaut Business Park\nILFORD, IG6 3UG')}
+                {t('contact_address', '')}
               </p>
               <div className="pt-2">
                 <a
-                  href={`mailto:${t('contact_email', 'softwaredevelopment2181@gmail.com')}`}
+                  href={`mailto:${t('contact_email', '')}`}
                   className="text-white text-sm underline decoration-white/40 hover:decoration-white transition-all"
                 >
-                  {t('contact_email', 'softwaredevelopment2181@gmail.com')}
+                  {t('contact_email', '')}
                 </a>
               </div>
               <div className="pt-4">
                 <p className="text-white text-[22px] leading-none font-medium">
                   <a
-                    href={`tel:${t('contact_phone', '07545888522')}`}
+                    href={`tel:${t('contact_phone', '')}`}
                     className="hover:text-orange transition-colors"
                   >
-                    {t('contact_phone', '07545888522')}
+                    {t('contact_phone', '')}
                   </a>
                 </p>
               </div>
@@ -115,7 +99,7 @@ export default function FooterIsland({ initialSettings }: FooterIslandProps) {
               {[
                 { label: t('footer_info_privacy', 'Privacy Policy'), path: '/privacy-policy' },
                 { label: t('footer_info_terms', 'Terms & Conditions'), path: '/terms-of-service' },
-                { label: t('footer_info_cookies', 'Cookies Page'), path: '/cookies' },
+                { label: t('footer_info_cookies', 'Cookie Policy'), path: '/cookies' },
                 { label: t('footer_info_returns', 'Returns & Refunds'), path: '/returns-policy' },
                 { label: t('footer_info_faq', 'FAQ'), path: '/faq' },
               ].map((item) => (

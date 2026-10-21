@@ -40,14 +40,9 @@ try {
 
 // Helper: get setting
 const t = (key: string, fallback = '') => settings[key] || fallback;
-const contactPhone = t('contact_phone', t('services_hero_phone'));
-const phoneDigits = contactPhone.replace(/\D/g, '');
-const whatsappPhone = phoneDigits.startsWith('00')
-  ? phoneDigits.slice(2)
-  : phoneDigits.startsWith('0') ? `44${phoneDigits.slice(1)}` : phoneDigits;
+const contactPhone = t('contact_phone');
 const contactActions = [
   ...(contactPhone ? [{ kind: 'phone', href: `tel:${contactPhone.replace(/\s/g, '')}`, label: t('services_phone_label', 'Call Us') }] : []),
-  ...(whatsappPhone ? [{ kind: 'whatsapp', href: `https://wa.me/${whatsappPhone}`, label: t('services_whatsapp_label', 'WhatsApp Us') }] : []),
   { kind: 'quote', href: '/get-a-quote', label: t('services_quote_label', 'Request a Quote') },
 ];
 
@@ -56,7 +51,7 @@ const servicesUrl = `${siteUrl}/services`;
 const itemListJsonLd = services.length > 0
   ? buildItemListJsonLd({
       name: 'Services',
-      description: 'Commercial kitchen ventilation and fabrication services by Midia M Metal.',
+      description: "Commercial kitchen fabrication, ventilation systems, canopy installation and stainless steel wall cladding. Our factory is in London.",
       url: servicesUrl,
       items: services.map((s: any) => ({
         url: `${siteUrl}/services/${s.slug}`,
@@ -67,8 +62,8 @@ const itemListJsonLd = services.length > 0
 ---
 
 <BaseLayout
-  title={getPageTitle(settings, 'services_meta_title', 'Commercial Kitchen Fabrication & Installation | Midia M Metal')}
-  description={getPageDescription(settings, 'services_meta_description', 'Custom kitchen equipment, ventilation, canopy installation and welding from our London-based team. Call us about fabrication, fitting, repairs or maintenance.')}
+  title={getPageTitle(settings, 'services_meta_title', "Commercial Kitchen Services | Midia M Metal")}
+  description={getPageDescription(settings, 'services_meta_description', "Commercial kitchen fabrication, ventilation systems, canopy installation and stainless steel wall cladding. Our factory is in London.")}
   canonicalPath="/services"
   structuredData={[
     buildBreadcrumbJsonLd([
@@ -83,18 +78,18 @@ const itemListJsonLd = services.length > 0
     <section class="container mx-auto px-4 lg:px-8 pt-16 md:pt-20 pb-16 md:pb-24">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div class="max-w-xl">
-          <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#10275c] mb-4">{t("services_hero_label")}</p>
-          <h1 class="font-sans text-[38px] sm:text-[48px] md:text-[56px] leading-[1.05] font-semibold text-[#10275c] mb-6">{t("services_hero_subtitle")}</h1>
+          <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#10275c] mb-4">{t("services_hero_label", "Our Services")}</p>
+          <h1 class="font-sans text-[38px] sm:text-[48px] md:text-[56px] leading-[1.05] font-semibold text-[#10275c] mb-6">{t("services_hero_subtitle", "Commercial kitchen fabrication & installation.")}</h1>
           <p class="text-[#1c2b4a] text-[23px] md:text-[26px] leading-[1.25] mb-5">
-            {t("services_hero_tagline")}
+            {t("services_hero_tagline", "Stainless steel fabrication, welding and ventilation.")}
           </p>
           <p class="text-[#79849d] text-sm leading-7 mb-8 max-w-lg">
-            {t("services_hero_desc")}
+            {t("services_hero_desc", "Midia M Metal manufactures and installs stainless steel equipment for commercial kitchens. Our services include ventilation systems, extraction canopy installation, wall cladding and bespoke fabrication.")}
           </p>
           <div class="flex items-center gap-4 flex-wrap">
             {contactActions.map((action) => (
-              <a href={action.href} target={action.kind === 'whatsapp' ? '_blank' : undefined} rel={action.kind === 'whatsapp' ? 'noopener noreferrer' : undefined}
-                class={`inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors ${action.kind === 'phone' ? 'bg-orange text-white hover:bg-orange-hover' : action.kind === 'whatsapp' ? 'border border-primary text-primary hover:bg-primary hover:text-white' : 'text-primary underline underline-offset-4 hover:text-orange'}`}>
+              <a href={action.href}
+                class={`inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors ${action.kind === 'phone' ? 'bg-orange text-white hover:bg-orange-hover' : 'text-primary underline underline-offset-4 hover:text-orange'}`}>
                 {action.label}
               </a>
             ))}
@@ -113,14 +108,14 @@ const itemListJsonLd = services.length > 0
 
     <!-- Services Grid -->
     <section class="container mx-auto px-4 lg:px-8 py-16 md:py-24">
-      <p class="text-center text-[10px] font-bold tracking-[0.24em] text-muted-foreground uppercase mb-3">{t("services_quality_label")}</p>
+      <p class="text-center text-[10px] font-bold tracking-[0.24em] text-muted-foreground uppercase mb-3">{t("services_quality_label", "Our Expertise")}</p>
       <h2 class="text-center font-sans text-[44px] md:text-[62px] leading-[0.95] font-semibold text-[#10275c] mb-12 md:mb-16 whitespace-pre-line">
-        {t("services_quality_title")}
+        {t("services_quality_title", "Our specialist services.")}
       </h2>
       {services.length > 0 ? (
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
           {services.map((s: any) => (
-            <div class="text-center">
+            <div class="flex flex-col text-center">
               <a href={`/services/${s.slug}`} class="block">
                 <div class="w-44 h-44 mx-auto rounded-full overflow-hidden mb-7 border-8 border-[#eaf0f3] shadow-sm">
                   <Image src={s.image} alt={s.title} width={200} height={200} loading="lazy" decoding="async" class="w-full h-full object-cover" />
@@ -132,7 +127,7 @@ const itemListJsonLd = services.length > 0
                 </a>
               </h3>
               <p class="text-sm text-[#58657f] leading-relaxed mb-5 max-w-sm mx-auto">{s.excerpt}</p>
-              <a href={`/services/${s.slug}`} class="inline-flex items-center justify-center w-8 h-8 rounded-full border border-[#cfd8e6] text-primary hover:text-orange hover:border-orange transition-colors" aria-label={`View details for ${s.title}`}>
+              <a href={`/services/${s.slug}`} class="inline-flex items-center justify-center self-center mt-auto shrink-0 w-8 h-8 rounded-full border border-[#cfd8e6] text-primary hover:text-orange hover:border-orange transition-colors" aria-label={`View details for ${s.title}`}>
                 <span class="sr-only">View details for {s.title}</span>
                 <!-- ArrowRight icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
@@ -149,11 +144,11 @@ const itemListJsonLd = services.length > 0
     <section class="bg-gradient-to-r from-[#0c63a4] to-[#1296df]">
       <div class="container mx-auto px-4 lg:px-8 py-8 md:py-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         <h3 class="max-w-2xl font-sans text-[32px] md:text-[40px] leading-[1.1] font-semibold text-white whitespace-pre-line">
-          {t("services_cta_title")}
+          {t("services_cta_title", "Discuss your project with our team.")}
         </h3>
         <div class="flex gap-3 flex-wrap shrink-0">
           {contactActions.map((action) => (
-            <a href={action.href} target={action.kind === 'whatsapp' ? '_blank' : undefined} rel={action.kind === 'whatsapp' ? 'noopener noreferrer' : undefined}
+            <a href={action.href}
               class={`inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-colors ${action.kind === 'phone' ? 'bg-white text-primary hover:bg-[#eef3f8]' : 'border border-white text-white hover:bg-white hover:text-primary'}`}>
               {action.label}
             </a>
@@ -170,16 +165,16 @@ const itemListJsonLd = services.length > 0
           <img src={t("services_modern_image_2")} alt="" loading="lazy" decoding="async" width={400} height={300} class="w-1/2 h-56 md:h-72 object-cover" />
         </div>
         <div class="max-w-xl">
-          <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground mb-3">{t("services_modern_label")}</p>
-          <h2 class="font-sans text-[36px] md:text-[48px] leading-[1.08] font-semibold text-[#10275c] mb-5">{t("services_modern_title")}</h2>
+          <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground mb-3">{t("services_modern_label", "Our Approach")}</p>
+          <h2 class="font-sans text-[36px] md:text-[48px] leading-[1.08] font-semibold text-[#10275c] mb-5">{t("services_modern_title", "From site survey to installation.")}</h2>
           <p class="text-[#58657f] text-sm leading-7 mb-5 whitespace-pre-line">
-            {t("services_modern_desc")}
+            {t("services_modern_desc", "We review the kitchen layout, measurements and equipment requirements to define the fabrication and installation work. Materials, dimensions and finishes are specified to suit the space and its intended use.\n\nTo request a quotation, share your drawings, measurements or a description of the work required.")}
           </p>
           {t("services_site_visit_note") && (
             <p class="text-[#58657f] text-sm leading-6 border-l-2 border-orange pl-4 mb-7">{t("services_site_visit_note")}</p>
           )}
           <a href="/contact" class="inline-flex items-center justify-center px-8 py-4 bg-orange text-white text-sm font-semibold hover:bg-orange-hover transition-colors">
-            {t("services_modern_cta_label", "Discuss Your Job")}
+            {t("services_modern_cta_label", "Contact Us")}
           </a>
         </div>
       </div>
@@ -193,10 +188,10 @@ const itemListJsonLd = services.length > 0
           <div class="w-14 h-14 mx-auto mb-4 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"></path><path d="M17.64 15 22 10.64"></path><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h2.47l2.26 1.91"></path></svg>
           </div>
-          <h3 class="font-sans text-[34px] leading-tight font-semibold text-primary mb-3">{t("services_feature_1_title")}</h3>
-          <p class="text-sm text-muted-foreground max-w-sm mx-auto">{t("services_feature_1_desc")}</p>
-          <a href="/services/custom-fabrication" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_1_title")}`}>
-            <span class="sr-only">Learn more about {t("services_feature_1_title")}</span>
+          <h3 class="font-sans text-[34px] leading-tight font-semibold text-primary mb-3">{t("services_feature_1_title", "Made to your specification")}</h3>
+          <p class="text-sm text-muted-foreground max-w-sm mx-auto">{t("services_feature_1_desc", "We fabricate stainless steel kitchen components to the required dimensions, layout and finish.")}</p>
+          <a href="/services/custom-fabrication" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_1_title", "Made to your specification")}`}>
+            <span class="sr-only">Learn more about {t("services_feature_1_title", "Made to your specification")}</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </a>
         </div>
@@ -205,10 +200,10 @@ const itemListJsonLd = services.length > 0
           <div class="w-14 h-14 mx-auto mb-4 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
           </div>
-          <h3 class="font-sans text-[34px] leading-tight font-semibold text-primary mb-3">{t("services_feature_2_title")}</h3>
-          <p class="text-sm text-muted-foreground max-w-sm mx-auto">{t("services_feature_2_desc")}</p>
-          <a href="/contact" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_2_title")}`}>
-            <span class="sr-only">Learn more about {t("services_feature_2_title")}</span>
+          <h3 class="font-sans text-[34px] leading-tight font-semibold text-primary mb-3">{t("services_feature_2_title", "Fabrication and installation")}</h3>
+          <p class="text-sm text-muted-foreground max-w-sm mx-auto">{t("services_feature_2_desc", "Our team provides workshop fabrication and on-site installation for canopies, ductwork and stainless steel fittings.")}</p>
+          <a href="/services/ventilation-systems" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_2_title", "Fabrication and installation")}`}>
+            <span class="sr-only">Learn more about {t("services_feature_2_title", "Fabrication and installation")}</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </a>
         </div>
@@ -217,21 +212,15 @@ const itemListJsonLd = services.length > 0
           <div class="w-14 h-14 mx-auto mb-4 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange"><path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle></svg>
           </div>
-          <h3 class="font-sans text-[34px] leading-tight font-semibold text-primary mb-3">{t("services_feature_3_title")}</h3>
-          <p class="text-sm text-muted-foreground max-w-sm mx-auto">{t("services_feature_3_desc")}</p>
-          <a href="/services/maintenance-cleaning" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_3_title")}`}>
-            <span class="sr-only">Learn more about {t("services_feature_3_title")}</span>
+          <h3 class="font-sans text-[34px] leading-tight font-semibold text-primary mb-3">{t("services_feature_3_title", "Stainless steel wall cladding")}</h3>
+          <p class="text-sm text-muted-foreground max-w-sm mx-auto">{t("services_feature_3_desc", "We fabricate and fit wall panels to the dimensions and layout of your kitchen.")}</p>
+          <a href="/services/wall-cladding" class="inline-flex items-center justify-center mt-4 text-primary hover:text-orange transition-colors" aria-label={`Learn more about ${t("services_feature_3_title", "Stainless steel wall cladding")}`}>
+            <span class="sr-only">Learn more about {t("services_feature_3_title", "Stainless steel wall cladding")}</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </a>
         </div>
       </div>
     </section>
-
-    {t("services_coverage_desc") && (
-      <section class="container mx-auto px-4 lg:px-8 pb-16 md:pb-20">
-        <p class="max-w-3xl mx-auto border-t border-[#cfd8e6] pt-8 text-center text-sm leading-7 text-[#58657f]">{t("services_coverage_desc")}</p>
-      </section>
-    )}
 
   </div>
 </BaseLayout>

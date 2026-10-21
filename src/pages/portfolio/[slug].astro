@@ -10,9 +10,11 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
 import { getApiBase } from '@/lib/api-base';
 import { buildBreadcrumbJsonLd } from '@/lib/seo';
+import portfolioImageAlt from '@/data/portfolio-image-alt.json';
 
 const siteUrl = import.meta.env.SITE;
 const API = `${getApiBase()}/v1`;
+const imageAltByUrl: Record<string, string> = portfolioImageAlt;
 
 const { slug } = Astro.params;
 
@@ -63,7 +65,7 @@ if (!project) {
         <section class="container mx-auto px-4 lg:px-8 pt-16 md:pt-24 pb-14 md:pb-20">
           <div class="grid grid-cols-1 xl:grid-cols-[68%_32%] gap-8 xl:gap-10 items-start">
             <div>
-              <Image src={project.image} alt={project.title} width={800} height={600} loading="eager" decoding="async" class="w-full h-[360px] md:h-[520px] object-cover" />
+              <Image src={project.image} alt={imageAltByUrl[project.image] || project.title} width={800} height={600} loading="eager" decoding="async" class="w-full h-auto md:h-[520px] object-contain bg-[#f4f5f7]" />
 
               <p class="mt-8 text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">{project.portfolio_category?.name || "Uncategorized"}</p>
               <h2 class="font-sans text-[42px] md:text-[58px] leading-[0.95] font-semibold text-[#10275c] mt-3 mb-6">{project.title}</h2>
@@ -74,8 +76,8 @@ if (!project) {
 
               {project.gallery && project.gallery.length > 0 && (
                 <div class={`grid grid-cols-1 ${project.gallery.length >= 2 ? 'md:grid-cols-2' : ''} gap-4 mb-8`}>
-                  {project.gallery.map((imgUrl: string) => (
-                    <Image src={imgUrl} alt="" width={600} height={400} loading="lazy" decoding="async" class="w-full h-[280px] object-cover" />
+                  {project.gallery.map((imgUrl: string, index: number) => (
+                    <Image src={imgUrl} alt={imageAltByUrl[imgUrl] || `${project.title} - additional project view ${index + 1}`} width={600} height={400} loading="lazy" decoding="async" class="w-full h-auto md:h-[280px] object-contain bg-[#f4f5f7]" />
                   ))}
                 </div>
               )}
@@ -84,31 +86,26 @@ if (!project) {
             <aside class="bg-[#f4f5f7] p-8">
               <h3 class="font-sans text-[30px] leading-none font-semibold text-primary mb-8">Project Info</h3>
             <div class="space-y-5 text-[15px] text-[#58657f]">
-                <div class="flex items-start gap-3">
+                {project.client && <div class="flex items-start gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#2f9cea] mt-1"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                   <p>
-                    <span class="text-primary font-semibold">Client:</span> {project.client || "N/A"}
+                    <span class="text-primary font-semibold">Client:</span> {project.client}
                   </p>
-                </div>
-                <div class="flex items-start gap-3">
+                </div>}
+                {project.customer_number && <div class="flex items-start gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#2f9cea] mt-1"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.35 1.9.7 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.35 1.84.58 2.8.7A2 2 0 0 1 22 16.92z"/></svg>
                   <p>
                     <span class="text-primary font-semibold">Client Phone:</span>{" "}
                     {project.customer_number ? <a href={`tel:${project.customer_number}`} class="hover:text-primary">{project.customer_number}</a> : "N/A"}
                   </p>
-                </div>
-                <div class="flex items-start gap-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#2f9cea] mt-1"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  <p>
-                    <span class="text-primary font-semibold">Location:</span> {project.location || "N/A"}
-                  </p>
-                </div>
-                <div class="flex items-start gap-3">
+                </div>}
+                {project.year && <div class="flex items-start gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#2f9cea] mt-1"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
                   <p>
-                    <span class="text-primary font-semibold">Year:</span> {project.year || "N/A"}
+                    <span class="text-primary font-semibold">Year:</span> {project.year}
                   </p>
-                </div>
+                </div>}
+                <p><span class="text-primary font-semibold">Category:</span> {project.portfolio_category?.name || "Uncategorized"}</p>
               </div>
 
               {project.services_list && project.services_list.length > 0 && (

@@ -23,6 +23,10 @@ export interface Customer {
 // --- Core state ---
 export const $customer = atom<Customer | null>(null);
 export const $isAuthLoading = atom<boolean>(true);
+export const $authError = atom<string | null>(null);
+
+let currentRequest: Promise<void> | null = null;
+let requestVersion = 0;
 
 // --- Derived ---
 export const $isAuthenticated = computed($customer, (c) => c !== null);
@@ -40,44 +44,67 @@ const getResolvedApiUrl = () => {
   return API_URL;
 };
 
-export function loginCustomer(customerData: Customer) {
+function setCustomerSession(customerData: Customer | null) {
+  // A late session response must not undo a login, logout or profile update.
+  requestVersion++;
+  currentRequest = null;
   $customer.set(customerData);
+  $authError.set(null);
+  $isAuthLoading.set(false);
+}
+
+export function loginCustomer(customerData: Customer) {
+  setCustomerSession(customerData);
 }
 
 export function logoutCustomer() {
-  $customer.set(null);
+  setCustomerSession(null);
 }
 
 export function updateCustomer(customerData: Customer) {
-  $customer.set(customerData);
+  setCustomerSession(customerData);
 }
 
 /**
- * Fetch current customer from API on app load.
- * Call this once from a React island or Astro client script.
- * 
- * Note: 401 responses are expected when user is not logged in.
- * The HttpOnly session cookies cannot be read by JavaScript, so we must
- * always make the API call to check auth status. 401 is handled gracefully.
+ * Shared session check, started by CustomerSessionIsland in BaseLayout.
+ * Concurrent consumers share one request. Only an explicit 401 means guest;
+ * network/server errors retain a separate, retryable state.
  */
-export async function fetchCurrentCustomer() {
-  try {
-    const response = await fetch(`${getResolvedApiUrl()}/v1/customer/me`, {
-      credentials: 'include',
-      headers: { Accept: 'application/json' },
-    });
+export function fetchCurrentCustomer(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if (currentRequest) return currentRequest;
 
-    if (response.ok) {
-      const data = await response.json();
-      $customer.set(data);
-    } else {
-      // 401/403 means not authenticated - this is expected, not an error
-      $customer.set(null);
+  const version = ++requestVersion;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  $isAuthLoading.set(true);
+  $authError.set(null);
+  currentRequest = Promise.resolve().then(async () => {
+    try {
+      const response = await fetch(`${getResolvedApiUrl()}/v1/customer/me`, {
+        credentials: 'include',
+        headers: { Accept: 'application/json' },
+        signal: controller.signal,
+      });
+      if (response.status === 401) {
+        if (version === requestVersion) $customer.set(null);
+      } else {
+        if (!response.ok) throw new Error('Session check failed');
+        const data = await response.json();
+        if (!data || typeof data.id !== 'number') throw new Error('Invalid session response');
+        if (version === requestVersion) $customer.set(data);
+      }
+    } catch {
+      if (version === requestVersion) {
+        $authError.set('We could not verify your session. Please try again.');
+      }
+    } finally {
+      clearTimeout(timeout);
+      if (version === requestVersion) {
+        $isAuthLoading.set(false);
+        currentRequest = null;
+      }
     }
-  } catch (error) {
-    // Network error - silently fail, user is not authenticated
-    $customer.set(null);
-  } finally {
-    $isAuthLoading.set(false);
-  }
+  });
+  return currentRequest;
 }

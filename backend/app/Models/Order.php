@@ -36,6 +36,7 @@ class Order extends Model
         'payment_method',
         'bank_transfer_details',
         'payment_status',
+        'refunded_amount',
         'stripe_payment_intent_id',
         'stripe_receipt_url',
         'notes',
@@ -58,9 +59,23 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'refunded_amount' => 'decimal:2',
         'shipping_metadata' => 'array',
         'bank_transfer_details' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Order $order) {
+            if ($order->payment_status === 'refunded') {
+                $order->refunded_amount = $order->total;
+            } elseif ($order->payment_status === 'partially_refunded'
+                && ! $order->isDirty('refunded_amount') && (float) $order->refunded_amount <= 0) {
+                // A manual status change alone cannot establish a refund amount.
+                $order->refunded_amount = null;
+            }
+        });
+    }
 
     public function customer()
     {
