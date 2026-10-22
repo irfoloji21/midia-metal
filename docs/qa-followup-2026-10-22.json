@@ -7,6 +7,11 @@
       "id": "NEW-001",
       "resolution": "Reject SVG and URL attachments, validate MIME content and extension, store with detected extensions, and restrict the quote picker to supported formats.",
       "verification": "QuoteAttachmentTest: 4 tests / 24 assertions passed, including renamed SVG rejection and valid PDF/PNG uploads."
+    },
+    {
+      "id": "NEW-002",
+      "resolution": "Use the versioned customer endpoints in both password recovery forms.",
+      "verification": "2 UI submission tests and 2 backend recovery tests passed, including a valid emailed token, replay rejection and invalid-token rejection."
     }
   ]
 }

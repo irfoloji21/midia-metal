@@ -36,7 +36,7 @@ export default function ForgotPasswordIsland() {
   const onSubmit = async (data: ForgotPasswordFormValues) => {
     setIsSubmitting(true);
     try {
-      await apiFetch('/customer/forgot-password', {
+      await apiFetch('/v1/customer/forgot-password', {
         method: 'POST',
         body: JSON.stringify(data),
       });

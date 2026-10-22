@@ -55,7 +55,7 @@ export default function ResetPasswordIsland() {
   const onSubmit = async (data: ResetPasswordFormValues) => {
     setIsSubmitting(true);
     try {
-      await apiFetch('/customer/reset-password', {
+      await apiFetch('/v1/customer/reset-password', {
         method: 'POST',
         body: JSON.stringify({
           ...data,
