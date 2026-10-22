@@ -895,6 +895,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                       <div className="ml-auto flex flex-col">
                         <button
                           type="button"
+                          aria-label="Increase quantity"
                           onClick={() => setQty((currentQty) => {
                             const cap = availableStock !== null
                               ? Math.min(availableStock, MAX_ORDER_QUANTITY)
@@ -908,6 +909,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                         </button>
                         <button
                           type="button"
+                          aria-label="Decrease quantity"
                           onClick={() => setQty((currentQty) => Math.max(1, currentQty - 1))}
                           className="text-[#7f8ca5] hover:text-primary"
                         >

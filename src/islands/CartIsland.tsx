@@ -163,7 +163,7 @@ function CartIsland() {
               </div>
               <div className="mt-4 flex items-center justify-between gap-3">
                 <div className="flex items-center border border-[#cad4e4] h-10">
-                  <button onClick={() => updateQuantity(item.id, item.qty - 1)} className="px-2.5 py-1.5 text-primary">
+                  <button aria-label={`Decrease quantity of ${item.name}`} onClick={() => updateQuantity(item.id, item.qty - 1)} className="px-2.5 py-1.5 text-primary">
                     <Minus className="w-3 h-3" />
                   </button>
                   <span className="px-4 text-sm font-medium text-primary">{item.qty}</span>
@@ -175,6 +175,7 @@ function CartIsland() {
                       item.qty >= item.available_stock
                     }
                     className="px-2.5 py-1.5 text-primary disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label={`Increase quantity of ${item.name}`}
                   >
                     <Plus className="w-3 h-3" />
                   </button>
@@ -253,7 +254,7 @@ function CartIsland() {
                 <span className="text-lg md:text-xl leading-none font-semibold text-primary">
                   £{(parseFloat(item.price.toString().replace(/[£,]/g, '')) * item.qty).toFixed(2)}
                 </span>
-                <button onClick={() => removeFromCart(item.id)} className="text-[#8f9ab1] hover:text-destructive w-fit">
+                <button aria-label={`Remove ${item.name}`} onClick={() => removeFromCart(item.id)} className="text-[#8f9ab1] hover:text-destructive w-fit">
                   <X className="w-6 h-6" />
                 </button>
               </div>
