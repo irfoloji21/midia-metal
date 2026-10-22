@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { CheckCircle, Trash2, RotateCcw } from "lucide-react";
+import { usePaginatedAdminList } from "@/hooks/use-paginated-admin-list";
+import ListPagination from "@/components/admin/ListPagination";
 
 const getMessageTypeLabel = (messageType?: string) =>
     messageType === "order_request" ? "Cancellation / Refund" : "Contact";
@@ -22,29 +24,15 @@ const MESSAGE_STATUS_LABELS: Record<string, string> = {
 };
 
 export default function AdminMessages() {
-    const [messages, setMessages] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [selectedMessage, setSelectedMessage] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState("all"); // all, read, unread
     const [filterType, setFilterType] = useState("all");
-
-    useEffect(() => {
-        loadMessages();
-    }, []);
-
-    const loadMessages = async () => {
-        try {
-            const res = await apiFetch<{ data?: any[] }>("/admin/messages");
-            // API returns paginated object with .data array
-            const data = res.data || (res as unknown as any[]);
-            setMessages(Array.isArray(data) ? data : []);
-        } catch (e) {
-            toast.error("Failed to load messages");
-        } finally {
-            setLoading(false);
-        }
-    };
+    const params = new URLSearchParams({ search: searchTerm.trim() });
+    if (filterStatus !== "all") params.set("read", filterStatus === "read" ? "1" : "0");
+    if (filterType !== "all") params.set("message_type", filterType);
+    const { items: messages, setItems: setMessages, ...pagination } = usePaginatedAdminList(`/admin/messages?${params}`);
+    const { reload: loadMessages, setPage } = pagination;
 
     const handleMarkAsRead = async (id: number) => {
         try {
@@ -85,27 +73,7 @@ export default function AdminMessages() {
         }
     };
 
-    const filteredMessages = messages
-        .filter((msg) => {
-            const matchesSearch =
-                msg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                msg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (msg.subject || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (msg.order?.order_number || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (msg.reason || "").toLowerCase().includes(searchTerm.toLowerCase());
-
-            const matchesStatus =
-                filterStatus === "all" ? true :
-                    filterStatus === "read" ? msg.read : !msg.read;
-
-            const matchesType =
-                filterType === "all" ? true : (msg.message_type || "contact") === filterType;
-
-            return matchesSearch && matchesStatus && matchesType;
-        })
-        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-    if (loading) return <div>Loading...</div>;
+    const filteredMessages = messages;
 
     return (
         <div className="space-y-6">
@@ -116,13 +84,13 @@ export default function AdminMessages() {
                     type="text"
                     placeholder="Search by customer, order or subject..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
                     className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-full lg:w-80 text-sm"
                 />
                 <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
                     <select
                         value={filterType}
-                        onChange={(e) => setFilterType(e.target.value)}
+                        onChange={(e) => { setFilterType(e.target.value); setPage(1); }}
                         className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white w-full lg:w-52"
                     >
                         <option value="all">All Types</option>
@@ -131,7 +99,7 @@ export default function AdminMessages() {
                     </select>
                     <select
                         value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value)}
+                        onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}
                         className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white w-full lg:w-48"
                     >
                         <option value="all">All Messages</option>
@@ -141,6 +109,7 @@ export default function AdminMessages() {
                 </div>
             </div>
 
+            <ListPagination label="Messages" {...pagination} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white rounded-lg shadow overflow-hidden border border-[#e1e5eb]">
                     <ul className="divide-y divide-[#e1e5eb]">

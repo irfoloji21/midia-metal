@@ -19,6 +19,7 @@ class ContactController extends Controller
 
     public function index(Request $request)
     {
+        $request->validate(['search' => 'nullable|string|max:200', 'read' => 'nullable|boolean', 'message_type' => 'nullable|in:all,contact,order_request']);
         $query = ContactMessage::query()->with('order:id,order_number');
 
         if ($request->search) {
@@ -27,6 +28,7 @@ class ContactController extends Controller
                 $innerQuery->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('subject', 'like', "%{$search}%")
+                    ->orWhere('reason', 'like', "%{$search}%")
                     ->orWhereHas('order', function ($orderQuery) use ($search) {
                         $orderQuery->where('order_number', 'like', "%{$search}%");
                     });
@@ -34,14 +36,21 @@ class ContactController extends Controller
         }
 
         if ($request->filled('message_type') && $request->message_type !== 'all') {
-            $query->where('message_type', $request->message_type);
+            $query->where(function ($typeQuery) use ($request) {
+                $typeQuery->where('message_type', $request->message_type);
+                if ($request->message_type === 'contact') {
+                    $typeQuery->orWhereNull('message_type');
+                }
+            });
         }
 
-        if ($request->unread_only) {
+        if ($request->filled('read')) {
+            $query->where('read', $request->boolean('read'));
+        } elseif ($request->boolean('unread_only')) {
             $query->where('read', false);
         }
 
-        return response()->json($query->latest()->paginate(15));
+        return response()->json($query->latest()->orderByDesc('id')->paginate(15));
     }
 
     public function show(ContactMessage $contactMessage)

@@ -18,7 +18,7 @@ class ServiceController extends Controller
             $query->where('title', 'like', "%{$request->search}%");
         }
 
-        return response()->json($query->orderBy('order')->paginate(15));
+        return response()->json($query->orderBy('order')->orderBy('id')->paginate(15));
     }
 
     public function store(Request $request, FrontendContentDeployTrigger $frontendContentDeployTrigger)

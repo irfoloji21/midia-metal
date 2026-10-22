@@ -1,31 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Users, Search, Trash2, Eye, X, ShoppingBag } from "lucide-react";
 import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
+import { usePaginatedAdminList } from "@/hooks/use-paginated-admin-list";
+import ListPagination from "@/components/admin/ListPagination";
 
 export default function AdminCustomers() {
-    const [customers, setCustomers] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+    const { items: customers, setItems: _setCustomers, ...pagination } = usePaginatedAdminList(`/admin/customers?search=${search}`);
+    const { loading, reload: loadCustomers, setPage } = pagination;
 
     const { sort, toggleSort } = useTableSort("name");
-
-    useEffect(() => {
-        loadCustomers();
-    }, [search]);
-
-    const loadCustomers = async () => {
-        try {
-            const res = await apiFetch<{ data: any[] }>(`/admin/customers?search=${search}`);
-            setCustomers(res.data);
-        } catch (e) {
-            toast.error("Failed to load customers");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const sortedCustomers = sortRows(customers, sort.key === "orders" ? "orders_count" : sort.key === "spent" ? "orders_sum_total" : sort.key, sort.direction);
 
@@ -60,7 +47,7 @@ export default function AdminCustomers() {
                             type="text"
                             placeholder="Search customers..."
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                             className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#eb5c10] border-gray-300 h-10"
                         />
                     </div>
@@ -102,6 +89,8 @@ export default function AdminCustomers() {
                     </tbody>
                 </table>
             </div>
+
+            <ListPagination label="Customers" {...pagination} />
 
             {/* Customer Details Modal */}
             {selectedCustomer && (

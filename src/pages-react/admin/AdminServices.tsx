@@ -1,36 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
+import { usePaginatedAdminList } from "@/hooks/use-paginated-admin-list";
+import ListPagination from "@/components/admin/ListPagination";
 
 export default function AdminServices() {
-    const [services, setServices] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const [isEditing, setIsEditing] = useState(false);
     const [currentService, setCurrentService] = useState<any>(null);
     const [featuresDraft, setFeaturesDraft] = useState("");
 
     const [searchTerm, setSearchTerm] = useState("");
+    const params = new URLSearchParams({ search: searchTerm.trim() });
+    const { items: services, setItems: _setServices, ...pagination } = usePaginatedAdminList(`/admin/services?${params}`);
+    const { reload: loadServices, setPage } = pagination;
     const { sort, toggleSort } = useTableSort("title");
-
-    useEffect(() => {
-        loadServices();
-    }, []);
-
-    const loadServices = async () => {
-        try {
-            const res = await apiFetch<{ data: any[] }>("/admin/services");
-            setServices(res.data);
-        } catch (e) {
-            toast.error("Failed to load services");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleDelete = async (id: number) => {
         if (!confirm("Are you sure you want to delete this service?")) return;
@@ -84,12 +72,10 @@ export default function AdminServices() {
     };
 
     const filteredServices = sortRows(
-        services.filter((s) => s.title.toLowerCase().includes(searchTerm.toLowerCase())),
+        services,
         sort.key,
         sort.direction,
     );
-
-    if (loading) return <div>Loading...</div>;
 
     return (
         <div className="space-y-6">
@@ -108,7 +94,7 @@ export default function AdminServices() {
                     type="text"
                     placeholder="Search services..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
                     className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-full lg:w-80 text-sm"
                 />
             </div>
@@ -159,6 +145,8 @@ export default function AdminServices() {
                     </tbody>
                 </table>
             </div>
+
+            <ListPagination label="Services" {...pagination} />
 
             {isEditing && (
                 <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 overflow-y-auto">

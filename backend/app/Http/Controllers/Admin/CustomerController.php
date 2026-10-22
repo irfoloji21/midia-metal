@@ -19,7 +19,7 @@ class CustomerController extends Controller
             });
         }
 
-        return response()->json($query->latest()->paginate(15));
+        return response()->json($query->latest()->orderByDesc('id')->paginate(15));
     }
 
     public function show(Customer $customer)

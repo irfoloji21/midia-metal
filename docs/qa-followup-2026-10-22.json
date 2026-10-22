@@ -18,5 +18,10 @@
       "resolution": "Add category product pagination with page-specific canonicals, bounds handling and stable product ordering.",
       "verification": "Edge verified 20 products across 18+2 cards and 37 unique products across 18+18+1, previous/next links, invalid/out-of-range pages and 390px layout. Astro check: 0 errors."
     }
+    ,{
+      "id": "NEW-004",
+      "resolution": "Paginate Messages, Services, Portfolio and Customers; search/filter on the server, keep stable ordering, ignore stale requests and recover after deleting a last-page record.",
+      "verification": "3 pagination hook tests and 3 backend tests (64 assertions) passed. Edge verified all four lists, page navigation, formerly hidden search results, filter page reset and 390px layout. Astro check and changed-file ESLint passed."
+    }
   ]
 }

@@ -4,34 +4,26 @@ import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
 import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
+import { usePaginatedAdminList } from "@/hooks/use-paginated-admin-list";
+import ListPagination from "@/components/admin/ListPagination";
 
 export default function AdminPortfolio() {
-    const [projects, setProjects] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const [isEditing, setIsEditing] = useState(false);
     const [currentProject, setCurrentProject] = useState<any>(null);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
+    const params = new URLSearchParams({ search: searchTerm.trim() });
+    if (categoryFilter !== "all") params.set("category_id", categoryFilter);
+    const { items: projects, setItems: _setProjects, ...pagination } = usePaginatedAdminList(`/admin/portfolio?${params}`);
+    const { reload: loadProjects, setPage } = pagination;
     const { sort, toggleSort } = useTableSort("title");
 
     useEffect(() => {
-        loadProjects();
         loadCategories();
     }, []);
-
-    const loadProjects = async () => {
-        try {
-            const res = await apiFetch<{ data: any[] }>("/admin/portfolio");
-            setProjects(res.data);
-        } catch (e) {
-            toast.error("Failed to load portfolio projects");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const loadCategories = async () => {
         try {
@@ -121,17 +113,7 @@ export default function AdminPortfolio() {
         }));
     };
 
-    const filteredProjects = sortRows(projects
-        .filter((p) => {
-            const matchesSearch =
-                p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (p.client || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (p.customer_number || "").toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesCategory = categoryFilter === "all" || p.portfolio_category_id?.toString() === categoryFilter;
-            return matchesSearch && matchesCategory;
-        }), sort.key, sort.direction);
-
-    if (loading) return <div>Loading...</div>;
+    const filteredProjects = sortRows(projects, sort.key, sort.direction);
 
     return (
         <div className="space-y-6">
@@ -150,13 +132,13 @@ export default function AdminPortfolio() {
                     type="text"
                     placeholder="Search projects..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
                     className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-full lg:w-80 text-sm"
                 />
                 <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
                     <select
                         value={categoryFilter}
-                        onChange={(e) => setCategoryFilter(e.target.value)}
+                        onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
                         className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white flex-1 sm:flex-none"
                     >
                         <option value="all">All Categories</option>
@@ -222,6 +204,8 @@ export default function AdminPortfolio() {
                     </tbody>
                 </table>
             </div>
+
+            <ListPagination label="Portfolio" {...pagination} />
 
             {isEditing && (
                 <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 overflow-y-auto">

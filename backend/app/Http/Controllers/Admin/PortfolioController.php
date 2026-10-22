@@ -15,13 +15,17 @@ class PortfolioController extends Controller
     {
         $query = PortfolioProject::with('portfolioCategory');
         if ($request->search) {
-            $query->where('title', 'like', "%{$request->search}%");
+            $query->where(function ($searchQuery) use ($request) {
+                $searchQuery->where('title', 'like', "%{$request->search}%")
+                    ->orWhere('client', 'like', "%{$request->search}%")
+                    ->orWhere('customer_number', 'like', "%{$request->search}%");
+            });
         }
         if ($request->category_id) {
             $query->where('portfolio_category_id', $request->category_id);
         }
 
-        return response()->json($query->orderBy('order')->latest()->paginate(15));
+        return response()->json($query->orderBy('order')->latest()->orderByDesc('id')->paginate(15));
     }
 
     public function store(Request $request, FrontendContentDeployTrigger $frontendContentDeployTrigger)
