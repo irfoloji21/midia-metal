@@ -16,20 +16,29 @@ import AdaptiveProductImage from '@/components/AdaptiveProductImage.astro';
 const siteUrl = import.meta.env.SITE;
 const API = `${getApiBase()}/v1`;
 const { slug } = Astro.params;
+const requestedPage = Number(Astro.url.searchParams.get('page') || 1);
+const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+const categoryPath = `/shop/category/${encodeURIComponent(slug || '')}`;
+const categoryPageUrl = (value: number) => value > 1 ? `${categoryPath}?page=${value}` : categoryPath;
+const productParams = new URLSearchParams({ category: slug || '', page: String(page) });
 
 // Fetch category info + products in parallel at request time
 let category: any = null;
 let products: any[] = [];
+let lastPage = 1;
+let total = 0;
 
 try {
   const [catRes, prodRes] = await Promise.all([
     fetch(`${API}/product-categories`).then(r => r.ok ? r.json() : []),
-    fetch(`${API}/products?category=${slug}`).then(r => r.ok ? r.json() : { data: [] }),
+    fetch(`${API}/products?${productParams}`).then(r => r.ok ? r.json() : { data: [] }),
   ]);
   
   const allCategories = Array.isArray(catRes) ? catRes : catRes.data || [];
   category = allCategories.find((c: any) => c.slug === slug) || null;
   products = prodRes.data || [];
+  lastPage = prodRes.last_page || 1;
+  total = prodRes.total || 0;
 } catch (e) {
   console.error('Failed to fetch category data:', e);
 }
@@ -38,6 +47,7 @@ try {
 if (!category) {
   return Astro.redirect('/404');
 }
+if (page > lastPage) return Astro.redirect(categoryPageUrl(lastPage));
 
 const pageTitle = category?.name || 'Category';
 const pageDescription = category?.description || `Browse ${pageTitle} products from Midia M Metal.`;
@@ -47,7 +57,7 @@ const categoryImage = normalizeMediaUrl(category?.image, '/logo.png');
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
 
 // CollectionPage + ItemList JSON-LD
-const categoryUrl = `${siteUrl}/shop/category/${slug}`;
+const categoryUrl = `${siteUrl}${categoryPageUrl(page)}`;
 const itemListJsonLd = products.length > 0
   ? buildItemListJsonLd({
       name: pageTitle,
@@ -71,7 +81,7 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
   title={pageTitle}
   description={pageDescription}
   image={categoryImage}
-  canonicalPath={`/shop/category/${slug}`}
+  canonicalPath={categoryPageUrl(page)}
   structuredData={[breadcrumbJsonLd, ...(itemListJsonLd ? [itemListJsonLd] : [])]}
 >
   <div class="min-h-screen bg-[#eaf0f3]">
@@ -109,7 +119,7 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     </section>
 
     <!-- Products grid -->
-    <section class="container mx-auto px-4 lg:px-8 pb-20 md:pb-24">
+    <section id="category-products" class="container mx-auto px-4 lg:px-8 pb-20 md:pb-24">
       <h3 class="font-sans text-[34px] md:text-[46px] leading-none font-semibold text-[#10275c] mb-8">Products</h3>
 
       {products.length > 0 ? (
@@ -140,6 +150,15 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
         <div class="py-12 px-6 border border-[#cfd8e6] bg-[#f4f5f7] text-[#6f7c95]">
           No products found for this category.
         </div>
+      )}
+      {lastPage > 1 && (
+        <nav aria-label="Product pagination" class="mt-10 flex flex-wrap items-center justify-between gap-4 text-sm text-primary">
+          <p>Page {page} of {lastPage} · {total} products</p>
+          <div class="flex gap-3">
+            {page > 1 && <a rel="prev" href={`${categoryPageUrl(page - 1)}#category-products`} class="border border-[#cad4e4] bg-white px-4 py-3 hover:border-orange">Previous</a>}
+            {page < lastPage && <a rel="next" href={`${categoryPageUrl(page + 1)}#category-products`} class="border border-[#cad4e4] bg-white px-4 py-3 hover:border-orange">Next</a>}
+          </div>
+        </nav>
       )}
     </section>
   </div>

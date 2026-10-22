@@ -42,7 +42,7 @@ class ProductController extends Controller
             });
         }
 
-        return response()->json($query->orderBy('order')->paginate($perPage));
+        return response()->json($query->orderBy('order')->orderBy('id')->paginate($perPage));
     }
 
     public function show($id)

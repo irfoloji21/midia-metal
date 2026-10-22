@@ -13,5 +13,10 @@
       "resolution": "Use the versioned customer endpoints in both password recovery forms.",
       "verification": "2 UI submission tests and 2 backend recovery tests passed, including a valid emailed token, replay rejection and invalid-token rejection."
     }
+    ,{
+      "id": "NEW-003",
+      "resolution": "Add category product pagination with page-specific canonicals, bounds handling and stable product ordering.",
+      "verification": "Edge verified 20 products across 18+2 cards and 37 unique products across 18+18+1, previous/next links, invalid/out-of-range pages and 390px layout. Astro check: 0 errors."
+    }
   ]
 }
