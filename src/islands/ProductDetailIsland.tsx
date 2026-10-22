@@ -990,7 +990,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
 
                   return (
                     <div key={option} className="mt-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                      <label className="font-semibold text-primary text-[13px] md:text-[14px] capitalize shrink-0 sm:w-[120px]">
+                      <label htmlFor={`variant-${encodeURIComponent(option)}`} className="font-semibold text-primary text-[13px] md:text-[14px] capitalize shrink-0 sm:w-[120px]">
                         {label}:
                       </label>
                       <div className="relative flex-1 md:max-w-[420px]">
@@ -999,6 +999,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                         ) : (
                           <>
                             <select
+                              id={`variant-${encodeURIComponent(option)}`}
                               value={selectedVariants[option]?.value || ""}
                               onChange={(e) => handleVariantSelectionChange(option, e.target.value)}
                               className="w-full h-12 appearance-none border border-[#d1dbe8] bg-[#f8fafc] px-4 pr-10 text-[13px] md:text-[14px] font-medium text-primary outline-none transition-all hover:border-[#b4c4d4] focus:border-orange focus:bg-white focus:ring-1 focus:ring-orange cursor-pointer"

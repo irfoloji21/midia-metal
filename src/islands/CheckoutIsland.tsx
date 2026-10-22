@@ -219,6 +219,7 @@ function CheckoutIsland() {
     setFieldErrors(prev => ({ ...prev, [field]: undefined }));
   };
   const validationProps = (field: keyof CheckoutFormData) => ({
+    id: `checkout-${field}`,
     name: field,
     'aria-invalid': Boolean(fieldErrors[field]),
     'aria-describedby': fieldErrors[field] ? `error-${field}` : undefined,
@@ -370,22 +371,22 @@ function CheckoutIsland() {
                 <h2 className="font-sans text-[32px] md:text-[42px] leading-none font-semibold text-primary mb-7">Contact Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-[13px] font-semibold text-primary mb-2">First Name *</label>
+                    <label htmlFor="checkout-firstName" className="block text-[13px] font-semibold text-primary mb-2">First Name *</label>
                     <input {...validationProps("firstName")} type="text" required value={form.firstName} onChange={(e) => update("firstName", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("firstName")}
                   </div>
                   <div>
-                    <label className="block text-[13px] font-semibold text-primary mb-2">Last Name *</label>
+                    <label htmlFor="checkout-lastName" className="block text-[13px] font-semibold text-primary mb-2">Last Name *</label>
                     <input {...validationProps("lastName")} type="text" required value={form.lastName} onChange={(e) => update("lastName", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("lastName")}
                   </div>
                   <div>
-                    <label className="block text-[13px] font-semibold text-primary mb-2">Phone *</label>
+                    <label htmlFor="checkout-phone" className="block text-[13px] font-semibold text-primary mb-2">Phone *</label>
                     <input {...validationProps("phone")} type="tel" required value={form.phone} onChange={(e) => update("phone", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("phone")}
                   </div>
                   <div>
-                    <label className="block text-[13px] font-semibold text-primary mb-2">Email Address *</label>
+                    <label htmlFor="checkout-email" className="block text-[13px] font-semibold text-primary mb-2">Email Address *</label>
                     <input {...validationProps("email")} type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("email")}
                   </div>
@@ -399,12 +400,12 @@ function CheckoutIsland() {
                 {isBusiness && (
                   <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-[13px] font-semibold text-primary mb-2">Company Name *</label>
+                      <label htmlFor="checkout-company" className="block text-[13px] font-semibold text-primary mb-2">Company Name *</label>
                       <input {...validationProps("company")} type="text" required value={form.company} onChange={(e) => update("company", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("company")}
                     </div>
                     <div>
-                      <label className="block text-[13px] font-semibold text-primary mb-2">Company VAT Number (optional)</label>
+                      <label htmlFor="checkout-companyVat" className="block text-[13px] font-semibold text-primary mb-2">Company VAT Number (optional)</label>
                       <input {...validationProps("companyVat")} type="text" value={form.companyVat} onChange={(e) => update("companyVat", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("companyVat")}
                     </div>
@@ -465,27 +466,27 @@ function CheckoutIsland() {
                 )}
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-[13px] font-semibold text-primary mb-2">Country / Region</label>
-                    <input type="text" disabled value="United Kingdom" className="w-full h-12 border border-[#cad4e4] bg-[#dfe5ea] px-4 text-[14px] outline-none text-[#6e7a92] cursor-not-allowed" />
+                    <label htmlFor="shipping-country" className="block text-[13px] font-semibold text-primary mb-2">Country / Region</label>
+                    <input id="shipping-country" type="text" disabled value="United Kingdom" className="w-full h-12 border border-[#cad4e4] bg-[#dfe5ea] px-4 text-[14px] outline-none text-[#6e7a92] cursor-not-allowed" />
                   </div>
                   <div>
-                    <label className="block text-[13px] font-semibold text-primary mb-2">Street Address *</label>
+                    <label htmlFor="checkout-shipping_address" className="block text-[13px] font-semibold text-primary mb-2">Street Address *</label>
                     <input {...validationProps("shipping_address")} type="text" required placeholder="House number and street name" value={form.shipping_address} onChange={(e) => update("shipping_address", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("shipping_address")}
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
-                      <label className="block text-[13px] font-semibold text-primary mb-2">Town / City *</label>
+                      <label htmlFor="checkout-shipping_city" className="block text-[13px] font-semibold text-primary mb-2">Town / City *</label>
                       <input {...validationProps("shipping_city")} type="text" required value={form.shipping_city} onChange={(e) => update("shipping_city", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("shipping_city")}
                     </div>
                     <div>
-                      <label className="block text-[13px] font-semibold text-primary mb-2">County</label>
+                      <label htmlFor="checkout-shipping_county" className="block text-[13px] font-semibold text-primary mb-2">County</label>
                       <input {...validationProps("shipping_county")} type="text" value={form.shipping_county} onChange={(e) => update("shipping_county", e.target.value)} placeholder="e.g. Essex" className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("shipping_county")}
                     </div>
                     <div>
-                      <label className="block text-[13px] font-semibold text-primary mb-2">Postcode *</label>
+                      <label htmlFor="checkout-shipping_postcode" className="block text-[13px] font-semibold text-primary mb-2">Postcode *</label>
                       <input {...validationProps("shipping_postcode")} type="text" required value={form.shipping_postcode} onChange={(e) => update("shipping_postcode", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("shipping_postcode")}
                     </div>
@@ -527,6 +528,7 @@ function CheckoutIsland() {
                             <div className="flex items-center gap-3">
                               <input
                                 type="radio"
+                                aria-label={`${option.service} by ${option.carrier}`}
                                 checked={form.shippingOptionToken === option.quote_token}
                                 onChange={() => update("shippingOptionToken", option.quote_token)}
                                 className="mt-1 h-5 w-5 accent-[#0f6fb6]"
@@ -584,27 +586,27 @@ function CheckoutIsland() {
                   <h2 className="font-sans text-[32px] md:text-[42px] leading-none font-semibold text-primary mb-7">Billing Address</h2>
                   <div className="space-y-5">
                     <div>
-                      <label className="block text-[13px] font-semibold text-primary mb-2">Country / Region</label>
-                      <input type="text" disabled value="United Kingdom" className="w-full h-12 border border-[#cad4e4] bg-[#dfe5ea] px-4 text-[14px] outline-none text-[#6e7a92] cursor-not-allowed" />
+                      <label htmlFor="billing-country" className="block text-[13px] font-semibold text-primary mb-2">Country / Region</label>
+                      <input id="billing-country" type="text" disabled value="United Kingdom" className="w-full h-12 border border-[#cad4e4] bg-[#dfe5ea] px-4 text-[14px] outline-none text-[#6e7a92] cursor-not-allowed" />
                     </div>
                     <div>
-                      <label className="block text-[13px] font-semibold text-primary mb-2">Street Address *</label>
+                      <label htmlFor="checkout-address" className="block text-[13px] font-semibold text-primary mb-2">Street Address *</label>
                       <input {...validationProps("address")} type="text" required placeholder="House number and street name" value={form.address} onChange={(e) => update("address", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("address")}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                       <div>
-                        <label className="block text-[13px] font-semibold text-primary mb-2">Town / City *</label>
+                        <label htmlFor="checkout-city" className="block text-[13px] font-semibold text-primary mb-2">Town / City *</label>
                         <input {...validationProps("city")} type="text" required value={form.city} onChange={(e) => update("city", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("city")}
                       </div>
                       <div>
-                        <label className="block text-[13px] font-semibold text-primary mb-2">County</label>
+                        <label htmlFor="checkout-county" className="block text-[13px] font-semibold text-primary mb-2">County</label>
                         <input {...validationProps("county")} type="text" value={form.county} onChange={(e) => update("county", e.target.value)} placeholder="e.g. Essex" className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("county")}
                       </div>
                       <div>
-                        <label className="block text-[13px] font-semibold text-primary mb-2">Postcode *</label>
+                        <label htmlFor="checkout-postcode" className="block text-[13px] font-semibold text-primary mb-2">Postcode *</label>
                         <input {...validationProps("postcode")} type="text" required value={form.postcode} onChange={(e) => update("postcode", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
                     {fieldError("postcode")}
                       </div>
@@ -616,8 +618,8 @@ function CheckoutIsland() {
               {/* ── Order Notes ── */}
               <div className="border border-[#cad4e4] bg-[#f0f3f7] p-6 md:p-8">
                 <h3 className="font-sans text-[24px] md:text-[30px] leading-none font-semibold text-primary mb-5">Additional Information</h3>
-                <label className="block text-[13px] font-semibold text-primary mb-2">Order Notes (optional)</label>
-                <textarea rows={4} placeholder="Notes about your order, e.g. preferred delivery time or pickup details." value={form.notes} onChange={(e) => update("notes", e.target.value)} className="w-full border border-[#cad4e4] bg-[#eaf0f3] px-4 py-3 text-[14px] outline-none focus:border-orange resize-none" />
+                <label htmlFor="checkout-notes" className="block text-[13px] font-semibold text-primary mb-2">Order Notes (optional)</label>
+                <textarea id="checkout-notes" rows={4} placeholder="Notes about your order, e.g. preferred delivery time or pickup details." value={form.notes} onChange={(e) => update("notes", e.target.value)} className="w-full border border-[#cad4e4] bg-[#eaf0f3] px-4 py-3 text-[14px] outline-none focus:border-orange resize-none" />
               </div>
 
             </div>
