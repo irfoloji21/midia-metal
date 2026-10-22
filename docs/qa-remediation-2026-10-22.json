@@ -118,7 +118,38 @@
         "pageOverflow": 0
       }
     ],
-    "diff_whitespace": "passed"
+    "diff_whitespace": "passed",
+    "eslint": {
+      "scope": "Git-tracked JS/TS files",
+      "errors": 0,
+      "status": "passed"
+    },
+    "pint": {
+      "changed_php_files": "passed",
+      "full_repository": "pre-existing failures on 20 untouched files in this Windows checkout",
+      "unchanged_files": [
+        "backend/app/Http/Controllers/Admin/ContactController.php",
+        "backend/app/Http/Controllers/Admin/SettingsController.php",
+        "backend/app/Http/Controllers/Api/FormController.php",
+        "backend/app/Http/Controllers/Api/OrderConfirmationController.php",
+        "backend/app/Http/Controllers/Api/PaymentController.php",
+        "backend/app/Http/Controllers/Api/SettingsController.php",
+        "backend/config/services.php",
+        "backend/database/seeders/DatabaseSeeder.php",
+        "backend/database/seeders/HomepageCopySeeder.php",
+        "backend/database/seeders/LocalProductCatalogueSeeder.php",
+        "backend/database/seeders/LongwellDd7ProductContentSeeder.php",
+        "backend/database/seeders/ReferenceShopImportSeeder.php",
+        "backend/database/seeders/ServiceDetailCopySeeder.php",
+        "backend/database/seeders/ServicesPageCopySeeder.php",
+        "backend/database/seeders/SiteSettingsSeeder.php",
+        "backend/routes/api.php",
+        "backend/tests/Feature/AdminSettingsTest.php",
+        "backend/tests/Feature/OrderConfirmationTest.php",
+        "backend/tests/Feature/OrderPlacementTest.php",
+        "backend/tests/Feature/SharedSiteSettingsTest.php"
+      ]
+    }
   },
   "application": {
     "local_photo_migrations": "Both applied successfully; only the four matching known image records were changed.",
@@ -128,7 +159,8 @@
   "limitations": [
     "Approved real product photos are still needed for the three Conveyor Feet listings and Steelton four-wheel set. Placeholders remove misleading images but do not supply final catalogue photography.",
     "The PDF contains historical evidence, observations and blocked test scenarios. This work does not claim that the original complete test campaign was rerun, or that historical ambiguous deletion/payment outcomes were reconstructed.",
-    "No real payment, customer message deletion or test email was performed during regression verification."
+    "No real payment, customer message deletion or test email was performed during regression verification.",
+    "Full-repository Pint reports formatting issues on 20 files unchanged from the starting commit. All seven PHP files changed for this task pass Pint; existing unrelated formatting was left intact."
   ],
   "issues": [
     {

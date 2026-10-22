@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AdminUser;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -12,7 +13,7 @@ class AdminProductValidationTest extends TestCase
 
     public function test_renaming_a_product_preserves_its_public_url(): void
     {
-        $this->actingAs(\App\Models\AdminUser::factory()->create(), 'sanctum');
+        $this->actingAs(AdminUser::factory()->create(), 'sanctum');
         $product = Product::factory()->create(['slug' => 'original-product-url']);
         $this->putJson("/api/admin/products/{$product->id}", [
             'name' => 'Renamed Product',
