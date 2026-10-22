@@ -51,9 +51,8 @@ export default function AdminMessages() {
             await apiFetch(`/admin/messages/${id}/read`, { method: "PUT" });
             toast.success("Message marked as read");
             loadMessages();
-            if (selectedMessage?.id === id) {
-                setSelectedMessage({ ...selectedMessage, read: true });
-            }
+            setMessages(current => current.map(message => message.id === id ? { ...message, read: true } : message));
+            setSelectedMessage((current: any) => current?.id === id ? { ...current, read: true } : current);
         } catch (e) {
             toast.error("Failed to update message status");
         }
