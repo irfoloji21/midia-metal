@@ -12,36 +12,69 @@
       "id": "NEW-002",
       "resolution": "Use the versioned customer endpoints in both password recovery forms.",
       "verification": "2 UI submission tests and 2 backend recovery tests passed, including a valid emailed token, replay rejection and invalid-token rejection."
-    }
-    ,{
+    },
+    {
       "id": "NEW-003",
       "resolution": "Add category product pagination with page-specific canonicals, bounds handling and stable product ordering.",
       "verification": "Edge verified 20 products across 18+2 cards and 37 unique products across 18+18+1, previous/next links, invalid/out-of-range pages and 390px layout. Astro check: 0 errors."
-    }
-    ,{
+    },
+    {
       "id": "NEW-004",
       "resolution": "Paginate Messages, Services, Portfolio and Customers; search/filter on the server, keep stable ordering, ignore stale requests and recover after deleting a last-page record.",
       "verification": "3 pagination hook tests and 3 backend tests (64 assertions) passed. Edge verified all four lists, page navigation, formerly hidden search results, filter page reset and 390px layout. Astro check and changed-file ESLint passed."
-    }
-    ,{
+    },
+    {
       "id": "NEW-005",
       "resolution": "Limit percentage coupons to 100 on create and partial update, add the UI maximum and cap all discounts at the order amount, including existing invalid coupons.",
       "verification": "30 coupon, checkout-calculation and order-placement tests passed (106 assertions). Changed-file ESLint passed."
-    }
-    ,{
+    },
+    {
       "id": "NEW-006",
       "resolution": "Require a main portfolio image consistently in the UI and API while permitting partial edits that retain the existing image.",
       "verification": "2 backend tests / 26 assertions passed for missing, null, blank, valid and retained images. Edge verified missing-image submission is blocked before any POST and a valid-image project saves successfully."
-    }
-    ,{
+    },
+    {
       "id": "NEW-007",
       "resolution": "Encode customer search parameters with URLSearchParams.",
       "verification": "Edge found the existing audit+plus@example.test customer and verified exact round trips for ampersand/Unicode, spaces and a cleared search with pagination restored."
-    }
-    ,{
+    },
+    {
       "id": "NEW-008",
       "resolution": "Contain wide product descriptions in a bounded horizontal scroll region, with a keyboard-focusable accessible name when tables are present.",
       "verification": "14 ProductDetail tests passed. Edge confirmed zero document overflow at 320, 390, 768 and 1280px, keyboard horizontal scrolling and access to the last table column."
+    },
+    {
+      "id": "NEW-009",
+      "resolution": "Associate all login/register labels with unique input IDs and supply field names and appropriate autocomplete hints.",
+      "verification": "Edge verified all 7 field labels, click-to-focus, keyboard navigation and 390px layout."
     }
-  ]
+  ],
+  "finalVerification": {
+    "vitest": {
+      "tests": 251,
+      "files": 21,
+      "passed": true
+    },
+    "phpunit": {
+      "tests": 153,
+      "assertions": 822,
+      "passed": true
+    },
+    "astroCheck": {
+      "errors": 0,
+      "warnings": 0,
+      "hints": 21
+    },
+    "eslint": {
+      "scope": "src and tests",
+      "errors": 0,
+      "warnings": 10
+    },
+    "productionBuild": "passed",
+    "browser": "Focused Edge regressions against isolated database; 320–1280px for product tables, desktop/mobile for admin and auth forms",
+    "limits": [
+      "No real payments, shipping requests or email delivery performed.",
+      "Legacy Playwright fixture/expectation maintenance (QA-001) is separate from these nine fixes; the legacy suite was not rerun in this remediation."
+    ]
+  }
 }

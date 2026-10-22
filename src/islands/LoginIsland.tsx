@@ -35,8 +35,11 @@ export default function LoginIsland() {
                     <h2 className="font-sans text-[32px] md:text-[42px] leading-none font-semibold text-primary mb-7">Login</h2>
                     <form onSubmit={handleLogin} className="space-y-5">
                         <div>
-                            <label className="block text-[13px] font-semibold text-primary mb-2">Email address *</label>
+                            <label htmlFor="login-email" className="block text-[13px] font-semibold text-primary mb-2">Email address *</label>
                             <input
+                                id="login-email"
+                                name="email"
+                                autoComplete="username"
                                 type="email"
                                 required
                                 value={email}
@@ -46,10 +49,13 @@ export default function LoginIsland() {
                         </div>
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <label className="block text-[13px] font-semibold text-primary">Password *</label>
+                                <label htmlFor="login-password" className="block text-[13px] font-semibold text-primary">Password *</label>
                                 <a href="/forgot-password" className="text-[13px] text-orange hover:underline font-medium">Forgot password?</a>
                             </div>
                             <input
+                                id="login-password"
+                                name="password"
+                                autoComplete="current-password"
                                 type="password"
                                 required
                                 value={password}

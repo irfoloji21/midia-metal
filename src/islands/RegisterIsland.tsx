@@ -46,8 +46,11 @@ export default function RegisterIsland() {
                     <h2 className="font-sans text-[32px] md:text-[42px] leading-none font-semibold text-primary mb-7">Create Account</h2>
                     <form onSubmit={handleRegister} className="space-y-5">
                         <div>
-                            <label className="block text-[13px] font-semibold text-primary mb-2">Full Name *</label>
+                            <label htmlFor="register-name" className="block text-[13px] font-semibold text-primary mb-2">Full Name *</label>
                             <input
+                                id="register-name"
+                                name="name"
+                                autoComplete="name"
                                 type="text"
                                 required
                                 value={form.name}
@@ -56,8 +59,11 @@ export default function RegisterIsland() {
                             />
                         </div>
                         <div>
-                            <label className="block text-[13px] font-semibold text-primary mb-2">Email address *</label>
+                            <label htmlFor="register-email" className="block text-[13px] font-semibold text-primary mb-2">Email address *</label>
                             <input
+                                id="register-email"
+                                name="email"
+                                autoComplete="email"
                                 type="email"
                                 required
                                 value={form.email}
@@ -66,9 +72,12 @@ export default function RegisterIsland() {
                             />
                         </div>
                         <div>
-                            <label className="block text-[13px] font-semibold text-primary mb-2">Phone</label>
+                            <label htmlFor="register-phone" className="block text-[13px] font-semibold text-primary mb-2">Phone</label>
                             <input
-                                type="text"
+                                id="register-phone"
+                                name="phone"
+                                autoComplete="tel"
+                                type="tel"
                                 value={form.phone}
                                 onChange={(e) => update("phone", e.target.value)}
                                 className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange"
@@ -76,8 +85,11 @@ export default function RegisterIsland() {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-[13px] font-semibold text-primary mb-2">Password *</label>
+                                <label htmlFor="register-password" className="block text-[13px] font-semibold text-primary mb-2">Password *</label>
                                 <input
+                                    id="register-password"
+                                    name="password"
+                                    autoComplete="new-password"
                                     type="password"
                                     required
                                     value={form.password}
@@ -86,8 +98,11 @@ export default function RegisterIsland() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[13px] font-semibold text-primary mb-2">Confirm *</label>
+                                <label htmlFor="register-password-confirmation" className="block text-[13px] font-semibold text-primary mb-2">Confirm *</label>
                                 <input
+                                    id="register-password-confirmation"
+                                    name="password_confirmation"
+                                    autoComplete="new-password"
                                     type="password"
                                     required
                                     value={form.password_confirmation}
