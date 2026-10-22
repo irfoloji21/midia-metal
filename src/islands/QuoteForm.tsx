@@ -49,9 +49,10 @@ const QuoteForm = () => {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const chosen = Array.from(e.target.files || []);
-        const allowed = chosen.filter(f => f.size <= 10 * 1024 * 1024);
-        if (allowed.length !== chosen.length) toast.error("Files larger than 10 MB could not be added. Please select smaller files.");
+        const allowed = chosen.filter(f => /\.(jpe?g|png|gif|webp|pdf|dwg|dxf)$/i.test(f.name) && f.size <= 10 * 1024 * 1024);
+        if (allowed.length !== chosen.length) toast.error("Choose JPG, PNG, GIF, WebP, PDF, DWG or DXF files up to 10 MB each.");
         setFiles(prev => [...prev, ...allowed]);
+        e.target.value = "";
     };
 
     const removeFile = (i: number) => setFiles(prev => prev.filter((_, idx) => idx !== i));
@@ -141,7 +142,7 @@ const QuoteForm = () => {
                             <p className="text-sm text-[#6e7a92]">Attach photographs, PDFs or DWG/DXF drawings. Maximum file size: 10 MB per file.</p>
                             <label className="mt-3 inline-block cursor-pointer px-4 py-2 border border-[#cad4e4] bg-white text-sm text-primary hover:bg-gray-50">
                                 Choose Files
-                                <input id="quote-files" type="file" className="hidden" multiple accept="image/*,.pdf,.dwg,.dxf" onChange={handleFileChange} />
+                                <input id="quote-files" type="file" className="hidden" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.dwg,.dxf" onChange={handleFileChange} />
                             </label>
                         </div>
                         {files.length > 0 && (

@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-22",
+  "source": "Local full audit on commit 2dac252f2c05d17268df06cac97962f1f78ee38e",
+  "branch": "content",
+  "fixes": [
+    {
+      "id": "NEW-001",
+      "resolution": "Reject SVG and URL attachments, validate MIME content and extension, store with detected extensions, and restrict the quote picker to supported formats.",
+      "verification": "QuoteAttachmentTest: 4 tests / 24 assertions passed, including renamed SVG rejection and valid PDF/PNG uploads."
+    }
+  ]
+}

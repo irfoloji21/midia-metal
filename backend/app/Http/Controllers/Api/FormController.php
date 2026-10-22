@@ -9,8 +9,8 @@ use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\QuoteRequest;
-use App\Services\OrderService;
 use App\Services\CustomerOrderRequestNotificationService;
+use App\Services\OrderService;
 use App\Services\PaymentVerificationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -59,13 +59,9 @@ class FormController extends Controller
             'description' => 'required|string',
         ];
 
-        if ($request->hasFile('files')) {
-            $rules['files'] = 'nullable|array';
-            $rules['files.*'] = 'file|mimes:jpeg,png,jpg,gif,svg,webp,pdf,dwg,dxf|max:10240';
-        } else {
-            $rules['files'] = 'nullable|array';
-            $rules['files.*'] = 'nullable|string';
-        }
+        $rules['files'] = 'nullable|array';
+        // Check content and extension; never accept active SVG content or caller-supplied URLs.
+        $rules['files.*'] = 'required|file|mimes:jpeg,png,jpg,gif,webp,pdf,dwg,dxf|extensions:jpeg,png,jpg,gif,webp,pdf,dwg,dxf|max:10240';
 
         $validated = $request->validate($rules);
 
@@ -73,7 +69,7 @@ class FormController extends Controller
         if ($request->hasFile('files')) {
             $storedFiles = collect($request->file('files'))
                 ->map(function ($file) {
-                    $filename = time().'_'.Str::random(10).'.'.$file->getClientOriginalExtension();
+                    $filename = Str::uuid().'.'.$file->extension();
                     $path = $file->storeAs('quote-attachments', $filename, 'public');
 
                     return asset('storage/'.$path);
