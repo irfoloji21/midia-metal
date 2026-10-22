@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <rect width="800" height="800" fill="#f0f3f7"/>
+  <rect x="280" y="260" width="240" height="180" rx="12" fill="none" stroke="#8b97aa" stroke-width="8"/>
+  <path d="m300 420 65-70 50 50 40-40 45 60" fill="none" stroke="#8b97aa" stroke-width="8"/>
+  <circle cx="455" cy="310" r="18" fill="#8b97aa"/>
+  <text x="400" y="515" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" fill="#34445e">Product photo unavailable</text>
+  <text x="400" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#66758b">Contact us for product details</text>
+</svg>

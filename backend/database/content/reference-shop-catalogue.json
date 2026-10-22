@@ -6,7 +6,7 @@
     "Source IDs are provenance only; local database IDs are assigned independently.",
     "Unverified options and contradictory dimensions are withheld from the public catalogue with user approval; original records remain in the private source archive. Product prices and stock/shipping values are preserved.",
     "Descriptions and titles edited for professional English. Category URLs are mapped by meaning, not misleading source slugs.",
-    "Original image/title mismatch for source IDs 5,54,55 retained: their reference photos show sheet metal, not conveyor feet.",
+    "Known incorrect sheet-metal images for Conveyor Feet listings have been withdrawn pending confirmed product photos (BUG-014).",
     "Source ID 19 title specifies four 4-inch castors with two brakes, but the main reference image shows three red fixed castors; gallery shows different blue 5-inch castors. Original main product appearance preserved.",
     "Contradictory sheet variant dimensions are hidden; specifications use the grade, finish and nominal thickness stated in the source product titles.",
     "Identical source photos share one edited image: 25/29, 5/54/55, 13/43. Raw source images and galleries archived locally; public galleries use the edited hero images only."
@@ -896,11 +896,8 @@
       "slug": "aluminium-conveyor-feet-commercial-kitchens-jNFE",
       "price": "£1.00",
       "old_price": "£150.00",
-      "image": "/images/products/reference-catalogue/product-5-v1.webp",
-      "gallery": [
-        "/images/products/reference-catalogue/product-5-angle-a-v1.webp",
-        "/images/products/reference-catalogue/product-5-angle-b-v1.webp"
-      ],
+      "image": "/images/product-photo-unavailable.svg",
+      "gallery": [],
       "description": "<p>Aluminium conveyor feet for conveyor equipment used in commercial kitchens. These support components are intended to form part of the equipment's base arrangement, with the appropriate configuration determined by the conveyor design.</p>\n<p>When specifying replacement feet, match the component dimensions and attachment details to the existing assembly. The selected configuration should suit the equipment it will support.</p>",
       "tags": [],
       "specifications": {
@@ -997,11 +994,8 @@
       "slug": "gol-conveyor-feet-commercial-kitchens-j8ZX",
       "price": "£1.00",
       "old_price": "£150.00",
-      "image": "/images/products/reference-catalogue/product-5-v1.webp",
-      "gallery": [
-        "/images/products/reference-catalogue/product-5-angle-a-v1.webp",
-        "/images/products/reference-catalogue/product-5-angle-b-v1.webp"
-      ],
+      "image": "/images/product-photo-unavailable.svg",
+      "gallery": [],
       "description": "<p>GOL conveyor feet for commercial kitchen conveyor equipment. Intended for use within a conveyor support assembly, these components should be selected to match the equipment's base layout and connection points.</p>\n<p>For replacement work, compare the required dimensions and fitting arrangement with the existing feet. This helps identify the appropriate configuration for the conveyor.</p>",
       "tags": [],
       "specifications": {},
@@ -1096,11 +1090,8 @@
       "slug": "gold-conveyor-feet-commercial-kitchens-R0ey",
       "price": "£1.00",
       "old_price": "£150.00",
-      "image": "/images/products/reference-catalogue/product-5-v1.webp",
-      "gallery": [
-        "/images/products/reference-catalogue/product-5-angle-a-v1.webp",
-        "/images/products/reference-catalogue/product-5-angle-b-v1.webp"
-      ],
+      "image": "/images/product-photo-unavailable.svg",
+      "gallery": [],
       "description": "<p>Gold conveyor feet for conveyor equipment in commercial kitchens. These support components are selected as part of the conveyor's overall base arrangement, taking account of the available space and attachment points.</p>\n<p>Match the required size and fitting details to the equipment specification. For an existing installation, the original support arrangement provides the reference for selecting a replacement.</p>",
       "tags": [],
       "specifications": {},
