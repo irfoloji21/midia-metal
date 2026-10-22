@@ -99,6 +99,8 @@ export default function AdminProducts() {
     const filterPriceError = priceRangeError(minPrice, maxPrice);
     const { sort, toggleSort } = useTableSort("name");
     const oldPriceValue = parseMoneyValue(currentProduct?.old_price);
+    const variantPrices = (currentProduct?.variants || []).map((variant: any) => parseMoneyValue(variant.price)).filter((price: number | null): price is number => price !== null);
+    const derivedPrice = variantPrices.length ? Math.min(...variantPrices) : null;
     const hasPriceAboveOldPrice = !currentProduct?.price_on_request && oldPriceValue !== null && [
         currentProduct?.price,
         ...(currentProduct?.variants || []).map((variant: any) => variant?.price),
@@ -281,6 +283,7 @@ export default function AdminProducts() {
             const keyEl = document.getElementById('new_spec_key') as HTMLInputElement;
             const valEl = document.getElementById('new_spec_value') as HTMLInputElement;
             const finalProduct = { ...currentProduct };
+            if (derivedPrice !== null && !finalProduct.price_on_request) finalProduct.price = derivedPrice.toFixed(2);
 
             if (keyEl && valEl) {
                 const key = keyEl.value.trim();
@@ -1547,7 +1550,7 @@ export default function AdminProducts() {
                                         </label>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700" htmlFor="product-price">Price</label>
+                                        <label className="block text-sm font-medium text-gray-700" htmlFor="product-price">{derivedPrice !== null ? 'Starting price (from variants)' : 'Price'}</label>
                                         <label className="mt-2 flex items-center gap-2 text-sm text-gray-700">
                                             <input
                                                 type="checkbox"
@@ -1567,10 +1570,13 @@ export default function AdminProducts() {
                                             type="text"
                                             required={!currentProduct.price_on_request}
                                             disabled={Boolean(currentProduct.price_on_request)}
-                                            value={currentProduct.price}
+                                            readOnly={derivedPrice !== null}
+                                            aria-describedby={derivedPrice !== null ? 'product-price-help' : undefined}
+                                            value={derivedPrice !== null ? derivedPrice.toFixed(2) : currentProduct.price}
                                             onChange={(e) => setCurrentProduct({ ...currentProduct, price: e.target.value })}
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                                         />
+                                        {derivedPrice !== null && <p id="product-price-help" className="mt-2 text-sm text-gray-600">The starting price is calculated from the lowest variant price. Edit prices in the variant rows below.</p>}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Old Price (Optional)</label>
