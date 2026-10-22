@@ -63,7 +63,7 @@ if (!project) {
     {project ? (
       <>
         <section class="container mx-auto px-4 lg:px-8 pt-16 md:pt-24 pb-14 md:pb-20">
-          <div class="grid grid-cols-1 xl:grid-cols-[68%_32%] gap-8 xl:gap-10 items-start">
+          <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,68fr)_minmax(0,32fr)] gap-8 xl:gap-10 items-start [&>*]:min-w-0 [overflow-wrap:anywhere]">
             <div>
               <Image src={project.image} alt={imageAltByUrl[project.image] || project.title} width={800} height={600} loading="eager" decoding="async" class="w-full h-auto md:h-[520px] object-contain bg-[#f4f5f7]" />
 
