@@ -118,7 +118,11 @@ const itemListJsonLd = services.length > 0
             <div class="flex flex-col text-center">
               <a href={`/services/${s.slug}`} class="block">
                 <div class="w-44 h-44 mx-auto rounded-full overflow-hidden mb-7 border-8 border-[#eaf0f3] shadow-sm">
-                  <Image src={s.image} alt={s.title} width={200} height={200} loading="lazy" decoding="async" class="w-full h-full object-cover" />
+                  {typeof s.image === 'string' && s.image.trim() ? (
+                    <Image src={s.image} alt={s.title} width={200} height={200} loading="lazy" decoding="async" class="w-full h-full object-cover" />
+                  ) : (
+                    <img src="/placeholder.svg" alt="" width="200" height="200" loading="lazy" class="w-full h-full object-cover" />
+                  )}
                 </div>
               </a>
               <h3 class="font-sans text-[28px] lg:text-[32px] leading-tight font-semibold text-[#10275c] mb-3">
