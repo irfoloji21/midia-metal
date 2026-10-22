@@ -213,7 +213,7 @@ export default function AdminServices() {
                                         placeholder="Feature 1, Feature 2, Feature 3"
                                     />
                                 </div>
-                                <div className="col-span-2 flex items-center">
+                                <label className="col-span-2 flex items-center">
                                     <input
                                         type="checkbox"
                                         checked={currentService.active}
@@ -221,7 +221,7 @@ export default function AdminServices() {
                                         className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                     />
                                     <span className="ml-2 text-sm text-gray-600">Active</span>
-                                </div>
+                                </label>
                             </div>
                             <div className="pt-4 border-t flex justify-end gap-3 sticky bottom-0 bg-white">
                                 <button
