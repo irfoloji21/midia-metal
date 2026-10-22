@@ -19,6 +19,7 @@ import { $cart, $subtotal, $coupon, $isBusiness, setIsBusiness } from "@/stores/
 import { $customer } from "@/stores/auth";
 import type { CheckoutFormData } from "@/types/cart";
 import withErrorBoundary from "@/lib/withErrorBoundary";
+import { formatMoneyValue, parseMoneyValue } from "@/lib/pricing";
 
 // Astro-compatible CheckoutSteps (inline, no react-router)
 function CheckoutSteps({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
@@ -605,7 +606,7 @@ function CheckoutIsland() {
                               </div>
                             ))}
                           </div>
-                          <span className="text-sm md:text-base text-primary p-4 md:p-6 border-b border-[#cad4e4]">{typeof item.price === "string" ? item.price : `£${item.price}`}</span>
+                          <span className="text-sm md:text-base text-primary p-4 md:p-6 border-b border-[#cad4e4]">{formatMoneyValue((parseMoneyValue(item.price) ?? 0) * item.qty)}</span>
                         </div>
                       ))}
                     </div>

@@ -18,6 +18,7 @@ import { useStore } from "@nanostores/react";
 import { $cart, $subtotal, $coupon, $isBusiness, clearCart } from "@/stores/cart";
 import { $customer, $isAuthLoading, $authError } from "@/stores/auth";
 import CustomerSessionError from "@/components/CustomerSessionError";
+import { formatMoneyValue, parseMoneyValue } from "@/lib/pricing";
 
 // Stripe
 import { loadStripe } from "@stripe/stripe-js";
@@ -607,7 +608,7 @@ function PaymentIsland() {
                       </div>
                     ))}
                   </div>
-                  <span className="text-sm md:text-base text-primary p-4 md:p-6">{typeof item.price === "string" ? item.price : `£${item.price}`}</span>
+                  <span className="text-sm md:text-base text-primary p-4 md:p-6">{formatMoneyValue((parseMoneyValue(item.price) ?? 0) * item.qty)}</span>
                 </div>
               ))}
               <div className="grid grid-cols-[42%_58%] border-b border-[#cad4e4]">
