@@ -22,7 +22,7 @@ class StoreCouponRequest extends FormRequest
         return [
             'code' => 'required|string|unique:coupons,code',
             'type' => 'required|in:percentage,fixed',
-            'value' => 'required|numeric|min:0',
+            'value' => 'required|numeric|min:0'.($this->input('type') === 'percentage' ? '|max:100' : ''),
             'min_order_amount' => 'nullable|numeric|min:0',
             'max_uses' => 'nullable|integer|min:1',
             'expires_at' => 'nullable|date',

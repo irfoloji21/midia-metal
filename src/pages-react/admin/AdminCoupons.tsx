@@ -156,7 +156,7 @@ export default function AdminCoupons() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Value *</label>
-                                    <input required type="number" step="0.01" min="0" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })}
+                                    <input required type="number" step="0.01" min="0" max={form.type === "percentage" ? 100 : undefined} value={form.value} onChange={e => setForm({ ...form, value: e.target.value })}
                                         className="border rounded px-3 py-2 text-sm w-full" placeholder={form.type === "percentage" ? "10" : "15.00"} />
                                 </div>
                                 <div>

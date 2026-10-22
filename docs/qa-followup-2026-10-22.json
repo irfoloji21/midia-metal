@@ -23,5 +23,10 @@
       "resolution": "Paginate Messages, Services, Portfolio and Customers; search/filter on the server, keep stable ordering, ignore stale requests and recover after deleting a last-page record.",
       "verification": "3 pagination hook tests and 3 backend tests (64 assertions) passed. Edge verified all four lists, page navigation, formerly hidden search results, filter page reset and 390px layout. Astro check and changed-file ESLint passed."
     }
+    ,{
+      "id": "NEW-005",
+      "resolution": "Limit percentage coupons to 100 on create and partial update, add the UI maximum and cap all discounts at the order amount, including existing invalid coupons.",
+      "verification": "30 coupon, checkout-calculation and order-placement tests passed (106 assertions). Changed-file ESLint passed."
+    }
   ]
 }
