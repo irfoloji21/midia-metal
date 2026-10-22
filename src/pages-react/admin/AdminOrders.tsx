@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Download, Eye, MapPin, RefreshCcw, RotateCcw, Truck, X, XCircle } from "lucide-react";
@@ -85,6 +85,10 @@ export default function AdminOrders() {
   const [viewingOrder, setViewingOrder] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ last_page: 1, total: 0 });
+  const [loadError, setLoadError] = useState(false);
+  const requestSequence = useRef(0);
   const { sort, toggleSort } = useTableSort("created_at", "desc");
   const [shippingBusy, setShippingBusy] = useState<"label" | "track" | "void" | null>(null);
   const [refunding, setRefunding] = useState(false);
@@ -92,20 +96,31 @@ export default function AdminOrders() {
   const [bankRefundAcknowledged, setBankRefundAcknowledged] = useState(false);
   const [reviewingBankRefund, setReviewingBankRefund] = useState(false);
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
-
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
+    const request = ++requestSequence.current;
+    setLoading(true);
+    setLoadError(false);
+    const params = new URLSearchParams({ page: String(page) });
+    if (searchTerm.trim()) params.set("search", searchTerm.trim());
+    if (statusFilter !== "all") params.set("status", statusFilter);
     try {
-      const res = await apiFetch<{ data: any[] }>("/admin/orders");
+      const res = await apiFetch<{ data: any[]; last_page: number; total: number }>(`/admin/orders?${params}`);
+      if (request !== requestSequence.current) return;
       setOrders(res.data);
+      setPagination({ last_page: res.last_page, total: res.total });
+      if (page > res.last_page) setPage(Math.max(1, res.last_page));
     } catch {
-      toast.error("Failed to load orders");
+      if (request === requestSequence.current) setLoadError(true);
     } finally {
-      setLoading(false);
+      if (request === requestSequence.current) setLoading(false);
     }
-  };
+  }, [page, searchTerm, statusFilter]);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => { void loadOrders(); }, 250);
+    return () => { clearTimeout(timer); requestSequence.current += 1; };
+  }, [loadOrders]);
 
   const openOrder = async (orderId: number) => {
     try {
@@ -273,20 +288,10 @@ export default function AdminOrders() {
     }
   };
 
-  const filteredOrders = sortRows(orders
-    .filter((order) => {
-      const matchesSearch =
-        order.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customer_email.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === "all" || order.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    }), sort.key, sort.direction);
+  const filteredOrders = sortRows(orders, sort.key, sort.direction);
 
   const currentFulfilmentMethod = getFulfilmentMethod(viewingOrder);
   const isClickCollectOrder = currentFulfilmentMethod === "click_collect";
-
-  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -298,14 +303,16 @@ export default function AdminOrders() {
         <input
           type="text"
           placeholder="Search by ID, name or email..."
+          aria-label="Search orders"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
           className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-full lg:w-80 text-sm"
         />
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            aria-label="Order status"
+            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
             className="h-10 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-white flex-1 sm:flex-none"
           >
             <option value="all">All Statuses</option>
@@ -334,7 +341,13 @@ export default function AdminOrders() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredOrders.length === 0 ? (
+            {loading || loadError ? (
+              <tr>
+                <td colSpan={7} className="px-6 py-10 text-center text-sm text-gray-500">
+                  {loading ? <span role="status">Loading orders...</span> : <span role="alert">Failed to load orders. <button onClick={() => void loadOrders()} className="underline">Try again</button></span>}
+                </td>
+              </tr>
+            ) : filteredOrders.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-10 text-center text-sm text-gray-500">No orders found.</td>
               </tr>
@@ -396,6 +409,14 @@ export default function AdminOrders() {
           </tbody>
         </table>
       </div>
+
+      <nav aria-label="Order pagination" className="flex flex-wrap items-center justify-between gap-3 text-sm">
+        <span aria-live="polite">Page {page} of {pagination.last_page} · {pagination.total} orders</span>
+        <div className="flex gap-2">
+          <button disabled={loading || page <= 1} onClick={() => setPage(value => value - 1)} className="rounded border px-3 py-2 disabled:opacity-50">Previous</button>
+          <button disabled={loading || page >= pagination.last_page} onClick={() => setPage(value => value + 1)} className="rounded border px-3 py-2 disabled:opacity-50">Next</button>
+        </div>
+      </nav>
 
       {viewingOrder && (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 overflow-y-auto">

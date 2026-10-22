@@ -28,16 +28,19 @@ class OrderController extends Controller
             'customerRequests as unread_customer_requests_count' => fn ($customerRequestsQuery) => $customerRequestsQuery->where('read', false),
         ]);
 
-        if ($request->search) {
-            $query->where('order_number', 'like', "%{$request->search}%")
-                ->orWhere('customer_name', 'like', "%{$request->search}%")
-                ->orWhere('customer_email', 'like', "%{$request->search}%");
+        $search = trim((string) $request->search);
+        if ($search !== '') {
+            $query->where(function ($matches) use ($search) {
+                $matches->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%")
+                    ->orWhere('customer_email', 'like', "%{$search}%");
+            });
         }
         if ($request->status) {
             $query->where('status', $request->status);
         }
 
-        return response()->json($query->latest()->paginate(15));
+        return response()->json($query->latest()->orderByDesc('id')->paginate(15));
     }
 
     public function show(Order $order)

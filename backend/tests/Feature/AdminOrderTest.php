@@ -41,6 +41,28 @@ class AdminOrderTest extends TestCase
         $this->assertSame(5, $response->json('total'));
     }
 
+    public function test_older_orders_remain_accessible_and_searchable_after_first_page(): void
+    {
+        $this->authenticatedAdmin();
+        $older = Order::factory()->create(['customer_name' => 'Older customer', 'created_at' => now()->subDay()]);
+        Order::factory()->count(15)->create();
+
+        $this->getJson('/api/admin/orders')->assertOk()->assertJsonCount(15, 'data')->assertJsonPath('last_page', 2);
+        $this->getJson('/api/admin/orders?page=2')->assertOk()->assertJsonPath('data.0.id', $older->id);
+        $this->getJson('/api/admin/orders?search=Older')->assertOk()->assertJsonPath('total', 1)->assertJsonPath('data.0.id', $older->id);
+    }
+
+    public function test_order_search_and_status_filters_apply_together(): void
+    {
+        $this->authenticatedAdmin();
+        Order::factory()->create(['order_number' => 'TARGET-1', 'status' => 'pending']);
+        Order::factory()->create(['customer_name' => 'TARGET buyer', 'status' => 'pending']);
+        $match = Order::factory()->create(['customer_email' => 'target@example.com', 'status' => 'shipped']);
+
+        $this->getJson('/api/admin/orders?search=TARGET&status=shipped')
+            ->assertOk()->assertJsonPath('total', 1)->assertJsonPath('data.0.id', $match->id);
+    }
+
     public function test_admin_can_search_orders_by_name(): void
     {
         $this->authenticatedAdmin();
