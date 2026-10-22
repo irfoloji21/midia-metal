@@ -86,8 +86,8 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
         </nav>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-[45%_55%] gap-8 md:gap-10 items-center">
-        <div class="bg-[#f4f5f7]">
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-8 md:gap-10 items-center">
+        <div class="min-w-0 bg-[#f4f5f7]">
           <img
             src={categoryImage}
             alt={category.name}
@@ -98,7 +98,7 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
             class="w-full h-[280px] md:h-[420px] object-cover"
           />
         </div>
-        <div>
+        <div class="min-w-0 [overflow-wrap:anywhere]">
           <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#10275c] mb-4">Category Overview</p>
           <h1 class="font-sans text-[34px] md:text-[48px] leading-[0.96] font-semibold text-[#10275c] mb-5">
             {category.name}
