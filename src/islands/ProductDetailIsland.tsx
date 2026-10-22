@@ -851,16 +851,6 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                 <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-orange' : ''}`} />
               </button>
             </div>
-            {hasEditorial && (
-              <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-6">
-                {productSpecEntries.filter(([key]) => ["Motor power", "Supply", "Speed control"].includes(key)).map(([key, value]) => (
-                  <div key={key} className="border border-[#d1dbe8] bg-white/60 p-4">
-                    <dt className="text-[11px] text-[#6e7a92] uppercase tracking-wide mb-2">{key}</dt>
-                    <dd className="text-sm text-primary font-semibold">{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
             <div className="flex items-baseline gap-3 mt-3 mb-3">
               <p className="text-orange text-[28px] md:text-[34px] leading-none font-medium">
                 {product.price_on_request ? PRICE_ON_REQUEST_LABEL : formatMoneyValue(displayedTotalPrice)}
