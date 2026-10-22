@@ -12,6 +12,7 @@ export default function AdminServices() {
 
     const [isEditing, setIsEditing] = useState(false);
     const [currentService, setCurrentService] = useState<any>(null);
+    const [featuresDraft, setFeaturesDraft] = useState("");
 
     const [searchTerm, setSearchTerm] = useState("");
     const { sort, toggleSort } = useTableSort("title");
@@ -43,6 +44,7 @@ export default function AdminServices() {
     };
 
     const openEdit = (service: any = null) => {
+        setFeaturesDraft((service?.features || []).join(", "));
         setCurrentService(
             service || {
                 title: "",
@@ -59,17 +61,18 @@ export default function AdminServices() {
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        const payload = { ...currentService, features: featuresDraft.split(",").map(feature => feature.trim()).filter(Boolean) };
         try {
             if (currentService.id) {
                 await apiFetch(`/admin/services/${currentService.id}`, {
                     method: "PUT",
-                    body: JSON.stringify(currentService),
+                    body: JSON.stringify(payload),
                 });
                 toast.success("Service updated");
             } else {
                 await apiFetch("/admin/services", {
                     method: "POST",
-                    body: JSON.stringify(currentService),
+                    body: JSON.stringify(payload),
                 });
                 toast.success("Service created");
             }
@@ -204,11 +207,12 @@ export default function AdminServices() {
                                     />
                                 </div>
                                 <div className="col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700">Features (Comma separated)</label>
+                                    <label htmlFor="service-features" className="block text-sm font-medium text-gray-700">Features (Comma separated)</label>
                                     <input
+                                        id="service-features"
                                         type="text"
-                                        value={(currentService.features || []).join(", ")}
-                                        onChange={(e) => setCurrentService({ ...currentService, features: e.target.value.split(",").map(f => f.trim()).filter(Boolean) })}
+                                        value={featuresDraft}
+                                        onChange={(e) => setFeaturesDraft(e.target.value)}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                                         placeholder="Feature 1, Feature 2, Feature 3"
                                     />
