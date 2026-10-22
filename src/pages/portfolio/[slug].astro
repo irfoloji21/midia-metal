@@ -68,7 +68,7 @@ if (!project) {
               <Image src={project.image} alt={imageAltByUrl[project.image] || project.title} width={800} height={600} loading="eager" decoding="async" class="w-full h-auto md:h-[520px] object-contain bg-[#f4f5f7]" />
 
               <p class="mt-8 text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">{project.portfolio_category?.name || "Uncategorized"}</p>
-              <h2 class="font-sans text-[42px] md:text-[58px] leading-[0.95] font-semibold text-[#10275c] mt-3 mb-6">{project.title}</h2>
+              <h1 class="font-sans text-[42px] md:text-[58px] leading-[0.95] font-semibold text-[#10275c] mt-3 mb-6">{project.title}</h1>
 
               <p class="text-[15px] text-[#58657f] leading-8 mb-6 whitespace-pre-wrap">
                 {project.description || "No description provided."}
