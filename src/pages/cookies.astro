@@ -12,25 +12,26 @@ export const prerender = false;
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { buildBreadcrumbJsonLd } from '@/lib/seo';
-import { fetchSettings, getPageTitle, getPageDescription } from '@/lib/settings';
+import { fetchSettings, getPageDescription } from '@/lib/settings';
 
 const siteUrl = import.meta.env.SITE;
 
 // --- Data Fetching (runs on each request) ---
 const settings = await fetchSettings();
 
-const title = settings['cookies_page_title'] || 'Cookies Page';
+const configuredTitle = settings['cookies_page_title']?.trim();
+const title = !configuredTitle || /^(cookies page|cookies policy)$/i.test(configuredTitle) ? 'Cookie Policy' : configuredTitle;
 const content = settings['cookies_page_content'] || '';
 ---
 
 <BaseLayout
-  title={getPageTitle(settings, 'cookies_page_title', 'Cookies Policy')}
+  title={title}
   description={getPageDescription(settings, undefined, 'Learn about how Midia M Metal uses cookies on our website.')}
   canonicalPath="/cookies"
   structuredData={[
     buildBreadcrumbJsonLd([
       { name: 'Home', url: `${siteUrl}/` },
-      { name: 'Cookies Policy', url: `${siteUrl}/cookies` },
+      { name: title, url: `${siteUrl}/cookies` },
     ]),
   ]}
 >
