@@ -21,6 +21,8 @@ import type { CheckoutFormData } from "@/types/cart";
 import withErrorBoundary from "@/lib/withErrorBoundary";
 import { formatMoneyValue, parseMoneyValue } from "@/lib/pricing";
 import { getCheckoutErrors, normalizeCheckoutForm, type CheckoutErrors } from "@/lib/checkout-validation";
+import { useCartAvailability } from '@/hooks/use-cart-availability';
+import CartAvailabilityNotice from '@/components/CartAvailabilityNotice';
 
 // Astro-compatible CheckoutSteps (inline, no react-router)
 function CheckoutSteps({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
@@ -109,6 +111,7 @@ type ShippingOption = {
 };
 
 function CheckoutIsland() {
+  const availability = useCartAvailability();
   const defaultForm: CheckoutFormData = {
     firstName: "",
     lastName: "",
@@ -327,6 +330,7 @@ function CheckoutIsland() {
       return;
     }
     if (cart.length === 0) { toast.error("Your cart is empty"); return; }
+    if (availability.blocked) return;
     if (form.fulfillmentMethod === "delivery" && !form.shippingOptionToken) {
       toast.error("Please choose a delivery option.");
       return;
@@ -353,6 +357,7 @@ function CheckoutIsland() {
     <>
       <section className="container mx-auto px-4 lg:px-8 pt-16 md:pt-24 pb-4 md:pb-6">
         <CheckoutSteps currentStep={2} />
+        <CartAvailabilityNotice state={availability} />
       </section>
 
       <section className="container mx-auto px-4 lg:px-8 pb-20 md:pb-28">
@@ -690,7 +695,7 @@ function CheckoutIsland() {
 
               <button
                 type="submit"
-                disabled={isSubmitting || !isHydrated || cart.length === 0 || (form.fulfillmentMethod === "delivery" && !form.shippingOptionToken)}
+                disabled={availability.blocked || isSubmitting || !isHydrated || cart.length === 0 || (form.fulfillmentMethod === "delivery" && !form.shippingOptionToken)}
                 className="w-full mt-8 h-16 bg-orange text-white inline-flex items-center justify-center text-sm font-semibold hover:bg-orange-hover disabled:opacity-50 transition-colors"
                 aria-label="Proceed to payment"
               >

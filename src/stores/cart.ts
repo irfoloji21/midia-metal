@@ -11,7 +11,8 @@
  * - localStorage persistence
  */
 import { atom, computed } from 'nanostores';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, ApiError } from '@/lib/api';
+import { resolveSelectedVariantRecord } from '@/lib/variants';
 import { clampQuantityToStock, getAvailableStock } from '@/lib/stock';
 import { formatMoneyValue, resolveSelectedVariantUnitPrice } from '@/lib/pricing';
 
@@ -43,6 +44,42 @@ function loadCoupon(): AppliedCoupon | null {
 export const $cart = atom<CartItem[]>(loadCart());
 export const $coupon = atom<AppliedCoupon | null>(loadCoupon());
 export const $isBusiness = atom<boolean>(false);
+
+export const $cartIssues = computed($cart, items => items.flatMap(item => {
+  if (item.availability_error) return [item.availability_error];
+  if (item.available_stock != null && item.qty > item.available_stock) {
+    return [item.available_stock <= 0 ? `${item.name} is out of stock. Remove it from your basket to continue.` : `Only ${item.available_stock} of ${item.name} are available. Reduce the quantity to continue.`];
+  }
+  return [];
+}));
+
+/** Revalidate saved basket snapshots without dropping items or changing requested quantities. */
+export async function refreshCartAvailability() {
+  const ids = [...new Set($cart.get().map(item => String(item.product_id)))];
+  const products = new Map(await Promise.all(ids.map(async id => {
+    try {
+      return [id, await apiFetch<Record<string, any>>(`/v1/products/${encodeURIComponent(id)}`)] as const;
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return [id, null] as const;
+      throw error;
+    }
+  })));
+  const refreshed = $cart.get().map(item => {
+    if (!products.has(String(item.product_id))) return item;
+    const product = products.get(String(item.product_id));
+    const selectionMissing = product && Object.keys(item.selected_variants || {}).length > 0 && !resolveSelectedVariantRecord(product, item.selected_variants);
+    if (!product || product.price_on_request || selectionMissing) return { ...item, available_stock: 0, availability_error: `${item.name} is no longer available to order. Remove it from your basket and choose an available product.` };
+    return {
+      ...item,
+      price: formatMoneyValue(resolveSelectedVariantUnitPrice(product.price, item.selected_variants, product) ?? product.price),
+      track_stock: product.track_stock,
+      stock_quantity: product.stock_quantity,
+      available_stock: getAvailableStock({ ...product, selected_variants: item.selected_variants }),
+      availability_error: undefined,
+    };
+  });
+  if (JSON.stringify(refreshed) !== JSON.stringify($cart.get())) $cart.set(refreshed);
+}
 
 // Persist cart to localStorage
 $cart.subscribe((items) => {

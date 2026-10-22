@@ -20,6 +20,8 @@ import { $customer, $isAuthLoading, $authError } from "@/stores/auth";
 import CustomerSessionError from "@/components/CustomerSessionError";
 import { formatMoneyValue, parseMoneyValue } from "@/lib/pricing";
 import { getCheckoutErrors, normalizeCheckoutForm } from "@/lib/checkout-validation";
+import { useCartAvailability } from '@/hooks/use-cart-availability';
+import CartAvailabilityNotice from '@/components/CartAvailabilityNotice';
 
 // Stripe
 import { loadStripe } from "@stripe/stripe-js";
@@ -211,6 +213,7 @@ function StripeCardForm({ totalFormatted, saveCard, setSaveCard, showSaveCheckbo
 
 // ─── Main PaymentIsland ─────────────────────────────────────────────────────────
 function PaymentIsland() {
+  const availability = useCartAvailability();
   // Read checkout form from sessionStorage (replaces React Router location.state)
   const [checkoutForm, setCheckoutForm] = useState<any>(null);
 
@@ -250,6 +253,7 @@ function PaymentIsland() {
   const [method, setMethod] = useState<"card" | "bank">("card");
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loadingIntent, setLoadingIntent] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveCard, setSaveCard] = useState(false);
   const [savedCards, setSavedCards] = useState<any[]>([]);
@@ -357,12 +361,14 @@ function PaymentIsland() {
         return undefined;
       }
     } catch { /* An incomplete stored session is replaced on the next attempt. */ }
+    if (availability.blocked) { setClientSecret(null); return undefined; }
     setConfirmedPayment(null);
     if (method !== "card" || totalForOrder <= 0 || (fulfilmentMethod === "delivery" && !shippingOptionToken)) {
       setClientSecret(null); return undefined;
     }
     let cancelled = false;
     setLoadingIntent(true);
+    setPaymentError('');
     setClientSecret(null);
     getPaymentSetup().then(async (setup) => {
       if (cancelled) return;
@@ -377,11 +383,12 @@ function PaymentIsland() {
     }).catch((error: unknown) => {
       if (!cancelled) {
         setClientSecret(null);
+        setPaymentError(error instanceof Error ? error.message : 'Unable to initialise payment. Please try again.');
         toast.error(error instanceof Error ? error.message : "Unable to initialise payment.");
       }
     }).finally(() => { if (!cancelled) setLoadingIntent(false); });
     return () => { cancelled = true; };
-  }, [sessionKey, authReady]);
+  }, [sessionKey, authReady, availability.blocked]);
 
   const createOrder = async (paymentIntentId: string) => {
     const session = paymentSession.current;
@@ -493,7 +500,9 @@ function PaymentIsland() {
               </div>
             )}
             {/* Card: Stripe Elements */}
-            {method === "card" && !confirmedPayment && (
+            {!confirmedPayment && <CartAvailabilityNotice state={availability} />}
+            {paymentError && <p role="alert" className="mb-4 text-sm text-red-700">{paymentError}</p>}
+            {method === "card" && !confirmedPayment && !availability.blocked && (
               <div className="border border-[#cad4e4] bg-[#f0f3f7] p-6 md:p-8">
                 <h3 className="font-sans text-[24px] md:text-[30px] leading-none font-semibold text-primary mb-6 flex items-center gap-3">
                   <Lock className="w-5 h-5 text-orange" /> Card Details
@@ -579,7 +588,7 @@ function PaymentIsland() {
               </div>
             )}
 
-            {method === "bank" && !confirmedPayment && (
+            {method === "bank" && !confirmedPayment && !availability.blocked && (
               <form onSubmit={handleNonCardSubmit}>
                 <div className="border border-[#cad4e4] bg-[#f0f3f7] p-6 mb-6">
                   <h3 className="font-semibold text-primary mb-3">Bank Transfer via Stripe</h3>

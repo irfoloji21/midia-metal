@@ -20,6 +20,7 @@ export interface CartItem {
   track_stock?: boolean;
   stock_quantity?: number | null;
   available_stock?: number | null;
+  availability_error?: string;
 }
 
 /** A successfully applied coupon. */

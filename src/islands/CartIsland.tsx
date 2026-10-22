@@ -28,6 +28,8 @@ import {
 } from '@/stores/cart';
 import withErrorBoundary from '@/lib/withErrorBoundary';
 import { normalizeMediaUrl } from '@/lib/media';
+import { useCartAvailability } from '@/hooks/use-cart-availability';
+import CartAvailabilityNotice from '@/components/CartAvailabilityNotice';
 
 // Astro-compatible CheckoutSteps (inline, no react-router)
 function CheckoutSteps({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
@@ -97,6 +99,7 @@ function CheckoutSteps({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
 }
 
 function CartIsland() {
+  const availability = useCartAvailability();
   const cart = useStore($cart);
   const subtotal = useStore($subtotal);
   const coupon = useStore($coupon);
@@ -123,6 +126,7 @@ function CartIsland() {
     <>
       <section className="container mx-auto px-4 lg:px-8 pt-16 md:pt-24 pb-4 md:pb-6">
         <CheckoutSteps currentStep={1} />
+        <CartAvailabilityNotice state={availability} />
       </section>
 
       <section className="container mx-auto px-4 lg:px-8 pb-20 md:pb-28">
@@ -333,6 +337,8 @@ function CartIsland() {
           </div>
           <a
             href="/checkout"
+            aria-disabled={availability.blocked}
+            onClick={(event) => { if (availability.blocked) event.preventDefault(); }}
             className="w-full mt-8 h-16 bg-orange text-white inline-flex items-center justify-center text-sm font-semibold hover:bg-orange-hover transition-colors"
           >
             Proceed to checkout
