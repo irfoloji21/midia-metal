@@ -35,6 +35,8 @@ export default function HeaderIsland({ initialSettings }: HeaderIslandProps) {
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const searchPanelRef = useRef<HTMLDivElement>(null);
   useModalFocus(isSearchOpen, searchPanelRef, () => setIsSearchOpen(false));
+  const infoPanelRef = useRef<HTMLDivElement>(null);
+  useModalFocus(isInfoSidebarOpen, infoPanelRef, () => setIsInfoSidebarOpen(false));
 
   useEffect(() => {
     setIsHydrated(true);
@@ -48,14 +50,6 @@ export default function HeaderIsland({ initialSettings }: HeaderIslandProps) {
     }
   }, [isSearchOpen]);
 
-  useEffect(() => {
-    if (!isInfoSidebarOpen) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isInfoSidebarOpen]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,13 +206,14 @@ export default function HeaderIsland({ initialSettings }: HeaderIslandProps) {
 
       {/* Desktop Info Sidebar */}
       {isInfoSidebarOpen && (
-        <div className="fixed inset-0 z-[70] hidden lg:block" role="dialog" aria-modal="true">
+        <div ref={infoPanelRef} tabIndex={-1} className="fixed inset-0 z-[70]" role="dialog" aria-modal="true" aria-label="Information">
           <button
             aria-label="Close information sidebar backdrop"
+            tabIndex={-1}
             className="absolute inset-0 bg-[#0b1530]/30"
             onClick={() => setIsInfoSidebarOpen(false)}
           />
-          <aside className="absolute right-0 top-0 h-full w-[420px] bg-[#f3f5f8] border-l border-[#d7dfeb] p-10 overflow-y-auto">
+          <aside className="absolute right-0 top-0 h-full w-[420px] max-w-full bg-[#f3f5f8] border-l border-[#d7dfeb] p-10 overflow-y-auto">
             <div className="flex items-center justify-between mb-16">
               <img src={t('site_logo', '/logo.png')} alt={`${t('site_name', 'Midia M Metal')} Logo`} width="147" height="56" className="h-14 w-auto object-contain mix-blend-multiply" />
               <button
