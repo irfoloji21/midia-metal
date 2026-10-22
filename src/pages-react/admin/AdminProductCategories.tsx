@@ -196,7 +196,7 @@ export default function AdminProductCategories() {
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                                     />
                                 </div>
-                                <div className="col-span-2 flex items-center">
+                                <label className="col-span-2 flex items-center">
                                     <input
                                         type="checkbox"
                                         checked={currentCategory.active}
@@ -204,7 +204,7 @@ export default function AdminProductCategories() {
                                         className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                     />
                                     <span className="ml-2 text-sm text-gray-600">Active</span>
-                                </div>
+                                </label>
                             </div>
                             <div className="pt-4 border-t flex justify-end gap-3 sticky bottom-0 bg-white shadow-[0_-5px_15px_-5px_rgba(0,0,0,0.05)] pb-4">
                                 <button
