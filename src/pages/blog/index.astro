@@ -29,14 +29,17 @@ const settings = await fetchSettings();
 const requestedPage = Number(Astro.url.searchParams.get('page') || 1);
 const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
 const selectedCategories = [...new Set(Astro.url.searchParams.getAll('category').filter(value => value.trim()))];
+const search = (Astro.url.searchParams.get('search') || '').trim();
 const blogPageUrl = (targetPage: number) => {
   const params = new URLSearchParams();
+  if (search) params.set('search', search);
   selectedCategories.forEach(category => params.append('category', category));
   if (targetPage > 1) params.set('page', String(targetPage));
   return params.size ? `/blog?${params.toString()}` : '/blog';
 };
 const canonicalPath = blogPageUrl(page);
 const apiParams = new URLSearchParams({ page: String(page) });
+if (search) apiParams.set('search', search);
 selectedCategories.forEach(category => apiParams.append('categories[]', category));
 
 let posts: any[] = [];
@@ -174,15 +177,21 @@ const itemListJsonLd = posts.length > 0
         <aside class="bg-[#f4f5f7] p-6 md:p-8 h-fit lg:sticky lg:top-28 space-y-8">
           <div>
             <h3 class="font-sans text-[16px] leading-none font-semibold text-primary mb-5">{t("blog_sidebar_search", "Search")}</h3>
-            <div class="relative">
+            <form method="get" action="/blog" class="relative">
+              {selectedCategories.map(category => <input type="hidden" name="category" value={category} />)}
               <!-- Search icon -->
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2 text-[#8a95ac]"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
               <input
                 type="text"
+                name="search"
+                value={search}
+                aria-label="Search articles"
                 placeholder="Search for article..."
                 class="w-full h-12 border border-[#d1dbe8] bg-transparent pl-12 pr-4 text-[14px] text-primary placeholder:text-[#9aa6bc] outline-none"
               />
-            </div>
+              <button type="submit" class="mt-3 text-sm font-semibold text-primary underline">Search articles</button>
+              {search && <a href="/blog" class="ml-4 text-sm text-primary underline">Clear search</a>}
+            </form>
           </div>
 
           <div>
@@ -191,6 +200,7 @@ const itemListJsonLd = posts.length > 0
               {categories.filter(category => category.category).map((category) => (
                 <li>
                   <form method="get" action="/blog">
+                    {search && <input type="hidden" name="search" value={search} />}
                     {(selectedCategories.includes(category.category)
                       ? selectedCategories.filter(value => value !== category.category)
                       : [...selectedCategories, category.category]
