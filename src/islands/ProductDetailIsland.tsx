@@ -11,7 +11,8 @@ import {
   Facebook,
   Twitter,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useModalFocus } from '@/hooks/use-modal-focus';
 import { apiFetch, ApiError } from "@/lib/api";
 import { useReviewEligibility } from "@/lib/use-review-eligibility";
 import { normalizeMediaUrl } from "@/lib/media";
@@ -255,6 +256,8 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const lightboxRef = useRef<HTMLDivElement>(null);
+  useModalFocus(isLightboxOpen, lightboxRef, () => setIsLightboxOpen(false));
 
   const { status: canReviewStatus, retry: retryReviewEligibility, markReviewed } = useReviewEligibility(id);
 
@@ -1267,6 +1270,17 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
         isLightboxOpen && (
           <div
             className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 md:p-12 cursor-pointer"
+            ref={lightboxRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Product gallery"
+            tabIndex={-1}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                event.preventDefault();
+                setLightboxIndex(index => (index + (event.key === 'ArrowLeft' ? -1 : 1) + allImages.length) % allImages.length);
+              }
+            }}
             onClick={() => setIsLightboxOpen(false)}
           >
             <button
