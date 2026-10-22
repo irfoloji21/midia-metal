@@ -47,6 +47,11 @@
       "id": "NEW-009",
       "resolution": "Associate all login/register labels with unique input IDs and supply field names and appropriate autocomplete hints.",
       "verification": "Edge verified all 7 field labels, click-to-focus, keyboard navigation and 390px layout."
+    },
+    {
+      "id": "QA-001",
+      "resolution": "Refresh dashboard, authenticated checkout, Stripe bank-transfer and signed order-confirmation fixtures. Preserve guest/customer 422, 500 and network failure coverage; verify retrying the same payment session, pending-to-paid refresh, URL token removal and untrusted-link rejection. Replace the Unix-only runner with disposable seeded SQLite and isolated PHP/Astro servers. Crawl every discovered route in a fresh browser context, including authenticated admin routes and the expected 404 page.",
+      "verification": "27 Playwright tests passed without skips or retries, including 77 routes with no unexpected runtime errors. A narrowly scoped Edge exception requires an observed successful 204 CSRF response; the payment route also checks that the CSRF cookie was issued."
     }
   ],
   "finalVerification": {
@@ -74,7 +79,30 @@
     "browser": "Focused Edge regressions against isolated database; 320–1280px for product tables, desktop/mobile for admin and auth forms",
     "limits": [
       "No real payments, shipping requests or email delivery performed.",
-      "Legacy Playwright fixture/expectation maintenance (QA-001) is separate from these nine fixes; the legacy suite was not rerun in this remediation."
-    ]
+      "E2E uses a disposable database populated by DatabaseSeeder. Stripe payment endpoints are mocked; the suite does not make real Stripe payments. External font CSS is stubbed to avoid third-party network dependencies."
+    ],
+    "playwright": {
+      "tests": 27,
+      "routes": 77,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "retries": 0,
+      "browser": "Headless Microsoft Edge",
+      "passed": true,
+      "command": "npm run test:e2e",
+      "prerequisites": "Installed npm and Composer dependencies; PHP with pdo_sqlite, sqlite3 and fileinfo. Edge is used by default on Windows, bundled Playwright Chromium elsewhere; PLAYWRIGHT_CHANNEL and PHP_BINARY can override the executables.",
+      "artifacts": [
+        "playwright-report/index.html",
+        "output/e2e/results.json",
+        "output/e2e/astro.log",
+        "output/e2e/backend.log"
+      ]
+    },
+    "e2eLint": {
+      "scope": "tests and playwright.config.ts",
+      "errors": 0,
+      "warnings": 0
+    }
   }
 }

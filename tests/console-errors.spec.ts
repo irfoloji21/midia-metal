@@ -1,510 +1,148 @@
-import { test, expect, type Page } from '@playwright/test';
-import * as fs from 'fs';
-import * as path from 'path';
+import { test, expect, API_BASE, hydrated, seedCheckout, mockCheckoutApi } from './support/fixtures';
+import type { Page, BrowserContext, Request } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
 
-const API_ORIGIN = 'http://127.0.0.1:8000';
-const API_BASE = `${API_ORIGIN}/api/v1`;
-const ADMIN_API_BASE = `${API_ORIGIN}/api/admin`;
-const ASTRO_SERVER_LOG = '/tmp/midia-astro-playwright.log';
-const ADMIN_EMAIL = 'admin@midiametal.com';
-const ADMIN_PASSWORD = 'password';
-const CUSTOMER_EMAIL = 'asd@asd.com';
-const CUSTOMER_PASSWORD = '12345678';
-
-const STATIC_SKIP_PAGES = new Set(['/404']);
-const ADMIN_ROUTES = [
-  '/admin',
-  '/admin/dashboard',
-  '/admin/products',
-  '/admin/product-categories',
-  '/admin/blog',
-  '/admin/portfolio',
-  '/admin/portfolio-categories',
-  '/admin/orders',
-  '/admin/quotes',
-  '/admin/coupons',
-  '/admin/messages',
-  '/admin/product-reviews',
-  '/admin/customers',
-  '/admin/faq',
-  '/admin/services',
-  '/admin/settings',
-  '/admin/login',
-  '/admin/forgot-password',
-  '/admin/reset-password',
+const adminRoutes = [
+  '/admin', '/admin/dashboard', '/admin/products', '/admin/product-categories', '/admin/blog',
+  '/admin/portfolio', '/admin/portfolio-categories', '/admin/orders', '/admin/quotes', '/admin/coupons',
+  '/admin/messages', '/admin/product-reviews', '/admin/customers', '/admin/faq', '/admin/services',
+  '/admin/settings', '/admin/login', '/admin/forgot-password', '/admin/reset-password',
 ];
+const publicAdminRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-password'];
+type CatalogItem = { id: number; slug?: string; name?: string };
 
-const CUSTOMER_AUTH_ROUTES = ['/account'];
-const CART_REQUIRED_ROUTES = ['/cart', '/checkout'];
-const CHECKOUT_STATE_ROUTES = ['/payment', '/thank-you'];
+function staticRoutes(directory = path.join(process.cwd(), 'src/pages'), prefix = ''): string[] {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
+    if (entry.name.startsWith('[')) return [];
+    if (entry.isDirectory()) return staticRoutes(path.join(directory, entry.name), `${prefix}/${entry.name}`);
+    if (!entry.name.endsWith('.astro')) return [];
+    return [entry.name === 'index.astro' ? prefix || '/' : `${prefix}/${entry.name.slice(0, -6)}`];
+  });
+}
 
-const ALLOWED_NON_200 = new Map<string, number[]>([
-  ['/admin/reset-password', [200, 400, 422]],
-  ['/reset-password', [200, 400, 422]],
-]);
-
-const IGNORE_CONSOLE_PATTERNS = [
-  'Failed to load resource: the server responded with a status of 401',
-  'WebSocket connection to \'ws://127.0.0.1:4323/\' failed',
-  '/api/v1/customer/me',
-  '/api/admin/me',
-  'TypeError: Failed to fetch',
-  'AdminDashboard.tsx',
-  '401 (Unauthorized)',
-  'Stripe',
-  'js.stripe.com',
-  'React Router Future Flag Warning',
-];
-
-const IGNORE_REQUEST_FAILURE_PATTERNS = [
-  'js.stripe.com',
-  'm.stripe.network',
-  'fonts.gstatic.com',
-  'fonts.googleapis.com',
-  'google-analytics',
-  '/sanctum/csrf-cookie - net::ERR_ABORTED',
-  '/api/admin/dashboard - net::ERR_ABORTED',
-  '/api/admin/stats/top-products - net::ERR_ABORTED',
-];
-
-const IGNORE_ASTRO_LOG_PATTERNS = [
-  '[vite] connecting',
-  '[vite] connected',
-  'The server is being restarted or closed. Request is outdated',
-  'Re-optimizing dependencies because vite config has changed',
-  'ready in',
-  'Local',
-  'Network',
-  'watching for file changes',
-  'Enabling sessions with filesystem storage',
-  'Syncing content',
-  'Synced content',
-  'Generated',
-];
-
-type CatalogItem = { slug?: string | null; id?: number | string | null };
-type ProductRecord = { id: number | string; slug?: string | null; name?: string; price?: string | number; image?: string | null; selected_variants?: Record<string, any> | null };
-type SessionCookie = { name: string; value: string };
-
-let cachedAdminCookies: SessionCookie[] | null = null;
-let cachedCustomerCookies: SessionCookie[] | null = null;
-
-function discoverStaticPages(): string[] {
-  const pagesDir = path.join(process.cwd(), 'src', 'pages');
-  const pages: string[] = [];
-
-  function walk(dir: string, basePath = '') {
-    const entries = fs.readdirSync(dir);
-
-    for (const entry of entries) {
-      const filePath = path.join(dir, entry);
-      const stat = fs.statSync(filePath);
-
-      if (stat.isDirectory()) {
-        if (!entry.startsWith('[')) {
-          walk(filePath, `${basePath}/${entry}`);
-        }
-        continue;
-      }
-
-      if (!entry.endsWith('.astro') || entry.startsWith('[')) {
-        continue;
-      }
-
-      const route = entry === 'index.astro'
-        ? (basePath || '/')
-        : `${basePath}/${entry.replace(/\.astro$/, '')}`;
-
-      if (!STATIC_SKIP_PAGES.has(route)) {
-        pages.push(route);
-      }
-    }
+async function catalog(endpoint: string): Promise<CatalogItem[]> {
+  const items: CatalogItem[] = [];
+  for (let page = 1; page <= 100; page++) {
+    const response = await fetch(`${API_BASE}${endpoint}?page=${page}`);
+    expect(response.ok, endpoint).toBe(true);
+    const payload = await response.json();
+    items.push(...(Array.isArray(payload) ? payload : payload.data));
+    if (!payload.next_page_url) return items;
   }
-
-  walk(pagesDir);
-  return [...new Set(pages)].sort();
+  throw new Error(`Pagination did not terminate: ${endpoint}`);
 }
 
-async function fetchJson<T>(endpoint: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${endpoint}`);
-  expect(response.ok, `Failed to fetch ${endpoint}: ${response.status}`).toBeTruthy();
-  return response.json() as Promise<T>;
+async function login(kind: 'admin' | 'customer') {
+  const url = kind === 'admin' ? `${API_BASE.replace('/v1', '/admin')}/login` : `${API_BASE}/customer/login`;
+  const response = await fetch(url, {
+    method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(kind === 'admin'
+      ? { email: 'admin@midiametal.com', password: 'password' }
+      : { email: 'asd@asd.com', password: '12345678' }),
+  });
+  expect(response.ok, `Seeded ${kind} login: ${response.status}`).toBe(true);
+  const cookies = response.headers.getSetCookie().map(header => {
+    const pair = header.split(';')[0];
+    const separator = pair.indexOf('=');
+    return { name: pair.slice(0, separator), value: pair.slice(separator + 1), domain: '127.0.0.1', path: '/', httpOnly: true };
+  }).filter(cookie => cookie.name === `${kind}_token`);
+  expect(cookies).toHaveLength(1);
+  return cookies;
 }
 
-async function fetchAllPaginated<T extends CatalogItem>(endpoint: string): Promise<T[]> {
-  const results: T[] = [];
-  let page = 1;
-
-  while (true) {
-    const payload = await fetchJson<{ data?: T[]; next_page_url?: string | null }>(`${endpoint}${endpoint.includes('?') ? '&' : '?'}page=${page}`);
-    results.push(...(Array.isArray(payload.data) ? payload.data : []));
-    if (!payload.next_page_url) {
-      break;
-    }
-    page += 1;
-  }
-
-  return results;
-}
-
-async function discoverAllRoutes() {
-  const staticPages = discoverStaticPages();
-
-  const [products, categories, blogPayload, services, portfolio] = await Promise.all([
-    fetchAllPaginated<ProductRecord>('/products'),
-    fetchJson<Array<{ slug?: string | null }>>('/product-categories'),
-    fetchJson<{ data?: Array<{ slug?: string | null }> }>('/blog'),
-    fetchJson<Array<{ slug?: string | null }>>('/services'),
-    fetchJson<Array<{ slug?: string | null }>>('/portfolio'),
-  ]);
-
-  const dynamicRoutes = [
-    ...products.map((product) => `/shop/${product.slug || product.id}`),
-    ...categories.map((category) => `/shop/category/${category.slug}`).filter((route) => !route.endsWith('/undefined')),
-    ...((blogPayload.data || []).map((post) => `/blog/${post.slug}`)).filter((route) => !route.endsWith('/undefined')),
-    ...services.map((service) => `/services/${service.slug}`).filter((route) => !route.endsWith('/undefined')),
-    ...portfolio.map((item) => `/portfolio/${item.slug}`).filter((route) => !route.endsWith('/undefined')),
-  ];
-
-  const routes = [...new Set([...staticPages, ...dynamicRoutes, ...ADMIN_ROUTES])].sort();
-
-  const firstPurchasableProduct = products.find((product) => product.slug && product.image !== undefined) ?? products[0];
-  expect(firstPurchasableProduct, 'At least one product is required for cart-dependent route tests').toBeTruthy();
-
-  return {
-    routes,
-    firstProduct: firstPurchasableProduct!,
-  };
-}
-
-async function captureIssues(page: Page) {
+function captureIssues(page: Page) {
   const issues: string[] = [];
-
-  await page.addInitScript(() => {
-    const originalError = console.error;
-    const originalWarn = console.warn;
-
-    // @ts-expect-error test-only field
-    window.__capturedConsoleIssues = [];
-
-    const pushIssue = (type: string, args: unknown[]) => {
-      const text = args.map((arg) => {
-        if (typeof arg === 'string') return arg;
-        try {
-          return JSON.stringify(arg);
-        } catch {
-          return String(arg);
-        }
-      }).join(' ');
-
-      // @ts-expect-error test-only field
-      window.__capturedConsoleIssues.push({ type, text });
-    };
-
-    console.error = (...args) => {
-      pushIssue('ERROR', args);
-      originalError.apply(console, args);
-    };
-
-    console.warn = (...args) => {
-      pushIssue('WARN', args);
-      originalWarn.apply(console, args);
-    };
+  const responses = new WeakMap<Request, number>();
+  page.on('pageerror', error => issues.push(`Runtime: ${error.message}`));
+  page.on('console', message => {
+    if (!['error', 'warning'].includes(message.type())) return;
+    const text = message.text();
+    const url = message.location().url;
+    // Anonymous session probes and the deliberate 404 page are expected responses.
+    if (text.includes('status of 401') && /\/api\/(v1\/customer|admin)\/me$/.test(url)) return;
+    if (text.includes('status of 404') && /\/404$/.test(url)) return;
+    if (text.startsWith('⚠️ React Router Future Flag Warning:')) return;
+    issues.push(`Console (${url}): ${text}`);
   });
-
-  page.on('console', (msg) => {
-    const type = msg.type().toUpperCase();
-    const text = msg.text();
-    if (type === 'ERROR' || type === 'WARNING' || text.includes('Hydration') || text.includes('did not match')) {
-      issues.push(`[CONSOLE:${type}] ${text}`);
+  page.on('requestfailed', request => {
+    // Edge can report ERR_ABORTED after receiving a successful empty CSRF response.
+    // Require the observed 204; actual bootstrap/network failures must still fail the test.
+    if (request.method() === 'GET' && new URL(request.url()).pathname === '/sanctum/csrf-cookie'
+      && responses.get(request) === 204 && request.failure()?.errorText === 'net::ERR_ABORTED') return;
+    issues.push(`Request: ${request.url()} ${request.failure()?.errorText}`);
+  });
+  page.on('response', response => {
+    responses.set(response.request(), response.status());
+    if (response.status() >= 500 && new URL(response.url()).hostname === '127.0.0.1') {
+      issues.push(`HTTP ${response.status()}: ${response.url()}`);
     }
   });
-
-  page.on('pageerror', (error) => {
-    issues.push(`[PAGE_ERROR] ${error.message}`);
-  });
-
-  page.on('requestfailed', (request) => {
-    const failure = request.failure();
-    const failureText = failure?.errorText || 'unknown';
-    issues.push(`[REQUEST_FAILED] ${request.method()} ${request.url()} - ${failureText}`);
-  });
-
   return issues;
 }
 
-function shouldIgnoreIssue(issue: string) {
-  if (issue.includes('Hydration') || issue.includes('did not match') || issue.includes('server rendered HTML')) {
-    return false;
-  }
-
-  if (issue.startsWith('[REQUEST_FAILED]')) {
-    if (issue.includes(' - net::ERR_ABORTED') && issue.includes('http://127.0.0.1:4323/src/')) {
-      return true;
-    }
-
-    return IGNORE_REQUEST_FAILURE_PATTERNS.some((pattern) => issue.includes(pattern));
-  }
-
-  return IGNORE_CONSOLE_PATTERNS.some((pattern) => issue.includes(pattern));
-}
-
-function hasTransientViteOptimizeIssue(issues: string[]) {
-  return issues.some((issue) =>
-    issue.includes('Outdated Optimize Dep') || issue.includes('/node_modules/.vite/deps/'),
-  );
-}
-
-async function collectIssues(page: Page, issues: string[]) {
-  const injected = await page.evaluate(() => {
-    // @ts-expect-error test-only field
-    return window.__capturedConsoleIssues || [];
-  }) as Array<{ type: string; text: string }>;
-
-  for (const issue of injected) {
-    issues.push(`[INJECTED:${issue.type}] ${issue.text}`);
-  }
-
-  return [...new Set(issues)].filter((issue) => !shouldIgnoreIssue(issue));
-}
-
-function getAstroServerLogIssues() {
-  if (!fs.existsSync(ASTRO_SERVER_LOG)) {
-    return [];
-  }
-
-  const contents = fs.readFileSync(ASTRO_SERVER_LOG, 'utf8');
-  return contents
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .filter((line) => /error|exception|failed|\[500\]/i.test(line))
-    .filter((line) => !IGNORE_ASTRO_LOG_PATTERNS.some((pattern) => line.includes(pattern)));
-}
-
-async function loginViaApi(endpoint: '/customer/login' | '/admin/login', credentials: { email: string; password: string }) {
-  const baseUrl = endpoint.startsWith('/admin/') ? ADMIN_API_BASE : API_BASE;
-  const normalizedEndpoint = endpoint.startsWith('/admin/')
-    ? endpoint.replace('/admin', '')
-    : endpoint;
-
-  const response = await fetch(`${baseUrl}${normalizedEndpoint}`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-    body: JSON.stringify(credentials),
-  });
-
-  expect(response.ok, `Failed API login for ${endpoint}: ${response.status}`).toBeTruthy();
-
-  const setCookie = response.headers.getSetCookie?.() ?? [];
-  return setCookie
-    .map((cookieHeader) => {
-      const [pair] = cookieHeader.split(';');
-      const separator = pair.indexOf('=');
-      return {
-        name: pair.slice(0, separator),
-        value: pair.slice(separator + 1),
-      };
-    })
-    .filter((cookie) => cookie.name === 'customer_token' || cookie.name === 'admin_token');
-}
-
-async function ensureAdminLoggedIn(page: Page) {
-  if (!cachedAdminCookies) {
-    cachedAdminCookies = await loginViaApi('/admin/login', {
-      email: ADMIN_EMAIL,
-      password: ADMIN_PASSWORD,
+test('all discovered public and admin routes render without runtime errors', async ({ browser }, testInfo) => {
+  test.setTimeout(600000);
+  const [products, categories, posts, services, portfolio] = await Promise.all([
+    catalog('/products'), catalog('/product-categories'), catalog('/blog'), catalog('/services'), catalog('/portfolio'),
+  ]);
+  expect(products.length).toBeGreaterThan(0);
+  const productResponse = await fetch(`${API_BASE}/products/${products[0].id}`);
+  expect(productResponse.ok).toBe(true);
+  const firstProduct = await productResponse.json();
+  const routes = [...new Set([
+    ...staticRoutes(), ...adminRoutes,
+    ...products.map(item => `/shop/${item.slug || item.id}`),
+    ...categories.map(item => `/shop/category/${item.slug}`),
+    ...posts.map(item => `/blog/${item.slug}`),
+    ...services.map(item => `/services/${item.slug}`),
+    ...portfolio.map(item => `/portfolio/${item.slug}`),
+  ])].sort();
+  const adminCookies = await login('admin');
+  const customerCookies = await login('customer');
+  const results: { route: string; status: number; issues: string[] }[] = [];
+  for (const route of routes) {
+    await test.step(route, async () => {
+      // A fresh context prevents listeners, init scripts and mock routes leaking between pages.
+      const context: BrowserContext = await browser.newContext();
+      await context.route('https://fonts.googleapis.com/**', intercepted => intercepted.fulfill({ contentType: 'text/css', body: '' }));
+      if (adminRoutes.includes(route) && !publicAdminRoutes.includes(route)) await context.addCookies(adminCookies);
+      if (route === '/account') await context.addCookies(customerCookies);
+      const page = await context.newPage();
+      const issues = captureIssues(page);
+      try {
+        if (['/cart', '/checkout'].includes(route)) {
+          await page.addInitScript(product => {
+            localStorage.setItem('midia_cart', JSON.stringify([{
+              id: String(product.id), product_id: product.id, name: product.name, price: product.price,
+              image: product.image || '', qty: 1, selected_variants: {},
+              track_stock: product.track_stock, stock_quantity: product.stock_quantity,
+              available_stock: product.track_stock ? product.stock_quantity : null,
+            }]));
+          }, firstProduct);
+        }
+        if (route === '/payment') {
+          await seedCheckout(page);
+          await mockCheckoutApi(page);
+        }
+        const target = route.endsWith('/reset-password') ? `${route}?token=e2e-display-token&email=reset%40example.test` : route;
+        const response = await page.goto(`http://127.0.0.1:4323${target}`, { waitUntil: 'networkidle' });
+        await hydrated(page);
+        if (route === '/payment') {
+          expect((await context.cookies()).some(cookie => cookie.name === 'XSRF-TOKEN' && cookie.value), 'CSRF cookie was issued').toBe(true);
+        }
+        const status = response?.status() || 0;
+        results.push({ route, status, issues });
+        expect.soft(status, route).toBe(route === '/404' ? 404 : 200);
+        expect.soft(new URL(page.url()).pathname, `${route} unexpectedly redirected`).toBe(route);
+        await expect.soft(page.locator('body')).not.toBeEmpty();
+        await expect.soft(page.getByText('Coming Soon', { exact: true })).toHaveCount(0);
+        expect.soft(issues, `${route}: ${issues.join('\n')}`).toEqual([]);
+      } finally { await context.close(); }
     });
   }
-
-  await page.context().addCookies(cachedAdminCookies.map((cookie) => ({
-    ...cookie,
-    domain: '127.0.0.1',
-    path: '/',
-    httpOnly: true,
-    sameSite: 'Lax' as const,
-    secure: false,
-  })));
-}
-
-async function ensureCustomerLoggedIn(page: Page) {
-  if (!cachedCustomerCookies) {
-    cachedCustomerCookies = await loginViaApi('/customer/login', {
-      email: CUSTOMER_EMAIL,
-      password: CUSTOMER_PASSWORD,
-    });
-  }
-
-  await page.context().addCookies(cachedCustomerCookies.map((cookie) => ({
-    ...cookie,
-    domain: '127.0.0.1',
-    path: '/',
-    httpOnly: true,
-    sameSite: 'Lax' as const,
-    secure: false,
-  })));
-}
-
-async function seedCart(page: Page, product: ProductRecord) {
-  const slugOrId = product.slug || String(product.id);
-  const detail = await fetchJson<any>(`/products/${slugOrId}`);
-  const variantEntries = Object.entries(detail.selected_variants || {});
-  const variantId = variantEntries.length > 0
-    ? `-${variantEntries.map(([key, value]: [string, any]) => `${key}-${value.value}`).join('-')}`
-    : '';
-
-  const cartItem = {
-    id: `${detail.id}${variantId}`,
-    product_id: detail.id,
-    name: detail.name,
-    price: detail.price,
-    qty: 1,
-    image: detail.image || '',
-    selected_variants: detail.selected_variants || {},
-    track_stock: detail.track_stock,
-    stock_quantity: detail.stock_quantity ?? null,
-    available_stock: detail.track_stock ? (detail.stock_quantity ?? 0) : null,
-  };
-
-  await page.addInitScript((item) => {
-    localStorage.setItem('midia_cart', JSON.stringify([item]));
-    localStorage.removeItem('midia_coupon');
-  }, cartItem);
-}
-
-async function seedCheckoutState(page: Page) {
-  await page.addInitScript(() => {
-    sessionStorage.setItem('checkoutForm', JSON.stringify({
-      firstName: 'Playwright',
-      lastName: 'Tester',
-      phone: '07123456789',
-      email: 'asd@asd.com',
-      company: '',
-      companyVat: '',
-      fulfillmentMethod: 'click_collect',
-      shipping_address: '1 Test Street',
-      shipping_city: 'London',
-      shipping_postcode: 'E1 6AN',
-      shipping_county: '',
-      shipping_country: 'United Kingdom',
-      billingSameAsShipping: true,
-      address: '1 Test Street',
-      city: 'London',
-      postcode: 'E1 6AN',
-      county: '',
-      country: 'United Kingdom',
-      notes: '',
-      shippingOptionToken: '',
-      selectedShippingOption: null,
-    }));
-
-    sessionStorage.setItem('lastOrder', JSON.stringify({
-      orderDetails: {
-        orderNumber: '#PW-1001',
-        method: 'Card',
-        total: '£10.00',
-        items: [{ name: 'Playwright Product', qty: 1 }],
-      },
-    }));
-  });
-}
-
-async function prepareRouteState(page: Page, route: string, product: ProductRecord) {
-  if (ADMIN_ROUTES.includes(route) && route !== '/admin/login' && route !== '/admin/forgot-password' && route !== '/admin/reset-password') {
-    await ensureAdminLoggedIn(page);
-    return;
-  }
-
-  if (CUSTOMER_AUTH_ROUTES.includes(route)) {
-    await ensureCustomerLoggedIn(page);
-    return;
-  }
-
-  if (CART_REQUIRED_ROUTES.includes(route) || CHECKOUT_STATE_ROUTES.includes(route)) {
-    await seedCart(page, product);
-  }
-
-  if (CHECKOUT_STATE_ROUTES.includes(route)) {
-    await seedCheckoutState(page);
-  }
-
-  if (route === '/payment') {
-    await page.route('**/api/v1/settings', async (interceptedRoute) => {
-      await interceptedRoute.fulfill({
-        status: 200,
-        json: [
-          { key: 'bank_account_name', value: 'Midia Metal Ltd' },
-          { key: 'bank_sort_code', value: '12-34-56' },
-          { key: 'bank_account_number', value: '12345678' },
-        ],
-      });
-    });
-
-    await page.route('**/api/v1/payment/intent', async (interceptedRoute) => {
-      await interceptedRoute.fulfill({
-        status: 200,
-        json: { client_secret: null },
-      });
-    });
-  }
-}
-
-async function clearBrowserState(page: Page) {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.evaluate(() => {
-    localStorage.clear();
-    sessionStorage.clear();
-  });
-  await page.goto('about:blank');
-}
-
-test.describe('Every route returns a healthy page', () => {
-  test('all discovered routes return expected status with no runtime issues', async ({ page }) => {
-    const { routes, firstProduct } = await discoverAllRoutes();
-
-    for (const route of routes) {
-      let issues = await captureIssues(page);
-      await prepareRouteState(page, route, firstProduct);
-
-      let response = await page.goto(route, { waitUntil: 'networkidle' });
-      let status = response?.status() || 0;
-      const allowedStatuses = ALLOWED_NON_200.get(route) || [200];
-
-      await page.waitForTimeout(500);
-
-      let uniqueIssues = await collectIssues(page, issues);
-
-      if (hasTransientViteOptimizeIssue(uniqueIssues)) {
-        await page.waitForTimeout(1000);
-        issues = await captureIssues(page);
-        response = await page.goto(route, { waitUntil: 'networkidle' });
-        status = response?.status() || 0;
-        await page.waitForTimeout(500);
-        uniqueIssues = await collectIssues(page, issues);
-      }
-
-      expect(
-        allowedStatuses.includes(status),
-        `${route} returned unexpected HTTP status ${status}`,
-      ).toBeTruthy();
-
-      expect(
-        uniqueIssues,
-        `${route} had runtime issues:\n${uniqueIssues.join('\n')}`,
-      ).toEqual([]);
-
-      await page.context().clearCookies();
-      await clearBrowserState(page);
-    }
-
-    const astroLogIssues = getAstroServerLogIssues();
-    expect(
-      astroLogIssues,
-      `Astro dev server reported errors:\n${astroLogIssues.join('\n')}`,
-    ).toEqual([]);
-  });
+  await testInfo.attach('route-results', { body: JSON.stringify(results, null, 2), contentType: 'application/json' });
+  const log = fs.readFileSync('output/e2e/astro.log', 'utf8');
+  const serverErrors = log.split('\n').filter(line => /\[ERROR\]|\[500\]|Unhandled|uncaught/i.test(line));
+  expect(serverErrors, 'Astro server errors').toEqual([]);
 });

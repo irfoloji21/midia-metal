@@ -1,97 +1,93 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, confirmation } from './support/fixtures';
 
-test.describe('Thank-you recovery', () => {
-  test('renders immediate sessionStorage thank-you state without calling recovery API', async ({ page }) => {
-    let confirmationRequestCount = 0;
+const credentials = { order: 'ORD-BANK-123', token: 'valid+token&value' };
+const query = new URLSearchParams(credentials).toString();
 
-    await page.route('**/api/v1/orders/confirmation?*', async (route) => {
-      confirmationRequestCount += 1;
-
-      await route.fulfill({
-        status: 200,
-        json: {
-          order_number: 'ORD-SHOULD-NOT-BE-USED',
-          created_at: '2026-04-17T12:00:00.000000Z',
-          payment_method: 'Credit / Debit Card',
-          total: 999.99,
-          items: [],
-        },
-      });
-    });
-
-    await page.addInitScript(() => {
-      window.sessionStorage.setItem('lastOrder', JSON.stringify({
-        orderDetails: {
-          orderNumber: 'ORD-SESSION-123',
-          createdAt: '2026-04-17T12:00:00.000Z',
-          method: 'Direct Bank Transfer',
-          total: '£88.50',
-          items: [
-            {
-              name: 'Session Product',
-              qty: 3,
-            },
-          ],
-        },
-      }));
-    });
-
-    await page.goto('/thank-you');
-
-    await expect(page.getByText('ORD-SESSION-123')).toBeVisible();
-    await expect(page.getByText('Session Product x 3')).toBeVisible();
-    await expect(page.getByText('£88.50')).toBeVisible();
-    expect(confirmationRequestCount).toBe(0);
+test('restores stored confirmation credentials and fetches authoritative order details', async ({ page }) => {
+  let calls = 0;
+  await page.addInitScript(value => {
+    sessionStorage.setItem('orderConfirmation', JSON.stringify(value));
+    sessionStorage.setItem('lastOrder', JSON.stringify({ orderDetails: { orderNumber: 'UNVERIFIED', total: '£999.99' } }));
+  }, credentials);
+  await page.route('**/api/v1/orders/confirmation?*', async route => {
+    calls++;
+    const params = new URL(route.request().url()).searchParams;
+    expect(Object.fromEntries(params)).toEqual(credentials);
+    await route.fulfill({ json: { ...confirmation, payment_status: 'paid' } });
   });
+  await page.goto('/thank-you');
+  await expect(page.locator('#order-number')).toHaveText('ORD-BANK-123');
+  await expect(page.locator('#order-items')).toHaveText('Steel Beam × 2');
+  await expect(page.locator('#order-total')).toHaveText('£56.50');
+  await expect(page.locator('#order-payment-status')).toHaveText('Payment received');
+  await expect(page.getByText('UNVERIFIED')).toHaveCount(0);
+  expect(calls).toBe(1);
+});
 
-  test('recovers order details from backend lookup on direct revisit', async ({ page }) => {
-    let interceptedUrl = '';
-
-    await page.route('**/api/v1/orders/confirmation?*', async (route) => {
-      interceptedUrl = route.request().url();
-
-      await route.fulfill({
-        status: 200,
-        json: {
-          order_number: 'ORD-RECOVER-123',
-          created_at: '2026-04-17T12:00:00.000000Z',
-          payment_method: 'Credit / Debit Card',
-          total: 123.45,
-          items: [
-            {
-              name: 'Recovered Product',
-              quantity: 2,
-            },
-          ],
-        },
-      });
-    });
-
-    await page.goto('/thank-you?order=ORD-RECOVER-123&token=valid-token');
-
-    await expect(page.getByText('ORD-RECOVER-123')).toBeVisible();
-    await expect(page.getByText('Recovered Product x 2')).toBeVisible();
-    await expect(page.getByText('£123.45')).toBeVisible();
-    await expect(page.getByText("We couldn't", { exact: false })).toHaveCount(0);
-    expect(interceptedUrl).toContain('order=ORD-RECOVER-123');
-    expect(interceptedUrl).toContain('token=valid-token');
-    await expect(page).toHaveURL(/\/thank-you$/);
+test('direct confirmation links remove credentials from the address bar and survive reload', async ({ page }) => {
+  let calls = 0;
+  await page.route('**/api/v1/orders/confirmation?*', async route => {
+    calls++;
+    expect(Object.fromEntries(new URL(route.request().url()).searchParams)).toEqual(credentials);
+    await route.fulfill({ json: { ...confirmation, payment_method: 'card', payment_status: 'paid' } });
   });
+  await page.goto(`/thank-you?${query}`);
+  await expect(page.locator('#order-payment-status')).toHaveText('Payment received');
+  await expect(page.locator('#payment-method')).toHaveText('Credit / Debit Card');
+  await expect(page).toHaveURL(/\/thank-you$/);
+  await page.reload();
+  await expect(page.locator('#order-number')).toHaveText('ORD-BANK-123');
+  expect(calls).toBe(2);
+  await expect(page.locator('#refresh-payment-status')).toBeHidden();
+});
 
-  test('shows explicit recovery fallback when backend lookup fails', async ({ page }) => {
-    await page.route('**/api/v1/orders/confirmation?*', async (route) => {
-      await route.fulfill({
-        status: 403,
-        json: {
-          message: 'Invalid confirmation token.',
-        },
-      });
-    });
-
-    await page.goto('/thank-you?order=ORD-RECOVER-999&token=bad-token');
-
-    await expect(page.getByText(/We couldn't (reload|find) the order details/i)).toBeVisible();
-    await expect(page.getByText('Unable to load order details.')).toBeVisible();
-    await expect(page.getByText('Unavailable')).toHaveCount(4);
+test('failed confirmation lookup shows recovery and can be retried', async ({ page }) => {
+  let calls = 0;
+  await page.route('**/api/v1/orders/confirmation?*', async route => {
+    calls++;
+    await route.fulfill(calls === 1
+      ? { status: 403, json: { message: 'Invalid confirmation token.' } }
+      : { json: { ...confirmation, payment_status: 'paid' } });
   });
+  await page.goto(`/thank-you?${query}`);
+  await expect(page.locator('#order-payment-status')).toHaveText('We could not load your order details. Please try again or refer to your confirmation email.');
+  await page.locator('#refresh-payment-status').click();
+  await expect(page.locator('#order-payment-status')).toHaveText('Payment received');
+  expect(calls).toBe(2);
+});
+
+test('pending transfer details disappear after payment is received', async ({ page }) => {
+  let calls = 0;
+  await page.route('**/api/v1/orders/confirmation?*', async route => {
+    calls++;
+    await route.fulfill({ json: { ...confirmation, payment_status: calls === 1 ? 'pending' : 'paid' } });
+  });
+  await page.goto(`/thank-you?${query}`);
+  await expect(page.locator('#order-payment-status')).toHaveText('Awaiting payment');
+  await expect(page.locator('#stripe-transfer-details')).toBeVisible();
+  await expect(page.locator('#transfer-fields')).toContainText('£56.50');
+  await expect(page.locator('#stripe-transfer-link')).toHaveAttribute('href', confirmation.bank_transfer_details.hosted_instructions_url);
+  await page.locator('#refresh-payment-status').click();
+  await expect(page.locator('#order-payment-status')).toHaveText('Payment received');
+  await expect(page.locator('#stripe-transfer-details')).toBeHidden();
+  await expect(page.locator('#refresh-payment-status')).toBeHidden();
+});
+
+test('legacy cached order details alone cannot stand in for a verified confirmation', async ({ page }) => {
+  let calls = 0;
+  await page.addInitScript(() => sessionStorage.setItem('lastOrder', JSON.stringify({ orderDetails: { orderNumber: 'UNVERIFIED' } })));
+  await page.route('**/api/v1/orders/confirmation?*', async route => { calls++; await route.abort(); });
+  await page.goto('/thank-you');
+  await expect(page.locator('#order-payment-status')).toHaveText('Order details are unavailable. Please use your confirmation email or sign in to your account.');
+  await expect(page.getByText('UNVERIFIED')).toHaveCount(0);
+  expect(calls).toBe(0);
+});
+
+test('transfer instructions never link to an untrusted lookalike domain', async ({ page }) => {
+  await page.route('**/api/v1/orders/confirmation?*', route => route.fulfill({ json: {
+    ...confirmation, bank_transfer_details: { ...confirmation.bank_transfer_details, hosted_instructions_url: 'https://stripe.com.example.test/instructions' },
+  } }));
+  await page.goto(`/thank-you?${query}`);
+  await expect(page.locator('#order-payment-status')).toHaveText('Awaiting payment');
+  await expect(page.locator('#stripe-transfer-link')).toBeHidden();
 });

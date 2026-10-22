@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, API_BASE } from './support/fixtures';
 
-const API_BASE = 'http://127.0.0.1:8000/api/v1';
+
 
 test('product detail page renders for a real product slug', async ({ page }) => {
   const productsResponse = await fetch(`${API_BASE}/products?page=1`);

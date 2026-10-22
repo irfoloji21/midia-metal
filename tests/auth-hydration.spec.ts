@@ -1,138 +1,54 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, seedCheckout, mockCheckoutApi, customer, hydrated } from './support/fixtures';
 
-async function mockCustomerApi(page: Page) {
-  // Set dummy customer token
-  await page.context().addCookies([{
-    name: 'customer_token',
-    value: 'mock_customer_token',
-    domain: '127.0.0.1',
-    path: '/',
-  }]);
-
-  // Mock customer profile info for hydration
-  await page.route('**/api/v1/customer/me', async route => {
-    await route.fulfill({
-      status: 200,
-      json: {
-        id: 1,
-        name: 'Test User',
-        email: 'asd@asd.com',
-        phone: '1234567890',
-        address: '1 Test Street',
-        city: 'London',
-        postcode: 'E1 6AN',
-        country: 'United Kingdom',
-        is_business: false,
-        company_name: null,
-        company_vat_number: null
-      }
-    });
-  });
-
-  // Mock payment methods
-  await page.route('**/api/v1/customer/payment-methods', async route => {
-    await route.fulfill({
-      status: 200,
-      json: []
-    });
-  });
-
-  // Mock settings and other checkout/payment endpoints if needed
-  await page.route('**/api/v1/settings', async route => {
-    await route.fulfill({
-      status: 200,
-      json: [
-        { key: 'bank_account_name', value: 'Midia Metal Ltd' },
-        { key: 'bank_sort_code', value: '12-34-56' },
-        { key: 'bank_account_number', value: '12345678' }
-      ]
-    });
-  });
-
-  await page.route('**/api/v1/payment/intent*', async route => {
-    await route.fulfill({
-      status: 200,
-      json: { client_secret: 'pi_3Pxxxx_secret_xxxx' }
-    });
-  });
-}
-
-async function seedCart(page: Page) {
-  await page.addInitScript(() => {
-    const item = {
-      id: '1',
-      product_id: 1,
-      name: 'Hydration Product',
-      price: '£10.00',
-      qty: 1,
-      image: '',
-      selected_variants: {},
-      track_stock: false,
-      stock_quantity: null,
-      available_stock: null,
-    };
-    window.localStorage.setItem('midia_cart', JSON.stringify([item]));
-  });
-}
-
-async function seedCheckoutForm(page: Page) {
-  await page.addInitScript(() => {
-    const form = {
-      firstName: '',
-      lastName: '',
-      phone: '',
-      email: '',
-      company: '',
-      companyVat: '',
-      fulfillmentMethod: 'click_collect',
-      shipping_address: '1 Test Street',
-      shipping_city: 'London',
-      shipping_postcode: 'E1 6AN',
-      shipping_county: '',
-      shipping_country: 'United Kingdom',
-      billingSameAsShipping: true,
-      address: '1 Test Street',
-      city: 'London',
-      postcode: 'E1 6AN',
-      county: '',
-      country: 'United Kingdom',
-      notes: '',
-      shippingOptionToken: '',
-      selectedShippingOption: null,
-    };
-    window.sessionStorage.setItem('checkoutForm', JSON.stringify(form));
-  });
-}
-
-test.describe('Auth Hydration', () => {
-  test('fresh authenticated load of /checkout hydrates customer fields', async ({ page }) => {
-    await mockCustomerApi(page);
-    await seedCart(page);
-    
+test.describe('Auth hydration', () => {
+  test('fresh authenticated checkout hydrates customer fields', async ({ page }) => {
+    await mockCheckoutApi(page, true);
+    await seedCheckout(page, false);
     await page.goto('/checkout');
-    
+    await hydrated(page);
     await expect(page.getByRole('heading', { name: 'Contact Details' })).toBeVisible();
-    
-    const emailInput = page.locator('input[type="email"]');
-    await expect(emailInput).toHaveValue('asd@asd.com', { timeout: 10000 });
+    await expect(page.locator('input[type="email"]')).toHaveValue(customer.email);
   });
 
-  test('fresh authenticated load of /payment triggers payment-methods request after hydration', async ({ page }) => {
-    await mockCustomerApi(page);
-    await seedCart(page);
-    await seedCheckoutForm(page);
-
-    const paymentMethodsPromise = page.waitForResponse(response => 
-      response.url().includes('/api/v1/customer/payment-methods')
-    );
-
+  test('fresh payment load waits for customer hydration before fetching saved payment methods', async ({ page }) => {
+    await mockCheckoutApi(page, true);
+    await seedCheckout(page);
+    let releaseProfile!: () => void;
+    const profileReady = new Promise<void>(resolve => { releaseProfile = resolve; });
+    let profileRequested = false;
+    let paymentMethodsCalls = 0;
+    await page.route('**/api/v1/customer/me', async route => {
+      profileRequested = true;
+      await profileReady;
+      await route.fulfill({ json: customer });
+    });
+    await page.route('**/api/v1/customer/payment-methods', async route => {
+      paymentMethodsCalls++;
+      await route.fulfill({ json: [] });
+    });
     await page.goto('/payment');
-
+    await expect.poll(() => profileRequested).toBe(true);
+    expect(paymentMethodsCalls).toBe(0);
+    await expect(page.getByText('Loading payment details...')).toBeVisible();
+    releaseProfile();
+    await expect.poll(() => paymentMethodsCalls).toBe(1);
     await expect(page.getByRole('heading', { name: 'Payment Method' })).toBeVisible();
+    await expect(page).toHaveURL(/\/payment$/);
+  });
 
-    const response = await paymentMethodsPromise;
-    expect(response.status()).toBeLessThan(500);
-
-    expect(page.url()).toContain('/payment');
+  test('incomplete checkout data returns to checkout before payment setup', async ({ page }) => {
+    await mockCheckoutApi(page);
+    await seedCheckout(page);
+    await page.addInitScript(() => {
+      const form = JSON.parse(sessionStorage.getItem('checkoutForm')!);
+      form.email = '';
+      sessionStorage.setItem('checkoutForm', JSON.stringify(form));
+    });
+    let setups = 0;
+    page.on('request', request => { if (request.url().endsWith('/payment/intent')) setups++; });
+    await page.goto('/payment');
+    await expect(page).toHaveURL(/\/checkout$/);
+    await expect(page.getByRole('heading', { name: 'Contact Details' })).toBeVisible();
+    expect(setups).toBe(0);
   });
 });
