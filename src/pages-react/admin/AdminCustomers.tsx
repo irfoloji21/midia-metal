@@ -9,7 +9,8 @@ import ListPagination from "@/components/admin/ListPagination";
 export default function AdminCustomers() {
     const [search, setSearch] = useState("");
     const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-    const { items: customers, setItems: _setCustomers, ...pagination } = usePaginatedAdminList(`/admin/customers?search=${search}`);
+    const params = new URLSearchParams({ search });
+    const { items: customers, setItems: _setCustomers, ...pagination } = usePaginatedAdminList(`/admin/customers?${params}`);
     const { loading, reload: loadCustomers, setPage } = pagination;
 
     const { sort, toggleSort } = useTableSort("name");
