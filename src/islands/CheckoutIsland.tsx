@@ -20,6 +20,7 @@ import { $customer } from "@/stores/auth";
 import type { CheckoutFormData } from "@/types/cart";
 import withErrorBoundary from "@/lib/withErrorBoundary";
 import { formatMoneyValue, parseMoneyValue } from "@/lib/pricing";
+import { getCheckoutErrors, normalizeCheckoutForm, type CheckoutErrors } from "@/lib/checkout-validation";
 
 // Astro-compatible CheckoutSteps (inline, no react-router)
 function CheckoutSteps({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
@@ -149,6 +150,7 @@ function CheckoutIsland() {
   
   const [form, setForm] = useState<CheckoutFormData>(defaultForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<CheckoutErrors>({});
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
   const [shippingOptionsLoading, setShippingOptionsLoading] = useState(false);
   const [shippingOptionsError, setShippingOptionsError] = useState("");
@@ -211,7 +213,16 @@ function CheckoutIsland() {
 
   const update = <K extends keyof CheckoutFormData>(field: K, value: CheckoutFormData[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    setFieldErrors(prev => ({ ...prev, [field]: undefined }));
   };
+  const validationProps = (field: keyof CheckoutFormData) => ({
+    name: field,
+    'aria-invalid': Boolean(fieldErrors[field]),
+    'aria-describedby': fieldErrors[field] ? `error-${field}` : undefined,
+  });
+  const fieldError = (field: keyof CheckoutFormData) => fieldErrors[field]
+    ? <p id={`error-${field}`} role="alert" className="mt-2 text-sm text-red-700">{fieldErrors[field]}</p>
+    : null;
   const formatEtaDate = (value?: string | null) => {
     if (!value) return "Estimated date unavailable";
     const date = new Date(`${value}T00:00:00`);
@@ -307,6 +318,14 @@ function CheckoutIsland() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const normalized = normalizeCheckoutForm(form);
+    const errors = getCheckoutErrors(normalized, isBusiness);
+    setFieldErrors(errors);
+    setForm(normalized);
+    if (Object.keys(errors).length) {
+      (e.currentTarget as HTMLFormElement).querySelector<HTMLElement>(`[name="${Object.keys(errors)[0]}"]`)?.focus();
+      return;
+    }
     if (cart.length === 0) { toast.error("Your cart is empty"); return; }
     if (form.fulfillmentMethod === "delivery" && !form.shippingOptionToken) {
       toast.error("Please choose a delivery option.");
@@ -319,7 +338,7 @@ function CheckoutIsland() {
       sessionStorage.setItem(
         "checkoutForm",
         JSON.stringify({
-          ...form,
+          ...normalized,
           selectedShippingOption,
         })
       );
@@ -347,19 +366,23 @@ function CheckoutIsland() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-[13px] font-semibold text-primary mb-2">First Name *</label>
-                    <input type="text" required value={form.firstName} onChange={(e) => update("firstName", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    <input {...validationProps("firstName")} type="text" required value={form.firstName} onChange={(e) => update("firstName", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("firstName")}
                   </div>
                   <div>
                     <label className="block text-[13px] font-semibold text-primary mb-2">Last Name *</label>
-                    <input type="text" required value={form.lastName} onChange={(e) => update("lastName", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    <input {...validationProps("lastName")} type="text" required value={form.lastName} onChange={(e) => update("lastName", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("lastName")}
                   </div>
                   <div>
                     <label className="block text-[13px] font-semibold text-primary mb-2">Phone *</label>
-                    <input type="tel" required value={form.phone} onChange={(e) => update("phone", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    <input {...validationProps("phone")} type="tel" required value={form.phone} onChange={(e) => update("phone", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("phone")}
                   </div>
                   <div>
                     <label className="block text-[13px] font-semibold text-primary mb-2">Email Address *</label>
-                    <input type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    <input {...validationProps("email")} type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("email")}
                   </div>
                 </div>
 
@@ -372,11 +395,13 @@ function CheckoutIsland() {
                   <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-[13px] font-semibold text-primary mb-2">Company Name *</label>
-                      <input type="text" required value={form.company} onChange={(e) => update("company", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                      <input {...validationProps("company")} type="text" required value={form.company} onChange={(e) => update("company", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("company")}
                     </div>
                     <div>
                       <label className="block text-[13px] font-semibold text-primary mb-2">Company VAT Number (optional)</label>
-                      <input type="text" value={form.companyVat} onChange={(e) => update("companyVat", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                      <input {...validationProps("companyVat")} type="text" value={form.companyVat} onChange={(e) => update("companyVat", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("companyVat")}
                     </div>
                   </div>
                 )}
@@ -440,20 +465,24 @@ function CheckoutIsland() {
                   </div>
                   <div>
                     <label className="block text-[13px] font-semibold text-primary mb-2">Street Address *</label>
-                    <input type="text" required placeholder="House number and street name" value={form.shipping_address} onChange={(e) => update("shipping_address", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    <input {...validationProps("shipping_address")} type="text" required placeholder="House number and street name" value={form.shipping_address} onChange={(e) => update("shipping_address", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("shipping_address")}
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
                       <label className="block text-[13px] font-semibold text-primary mb-2">Town / City *</label>
-                      <input type="text" required value={form.shipping_city} onChange={(e) => update("shipping_city", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                      <input {...validationProps("shipping_city")} type="text" required value={form.shipping_city} onChange={(e) => update("shipping_city", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("shipping_city")}
                     </div>
                     <div>
                       <label className="block text-[13px] font-semibold text-primary mb-2">County</label>
-                      <input type="text" value={form.shipping_county} onChange={(e) => update("shipping_county", e.target.value)} placeholder="e.g. Essex" className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                      <input {...validationProps("shipping_county")} type="text" value={form.shipping_county} onChange={(e) => update("shipping_county", e.target.value)} placeholder="e.g. Essex" className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("shipping_county")}
                     </div>
                     <div>
                       <label className="block text-[13px] font-semibold text-primary mb-2">Postcode *</label>
-                      <input type="text" required value={form.shipping_postcode} onChange={(e) => update("shipping_postcode", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                      <input {...validationProps("shipping_postcode")} type="text" required value={form.shipping_postcode} onChange={(e) => update("shipping_postcode", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("shipping_postcode")}
                     </div>
                   </div>
                 </div>
@@ -555,20 +584,24 @@ function CheckoutIsland() {
                     </div>
                     <div>
                       <label className="block text-[13px] font-semibold text-primary mb-2">Street Address *</label>
-                      <input type="text" required placeholder="House number and street name" value={form.address} onChange={(e) => update("address", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                      <input {...validationProps("address")} type="text" required placeholder="House number and street name" value={form.address} onChange={(e) => update("address", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("address")}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                       <div>
                         <label className="block text-[13px] font-semibold text-primary mb-2">Town / City *</label>
-                        <input type="text" required value={form.city} onChange={(e) => update("city", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                        <input {...validationProps("city")} type="text" required value={form.city} onChange={(e) => update("city", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("city")}
                       </div>
                       <div>
                         <label className="block text-[13px] font-semibold text-primary mb-2">County</label>
-                        <input type="text" value={form.county} onChange={(e) => update("county", e.target.value)} placeholder="e.g. Essex" className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                        <input {...validationProps("county")} type="text" value={form.county} onChange={(e) => update("county", e.target.value)} placeholder="e.g. Essex" className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("county")}
                       </div>
                       <div>
                         <label className="block text-[13px] font-semibold text-primary mb-2">Postcode *</label>
-                        <input type="text" required value={form.postcode} onChange={(e) => update("postcode", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                        <input {...validationProps("postcode")} type="text" required value={form.postcode} onChange={(e) => update("postcode", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
+                    {fieldError("postcode")}
                       </div>
                     </div>
                   </div>

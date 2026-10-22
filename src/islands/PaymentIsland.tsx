@@ -19,6 +19,7 @@ import { $cart, $subtotal, $coupon, $isBusiness, clearCart } from "@/stores/cart
 import { $customer, $isAuthLoading, $authError } from "@/stores/auth";
 import CustomerSessionError from "@/components/CustomerSessionError";
 import { formatMoneyValue, parseMoneyValue } from "@/lib/pricing";
+import { getCheckoutErrors, normalizeCheckoutForm } from "@/lib/checkout-validation";
 
 // Stripe
 import { loadStripe } from "@stripe/stripe-js";
@@ -221,7 +222,9 @@ function PaymentIsland() {
     const stored = sessionStorage.getItem("checkoutForm");
     if (stored) {
       try {
-        setCheckoutForm(JSON.parse(stored));
+        const parsed = normalizeCheckoutForm(JSON.parse(stored));
+        if (Object.keys(getCheckoutErrors(parsed, $isBusiness.get())).length) throw new Error('Invalid checkout details');
+        setCheckoutForm(parsed);
         const previous = JSON.parse(sessionStorage.getItem("stripeCheckout") || "null") as CheckoutSession | null;
         if (previous) {
           const [payload] = JSON.parse(previous.key);
