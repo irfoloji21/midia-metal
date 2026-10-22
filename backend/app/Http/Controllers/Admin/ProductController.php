@@ -116,10 +116,6 @@ class ProductController extends Controller
         );
         $validated['variant_table_columns'] = $this->normalizeVariantTableColumns($validated['variant_table_columns'] ?? null);
 
-        if ($validated['name'] !== $product->name) {
-            $validated['slug'] = Str::slug($validated['name']).'-'.Str::random(4);
-        }
-
         $product->update($validated);
 
         return response()->json($product->load('category'));

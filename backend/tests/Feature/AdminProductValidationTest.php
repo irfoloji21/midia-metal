@@ -10,6 +10,21 @@ class AdminProductValidationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_renaming_a_product_preserves_its_public_url(): void
+    {
+        $this->actingAs(\App\Models\AdminUser::factory()->create(), 'sanctum');
+        $product = Product::factory()->create(['slug' => 'original-product-url']);
+        $this->putJson("/api/admin/products/{$product->id}", [
+            'name' => 'Renamed Product',
+            'price' => '£25.00',
+            'image' => 'https://example.com/product.jpg',
+            'active' => true,
+            'variants' => [['option' => 'Size', 'value' => 'Standard', 'price' => '£25.00']],
+        ])->assertOk()->assertJsonPath('name', 'Renamed Product')->assertJsonPath('slug', 'original-product-url');
+
+        $this->getJson('/api/v1/products/original-product-url')->assertOk()->assertJsonPath('id', $product->id);
+    }
+
     public function test_admin_product_store_normalizes_valid_money_values(): void
     {
         $response = $this
