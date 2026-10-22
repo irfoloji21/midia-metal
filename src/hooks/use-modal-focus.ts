@@ -9,7 +9,7 @@ export function useModalFocus(open: boolean, ref: RefObject<HTMLElement>, onClos
     const dialog = ref.current;
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const previousOverflow = document.body.style.overflow;
-    const focusable = () => Array.from(dialog.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]')).filter(node => !node.hidden && node.getAttribute('aria-hidden') !== 'true');
+    const focusable = () => Array.from(dialog.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]')).filter(node => node.tabIndex >= 0 && !node.hidden && node.getAttribute('aria-hidden') !== 'true' && getComputedStyle(node).display !== 'none' && getComputedStyle(node).visibility !== 'hidden');
     const focusFirst = () => (focusable()[0] || dialog).focus();
     document.body.style.overflow = 'hidden';
     focusFirst();

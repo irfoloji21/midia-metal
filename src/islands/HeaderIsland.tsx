@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSiteSettings } from '@/lib/use-site-settings';
 import { useStore } from '@nanostores/react';
 import { $cartCount } from '@/stores/cart';
+import { useModalFocus } from '@/hooks/use-modal-focus';
 
 // Re-export the existing Header but with nanostores context
 // For now, we create a simplified header that works outside React Router.
@@ -32,6 +33,8 @@ export default function HeaderIsland({ initialSettings }: HeaderIslandProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const settings = useSiteSettings(initialSettings);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const searchPanelRef = useRef<HTMLDivElement>(null);
+  useModalFocus(isSearchOpen, searchPanelRef, () => setIsSearchOpen(false));
 
   useEffect(() => {
     setIsHydrated(true);
@@ -164,11 +167,12 @@ export default function HeaderIsland({ initialSettings }: HeaderIslandProps) {
 
       {/* Search Overlay */}
       {isSearchOpen && (
-        <div className="absolute inset-0 bg-white z-[60] flex items-center px-4 lg:px-8">
+        <div ref={searchPanelRef} role="dialog" aria-modal="true" aria-label="Search products" tabIndex={-1} className="absolute inset-0 bg-white z-[60] flex items-center px-4 lg:px-8">
           <div className="container mx-auto flex items-center gap-4">
             <form onSubmit={handleSearchSubmit} className="flex-1 relative">
               <input
                 ref={searchInputRef}
+                aria-label="Search products"
                 type="text"
                 placeholder="Search products..."
                 className="w-full bg-transparent border-none text-2xl md:text-3xl font-semibold text-primary placeholder:text-muted-foreground/30 focus:outline-none"
