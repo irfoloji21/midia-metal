@@ -1,3 +1,4 @@
+import { priceRangeError } from "@/lib/price-filter";
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
@@ -95,6 +96,7 @@ export default function AdminProducts() {
     const [categoryFilter, setCategoryFilter] = useState("all");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
+    const filterPriceError = priceRangeError(minPrice, maxPrice);
     const { sort, toggleSort } = useTableSort("name");
     const oldPriceValue = parseMoneyValue(currentProduct?.old_price);
     const hasPriceAboveOldPrice = !currentProduct?.price_on_request && oldPriceValue !== null && [
@@ -397,8 +399,8 @@ export default function AdminProducts() {
             const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = categoryFilter === "all" || p.product_category_id?.toString() === categoryFilter;
             const price = p.price_on_request ? NaN : Number.parseFloat(String(p.price ?? "").replace(/[£,]/g, "").trim());
-            const min = minPrice.trim() === "" ? null : Number(minPrice);
-            const max = maxPrice.trim() === "" ? null : Number(maxPrice);
+            const min = filterPriceError || minPrice.trim() === "" ? null : Number(minPrice);
+            const max = filterPriceError || maxPrice.trim() === "" ? null : Number(maxPrice);
             const matchesPrice = Number.isFinite(price)
                 ? (min === null || price >= min) && (max === null || price <= max)
                 : min === null && max === null;
@@ -1406,6 +1408,8 @@ export default function AdminProducts() {
                         min="0"
                         step="0.01"
                         aria-label="Minimum price"
+                        aria-invalid={Boolean(filterPriceError)}
+                        aria-describedby={filterPriceError ? 'admin-price-filter-error' : undefined}
                         placeholder="Min price (£)"
                         value={minPrice}
                         onChange={(e) => setMinPrice(e.target.value)}
@@ -1416,11 +1420,14 @@ export default function AdminProducts() {
                         min="0"
                         step="0.01"
                         aria-label="Maximum price"
+                        aria-invalid={Boolean(filterPriceError)}
+                        aria-describedby={filterPriceError ? 'admin-price-filter-error' : undefined}
                         placeholder="Max price (£)"
                         value={maxPrice}
                         onChange={(e) => setMaxPrice(e.target.value)}
                         className="h-10 w-full sm:w-36 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm"
                     />
+                    {filterPriceError && <p id="admin-price-filter-error" role="alert" className="text-sm text-red-700">{filterPriceError} The price filter has not been applied.</p>}
                 </div>
             </div>
 
