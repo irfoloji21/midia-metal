@@ -10,7 +10,7 @@
  *   - Inline CheckoutSteps component (no react-router dependency)
  *   - Kept useCart, useCustomerAuth context hooks as-is
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MapPin, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
@@ -157,7 +157,7 @@ function CheckoutIsland() {
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
   const [shippingOptionsLoading, setShippingOptionsLoading] = useState(false);
   const [shippingOptionsError, setShippingOptionsError] = useState("");
-  const [hasRestoredCheckoutForm, setHasRestoredCheckoutForm] = useState(false);
+  const hasRestoredCheckoutForm = useRef(false);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("checkoutForm");
@@ -172,14 +172,15 @@ function CheckoutIsland() {
         country: parsed.country || prev.country,
         shippingOptionToken: parsed.shippingOptionToken || "",
       }));
-      setHasRestoredCheckoutForm(true);
+      hasRestoredCheckoutForm.current = true;
+      if (typeof parsed.isBusiness === 'boolean') setIsBusiness(parsed.isBusiness);
     } catch {
       sessionStorage.removeItem("checkoutForm");
     }
   }, []);
 
   useEffect(() => {
-    if (customer && !hasRestoredCheckoutForm) {
+    if (customer && !hasRestoredCheckoutForm.current) {
       const parts = (customer.name || "").split(" ");
       const cust = customer as any;
       const billingAddress = cust.billing_address || cust.address || "";
@@ -212,9 +213,10 @@ function CheckoutIsland() {
       }));
       setIsBusiness(customer.is_business || false);
     }
-  }, [customer, hasRestoredCheckoutForm, setIsBusiness]);
+  }, [customer, setIsBusiness]);
 
   const update = <K extends keyof CheckoutFormData>(field: K, value: CheckoutFormData[K]) => {
+    hasRestoredCheckoutForm.current = true;
     setForm((prev) => ({ ...prev, [field]: value }));
     setFieldErrors(prev => ({ ...prev, [field]: undefined }));
   };
@@ -344,6 +346,7 @@ function CheckoutIsland() {
         "checkoutForm",
         JSON.stringify({
           ...normalized,
+          isBusiness,
           selectedShippingOption,
         })
       );

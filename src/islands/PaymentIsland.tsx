@@ -15,7 +15,7 @@ import { CreditCard, Building2, Lock, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useStore } from "@nanostores/react";
-import { $cart, $subtotal, $coupon, $isBusiness, clearCart } from "@/stores/cart";
+import { $cart, $subtotal, $coupon, $isBusiness, clearCart, setIsBusiness } from "@/stores/cart";
 import { $customer, $isAuthLoading, $authError } from "@/stores/auth";
 import CustomerSessionError from "@/components/CustomerSessionError";
 import { formatMoneyValue, parseMoneyValue } from "@/lib/pricing";
@@ -226,6 +226,7 @@ function PaymentIsland() {
     if (stored) {
       try {
         const parsed = normalizeCheckoutForm(JSON.parse(stored));
+        if (typeof parsed.isBusiness === 'boolean') setIsBusiness(parsed.isBusiness);
         if (Object.keys(getCheckoutErrors(parsed, $isBusiness.get())).length) throw new Error('Invalid checkout details');
         setCheckoutForm(parsed);
         const previous = JSON.parse(sessionStorage.getItem("stripeCheckout") || "null") as CheckoutSession | null;
