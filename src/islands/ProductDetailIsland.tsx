@@ -492,7 +492,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
     return value ? [[column.label, value] as [string, string]] : [];
   });
   const combinationFrontendSpecEntries: Array<[string, string]> = (
-    !isSelectionTableMode && selectedCombinationVariant
+    selectedCombinationVariant
       ? variantTableColumns.combination
         .filter((column) => column.frontendVisible && column.key.startsWith("custom:"))
         .flatMap((column) => {
@@ -538,7 +538,12 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
       ...sizeFrontendSpecEntries,
       ...combinationFrontendSpecEntries,
       ...generalFrontendSpecEntries,
-    ] : []),
+    ] : []).map(([label, value]): [string, string] => [
+      productSpecEntries.some(([key, staticValue]) => key.toLowerCase() === label.toLowerCase() && staticValue !== value)
+        ? `${label} (selected variant)`
+        : label,
+      value,
+    ]),
   ];
   const specificationEntries: Array<[string, string]> = dedupeSpecEntries(generatedSpecificationEntries);
   const shareLinks = {

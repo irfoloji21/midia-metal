@@ -39,6 +39,26 @@ function renderPage() {
   return render(<><CustomerSessionIsland /><ProductDetailIsland id={product.slug} initialProduct={product} /></>);
 }
 
+it('keeps selected combination specifications when a static label collides', async () => {
+  const fixture = {
+    ...product, specifications: { 'QA finish': 'Brushed' }, variant_mode: 'combination', variant_options: ['Material'],
+    variant_table_columns: { combination: [{ key: 'custom:finish', label: 'QA Finish', visible: true, frontendVisible: true }] },
+    variants: [
+      { attributes: { Material: 'Steel' }, price: 12.5, stock: 5, custom_fields: { finish: 'QA Brushed' } },
+      { attributes: { Material: 'Aluminium' }, price: 24.75, stock: 5, custom_fields: { finish: 'QA Polished' } },
+    ],
+  };
+  fetchMock.mockImplementation(async (url: string) => reply(url.endsWith('/related') ? [] : fixture));
+  render(<ProductDetailIsland id={product.slug} initialProduct={fixture} />);
+  await act(async () => {});
+  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Steel' } });
+  expect(await screen.findByText('QA Brushed')).toBeInTheDocument();
+  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Aluminium' } });
+  expect(screen.getByText('QA Polished')).toBeInTheDocument();
+  expect(screen.queryByText('QA Brushed')).not.toBeInTheDocument();
+  expect(screen.getByText('Brushed')).toBeInTheDocument();
+});
+
 describe('review form with the shared page session', () => {
   it('opens on a direct load only after the session and purchase checks complete', async () => {
     let resolveSession!: (response: Response) => void;
