@@ -7,7 +7,7 @@
     "Unverified options and contradictory dimensions are withheld from the public catalogue with user approval; original records remain in the private source archive. Product prices and stock/shipping values are preserved.",
     "Descriptions and titles edited for professional English. Category URLs are mapped by meaning, not misleading source slugs.",
     "Known incorrect sheet-metal images for Conveyor Feet listings have been withdrawn pending confirmed product photos (BUG-014).",
-    "Source ID 19 title specifies four 4-inch castors with two brakes, but the main reference image shows three red fixed castors; gallery shows different blue 5-inch castors. Original main product appearance preserved.",
+    "Incomplete or mismatched castor set photos have been withdrawn pending confirmed photos of the four-piece set (BUG-015).",
     "Contradictory sheet variant dimensions are hidden; specifications use the grade, finish and nominal thickness stated in the source product titles.",
     "Identical source photos share one edited image: 25/29, 5/54/55, 13/43. Raw source images and galleries archived locally; public galleries use the edited hero images only."
   ],
@@ -3120,11 +3120,8 @@
       "slug": "steelton-4-poly-casters-2-with-brakes-4set-8sKk",
       "price": "£28.90",
       "old_price": null,
-      "image": "/images/products/reference-catalogue/product-19-v1.webp",
-      "gallery": [
-        "/images/products/reference-catalogue/product-19-angle-a-v1.webp",
-        "/images/products/reference-catalogue/product-19-angle-b-v1.webp"
-      ],
+      "image": "/images/product-photo-unavailable.svg",
+      "gallery": [],
       "description": "<p>Set of four Steelton 4-inch polyurethane castors for compatible shelving units, including two with brakes. The wheels allow the shelving to be repositioned locally for access beneath and behind the unit, while the brakes help hold it in place when stationary.</p>\n<p>Intended for occasional repositioning within the same area rather than transporting loaded shelving between spaces. Check the fittings and load requirements against the shelving specification.</p>",
       "tags": [],
       "specifications": {
