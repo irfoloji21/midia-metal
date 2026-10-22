@@ -350,8 +350,9 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
     const quantity = Number(item.stock_quantity ?? 0);
     return quantity > 0 ? `Stock: ${quantity}` : "Stock: Out of stock";
   };
-  const fallbackShareUrl = typeof window !== "undefined" ? window.location.href : "";
-  const shareUrl = product?.share_url || fallbackShareUrl;
+  const shareUrl = isHydrated && typeof window !== "undefined"
+    ? new URL(window.location.pathname, window.location.origin).href
+    : new URL(`/shop/${product?.slug || id}`, import.meta.env.SITE || 'https://midiammetal.com').href;
   const shareText = encodeURIComponent(`${product?.name || "Product"} | Midia M Metal`);
   const description = (product?.description || "").trim();
   const descriptionHasHtml = /<\/?[a-z][\s\S]*>/i.test(description);
@@ -547,8 +548,8 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   ];
   const specificationEntries: Array<[string, string]> = dedupeSpecEntries(generatedSpecificationEntries);
   const shareLinks = {
-    facebook: product?.share_links?.facebook || `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-    twitter: product?.share_links?.twitter || `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${shareText}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+    twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${shareText}`,
     whatsapp: `https://wa.me/?text=${shareText}%20${encodeURIComponent(shareUrl)}`,
   };
 
