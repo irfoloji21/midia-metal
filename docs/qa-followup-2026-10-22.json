@@ -28,5 +28,10 @@
       "resolution": "Limit percentage coupons to 100 on create and partial update, add the UI maximum and cap all discounts at the order amount, including existing invalid coupons.",
       "verification": "30 coupon, checkout-calculation and order-placement tests passed (106 assertions). Changed-file ESLint passed."
     }
+    ,{
+      "id": "NEW-006",
+      "resolution": "Require a main portfolio image consistently in the UI and API while permitting partial edits that retain the existing image.",
+      "verification": "2 backend tests / 26 assertions passed for missing, null, blank, valid and retained images. Edge verified missing-image submission is blocked before any POST and a valid-image project saves successfully."
+    }
   ]
 }

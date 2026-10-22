@@ -32,7 +32,7 @@ class PortfolioController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'nullable|string',
+            'image' => 'required|string',
             'description' => 'nullable|string',
             'location' => 'nullable|string',
             'client' => 'nullable|string',
@@ -68,7 +68,7 @@ class PortfolioController extends Controller
         $wasPublic = $portfolio->active;
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'nullable|string',
+            'image' => 'sometimes|required|string',
             'description' => 'nullable|string',
             'location' => 'nullable|string',
             'client' => 'nullable|string',

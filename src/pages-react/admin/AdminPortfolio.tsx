@@ -12,6 +12,7 @@ export default function AdminPortfolio() {
 
     const [isEditing, setIsEditing] = useState(false);
     const [currentProject, setCurrentProject] = useState<any>(null);
+    const [imageError, setImageError] = useState(false);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
@@ -46,6 +47,7 @@ export default function AdminPortfolio() {
     };
 
     const openEdit = (project: any = null) => {
+        setImageError(false);
         setCurrentProject(
             project || {
                 title: "",
@@ -74,6 +76,11 @@ export default function AdminPortfolio() {
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!currentProject.image?.trim()) {
+            setImageError(true);
+            toast.error("Choose a main project image before saving.");
+            return;
+        }
         try {
             const dataToSave = {
                 ...currentProject,
@@ -279,10 +286,12 @@ export default function AdminPortfolio() {
                                 </div>
                                 <div className="col-span-2">
                                     <ImageUpload
-                                        label="Main Project Image"
+                                        id="portfolio-main-image"
+                                        label="Main Project Image (required)"
                                         value={currentProject.image}
-                                        onChange={(url) => setCurrentProject({ ...currentProject, image: url })}
+                                        onChange={(url) => { setCurrentProject({ ...currentProject, image: url }); setImageError(false); }}
                                     />
+                                    {imageError && <p role="alert" className="mt-2 text-sm text-red-600">Choose a main project image before saving.</p>}
                                 </div>
 
                                 <div className="col-span-2 space-y-2">
