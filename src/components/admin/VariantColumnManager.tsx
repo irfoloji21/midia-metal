@@ -7,7 +7,6 @@
 import { useState } from "react";
 import { SlidersHorizontal, Trash2, Undo2 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { isCustomColumnKey } from "@/lib/adminProductUtils";
 import type { VariantTableColumn } from "@/types/product";
 
@@ -47,12 +46,12 @@ export default function VariantColumnManager({
                     </span>
                 </button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-[360px] p-3">
+            <PopoverContent align="end" side="bottom" collisionPadding={12} sticky="always" className="w-[360px] max-w-[calc(100vw-24px)] max-h-[var(--radix-popover-content-available-height)] overflow-y-auto p-3">
                 <div>
                     <p className="text-[11px] font-bold uppercase tracking-wider text-gray-500">{title}</p>
                     <p className="text-xs text-gray-400">{description}</p>
                 </div>
-                <ScrollArea className="mt-3 h-[min(420px,60vh)] pr-3">
+                <div className="mt-3 pr-3">
                     <div className="space-y-2">
                         {columns.map((column) => (
                             <div key={column.key} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2 py-2">
@@ -94,7 +93,7 @@ export default function VariantColumnManager({
                             </div>
                         ))}
                     </div>
-                </ScrollArea>
+                </div>
                 <div className="mt-3 border-t border-gray-200 pt-3">
                     <div className="flex gap-2">
                         <input
