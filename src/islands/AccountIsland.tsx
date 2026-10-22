@@ -452,7 +452,7 @@ function AccountIsland() {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 bg-white border border-[#cad4e4] p-6 md:p-10 min-h-[500px]">
+                <div className="min-w-0 flex-1 bg-white border border-[#cad4e4] p-6 md:p-10 min-h-[500px]">
 
                     {/* ──────────── ORDERS TAB ──────────── */}
                     {activeTab === "orders" && (
@@ -702,9 +702,9 @@ function AccountIsland() {
                             ) : (
                                 <div className="space-y-4">
                                     {quotes.map((quote: any) => (
-                                        <div key={quote.id} className="border border-[#cad4e4] p-5">
+                                        <div key={quote.id} className="min-w-0 border border-[#cad4e4] p-5 [overflow-wrap:anywhere]">
                                             <div className="flex flex-col md:flex-row justify-between md:items-start gap-4">
-                                                <div>
+                                                <div className="min-w-0 flex-1">
                                                     <h3 className="font-semibold text-primary">#{quote.id} — {quote.service || "General Enquiry"}</h3>
                                                     <p className="text-[#6e7a92] text-sm mt-1">{new Date(quote.created_at).toLocaleDateString("en-GB")}</p>
                                                     <p className="text-primary text-sm mt-2 line-clamp-2">{quote.description}</p>
