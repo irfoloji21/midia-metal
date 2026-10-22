@@ -5,7 +5,7 @@ export function useModalFocus(open: boolean, ref: RefObject<HTMLElement>, onClos
   const close = useRef(onClose);
   close.current = onClose;
   useEffect(() => {
-    if (!open || !ref.current) return;
+    if (!open || !ref.current) return undefined;
     const dialog = ref.current;
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const previousOverflow = document.body.style.overflow;

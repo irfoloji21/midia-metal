@@ -1,0 +1,415 @@
+{
+  "date": "2026-10-22",
+  "source": "midia-m-metal-tum-hatalar-2026-10-21.pdf",
+  "source_pages": 33,
+  "branch": "content",
+  "remote": "origin",
+  "base_commit": "7021671",
+  "scope": {
+    "distinct_report_bugs": 27,
+    "fixed_bugs": 25,
+    "photo_bugs_mitigated_pending_approved_images": 2,
+    "additional_observations_fixed": 4,
+    "duplicate_not_recounted": "BUG-004 / BUG-CONT-005",
+    "heading_commits": 31
+  },
+  "verification": {
+    "vitest": {
+      "tests": 246,
+      "files": 19,
+      "status": "passed"
+    },
+    "phpunit": {
+      "tests": 139,
+      "assertions": 678,
+      "status": "passed"
+    },
+    "astro_check": {
+      "errors": 0,
+      "warnings": 0,
+      "existing_hints": 21,
+      "status": "passed"
+    },
+    "production_build": "passed",
+    "browser": "Headless Microsoft Edge against local frontend; fixtures intercept mutation requests",
+    "browser_checks": [
+      {
+        "name": "Header search traps focus, closes with Escape and restores opener",
+        "status": "passed"
+      },
+      {
+        "name": "Information sidebar traps focus and restores opener",
+        "status": "passed"
+      },
+      {
+        "name": "Shop first and repeated Enter searches filter Mangal correctly",
+        "status": "passed"
+      },
+      {
+        "name": "Shop rejects reversed price ranges with a visible explanation",
+        "status": "passed"
+      },
+      {
+        "name": "Blog search submits and returns an empty result for a missing article",
+        "status": "passed"
+      },
+      {
+        "name": "Product gallery responds to arrows and Escape, share URLs use frontend origin",
+        "status": "passed"
+      },
+      {
+        "name": "Known incorrect catalogue photos are withdrawn locally",
+        "status": "passed"
+      },
+      {
+        "name": "Message read action updates immediately; native Cancel sends no delete",
+        "status": "passed"
+      },
+      {
+        "name": "Service Active label toggles and Features preserve commas until save",
+        "status": "passed"
+      },
+      {
+        "name": "Admin negative price filter is explained and variant starting price is read only",
+        "status": "passed"
+      },
+      {
+        "name": "Columns popover fits short and mobile viewports and scrolls to its last control",
+        "status": "passed"
+      },
+      {
+        "name": "Long wishlist names and quote text fit a 390px viewport",
+        "status": "passed"
+      },
+      {
+        "name": "Stale cart rechecks current stock and blocks checkout with an explanation",
+        "status": "passed"
+      },
+      {
+        "name": "Affected public pages have a main H1 and Cookie Policy uses the corrected title",
+        "status": "passed"
+      },
+      {
+        "name": "Portfolio detail fits 1024px and 1280px viewports",
+        "status": "passed"
+      },
+      {
+        "name": "Long product titles keep the wishlist button inside the product row",
+        "status": "passed"
+      },
+      {
+        "name": "Category Active text toggles its checkbox",
+        "status": "passed"
+      }
+    ],
+    "category_public_measurements": [
+      {
+        "width": 1024,
+        "right": 992,
+        "viewport": 1024,
+        "containerRight": 992,
+        "pageOverflow": 0
+      },
+      {
+        "width": 1280,
+        "right": 1248,
+        "viewport": 1280,
+        "containerRight": 1248,
+        "pageOverflow": 0
+      }
+    ],
+    "diff_whitespace": "passed"
+  },
+  "application": {
+    "local_photo_migrations": "Both applied successfully; only the four matching known image records were changed.",
+    "remote": "Commits pushed to origin/content. No production/staging deployment or remote migration is claimed.",
+    "deployment_requirement": "Deploy frontend and backend together and apply the two 2026_10_22 photo migrations to replace existing catalogue image records. Corrected photos are guarded from replacement."
+  },
+  "limitations": [
+    "Approved real product photos are still needed for the three Conveyor Feet listings and Steelton four-wheel set. Placeholders remove misleading images but do not supply final catalogue photography.",
+    "The PDF contains historical evidence, observations and blocked test scenarios. This work does not claim that the original complete test campaign was rerun, or that historical ambiguous deletion/payment outcomes were reconstructed.",
+    "No real payment, customer message deletion or test email was performed during regression verification."
+  ],
+  "issues": [
+    {
+      "id": "BUG-CONT-001",
+      "status": "fixed",
+      "title": "Services: null image crashes page",
+      "resolution": "Missing or blank service images use the existing fallback.",
+      "verification": "Source review and successful Astro compilation; live data has no active null-image fixture.",
+      "commit": "15d68f7ddb4a9db87a2a27574d39de4a333efd60"
+    },
+    {
+      "id": "BUG-CONT-002",
+      "status": "fixed",
+      "title": "Service Active text does not toggle",
+      "resolution": "The checkbox and text share a label.",
+      "verification": "Edge fixture: clicking Active toggles the checkbox.",
+      "commit": "8041f7eaea2f3e468bca150a47bb0ea6ec48c7a6"
+    },
+    {
+      "id": "BUG-CONT-003",
+      "status": "fixed",
+      "title": "Service Features typing loses separators",
+      "resolution": "Keep raw text while typing and split/trim only when saving.",
+      "verification": "Edge fixture: sequential typing preserves commas/spaces and save sends three trimmed features.",
+      "commit": "96a18b9ecac615628113d3feb63a6bea28ca4167"
+    },
+    {
+      "id": "BUG-CONT-004",
+      "status": "fixed",
+      "title": "Selected variant specs disappear after label collision",
+      "resolution": "Preserve differing variant values with a selected-variant suffix on colliding labels.",
+      "verification": "Component test switches Steel and Aluminium and keeps their respective values plus static specs.",
+      "commit": "c9f327cae6f4763829643aae3b13e12848205c48"
+    },
+    {
+      "id": "BUG-CONT-005",
+      "status": "fixed",
+      "title": "Social sharing uses backend origin",
+      "resolution": "Use the current frontend product URL after hydration.",
+      "verification": "Edge verifies the Facebook share URL matches the frontend origin and product path.",
+      "commit": "d2f4df3b66ca0443859cb2ad17fa16a379d22473"
+    },
+    {
+      "id": "BUG-CONT-006",
+      "status": "fixed",
+      "title": "Checkout line subtotal ignores quantity",
+      "resolution": "Multiply normalized unit price by quantity in checkout and payment summaries.",
+      "verification": "Checkout component test verifies quantity two at £12.50 displays £25.00.",
+      "commit": "3bbba6b160983f7ee94171acec77e8857a3cd14e"
+    },
+    {
+      "id": "BUG-CONT-007",
+      "status": "fixed",
+      "title": "Blank details and invalid UK postcode accepted",
+      "resolution": "Trim details, validate required fields/email/UK postcode, display field errors and guard restored payment data.",
+      "verification": "15 validation cases cover whitespace, valid/invalid postcode, business and separate billing fields.",
+      "commit": "c6dc86fc05bab39e68521d9465f42d90e2c311aa"
+    },
+    {
+      "id": "BUG-CONT-008",
+      "status": "fixed",
+      "title": "Stale cart stock lets checkout continue without explanation",
+      "resolution": "Refresh current product price/availability and explain blocked items before checkout/payment.",
+      "verification": "Cart tests cover stock zero, changed price, missing product and network failure; Edge confirms blocked checkout.",
+      "commit": "c0c61fd1012e099f14a355dd1dae24753e8df44e"
+    },
+    {
+      "id": "BUG-CONT-009",
+      "status": "fixed",
+      "title": "Admin accepts negative price filters silently",
+      "resolution": "Explain invalid negative/nonfinite/reversed ranges; do not apply invalid filters.",
+      "verification": "Shared range tests and Edge negative-price fixture.",
+      "commit": "151a806a294906058f3a143857a8f7f67535b365"
+    },
+    {
+      "id": "BUG-CONT-010",
+      "status": "fixed",
+      "title": "Primary price appears to reset after variant save",
+      "resolution": "Show the minimum variant price as read-only Starting price with an explanation.",
+      "verification": "Edge fixture confirms minimum 12.50 and read-only field; backend product tests pass.",
+      "commit": "2445dae26d56b813a5aaefd895a387b8aefc7270"
+    },
+    {
+      "id": "BUG-001",
+      "status": "fixed",
+      "title": "Columns popover extends outside viewport",
+      "resolution": "Constrain the whole popover to available viewport height/width and allow scrolling.",
+      "verification": "Edge checks 1280x650 and 390x650 with 16 columns; last control remains reachable.",
+      "commit": "89ea15733a3340e9dedae199ff3f0ed295d8461e"
+    },
+    {
+      "id": "BUG-002",
+      "status": "fixed",
+      "title": "Gallery keyboard navigation is missing",
+      "resolution": "Arrow keys switch images; Escape closes; focus stays inside and returns to the opener.",
+      "verification": "Focus hook tests and Edge arrow/Escape/focus checks.",
+      "commit": "49623c44d7a3294c36900ea20ca6d30b23b7472e"
+    },
+    {
+      "id": "BUG-003",
+      "status": "fixed",
+      "title": "Long quote content overflows",
+      "resolution": "Allow flex children to shrink and long strings to wrap.",
+      "verification": "Edge fixture with 500-character uninterrupted description/response has zero horizontal overflow at 390px.",
+      "commit": "a02d803222ab8d06aecdd1cc97b7641a770de1dc"
+    },
+    {
+      "id": "BUG-004",
+      "status": "duplicate",
+      "title": "Historical social sharing origin issue",
+      "resolution": "Covered by BUG-CONT-005; not counted twice.",
+      "verification": "See BUG-CONT-005.",
+      "commit": null
+    },
+    {
+      "id": "BUG-005",
+      "status": "fixed",
+      "title": "Checkout and product option labels are disconnected",
+      "resolution": "Associate checkout field labels and dynamic product selection labels with unique input IDs.",
+      "verification": "Checkout component tests access fields by label; Astro type check passes.",
+      "commit": "4f716f1e258b2cc886e411c0ba4f3fddf24e0124"
+    },
+    {
+      "id": "BUG-006",
+      "status": "fixed",
+      "title": "Icon-only quantity/remove actions lack names",
+      "resolution": "Add accessible names to basket and product quantity/removal buttons.",
+      "verification": "Source review and successful type check/build.",
+      "commit": "b4212eb6274b25d5e2586bb7a0b33dacc93a3b5b"
+    },
+    {
+      "id": "BUG-007",
+      "status": "fixed",
+      "title": "Wishlist button overflows beside a long product title",
+      "resolution": "Let the title shrink and wrap while reserving button width.",
+      "verification": "Edge long-title fixture keeps the button within its row with no page overflow at 390/1024/1280px.",
+      "commit": "2fef6ef81ff65b8566dd0cb9099f5b61fa84ff84"
+    },
+    {
+      "id": "BUG-008",
+      "status": "fixed",
+      "title": "Public pages lack main headings",
+      "resolution": "Add H1 to affected list/account/cart/checkout pages and use H1 for portfolio detail.",
+      "verification": "Edge confirms one main H1 on six affected routes and portfolio detail.",
+      "commit": "4617771bb39893707ce7f484216690f3f106706c"
+    },
+    {
+      "id": "BUG-009",
+      "status": "fixed",
+      "title": "Portfolio detail columns overflow",
+      "resolution": "Use fractional grid tracks that account for the gap and shrinkable content.",
+      "verification": "Edge confirms no horizontal overflow at 1024/1280px.",
+      "commit": "3b104226aa2e86b5c7632355553595840085695c"
+    },
+    {
+      "id": "BUG-010",
+      "status": "fixed",
+      "title": "Blog search is inert",
+      "resolution": "Submit a GET search form and preserve the query with filtering/pagination.",
+      "verification": "Edge submits a missing article query and confirms its URL, input value and empty result.",
+      "commit": "66a107bf331c16a2586e9b2f3e78205de55dafc6"
+    },
+    {
+      "id": "BUG-011",
+      "status": "fixed",
+      "title": "Cookie page title is inconsistent",
+      "resolution": "Normalize default cookie titles to Cookie Policy throughout the page.",
+      "verification": "Edge confirms the document title and H1.",
+      "commit": "d9298344057f0d5c85f60e2090570501f87672da"
+    },
+    {
+      "id": "BUG-012",
+      "status": "fixed",
+      "title": "Reversed Shop price range has no explanation",
+      "resolution": "Show a visible range error and do not confuse invalid input with a valid empty result.",
+      "verification": "Range tests plus Edge reversed-range check.",
+      "commit": "54ed0174374f8cb095c391bd628a7af5865ccfd0"
+    },
+    {
+      "id": "BUG-013",
+      "status": "fixed",
+      "title": "Category introduction extends beyond its container",
+      "resolution": "Use fractional grid tracks instead of percentages plus a gap.",
+      "verification": "Public Stainless Steel Sheets category reproduced 8px overflow at both 1024/1280px; after fix 0px, title right edge equals grid edge. Admin form had no overflow and was not the source.",
+      "commit": "dfccaee0f37bb642a8bf25fd8ea9160f1785433a"
+    },
+    {
+      "id": "BUG-014",
+      "status": "mitigated_pending_assets",
+      "title": "Conveyor Feet show unrelated sheet photos",
+      "resolution": "Withdraw known wrong main/gallery images for three products and show a neutral unavailable-photo placeholder.",
+      "verification": "Migration test protects approved/unrelated images; local API and Edge confirm placeholder. User does not know approved photo locations.",
+      "commit": "b6f033ef81fd4da40ead3899c6c8b5506d0c8bff"
+    },
+    {
+      "id": "BUG-015",
+      "status": "mitigated_pending_assets",
+      "title": "Steelton four-wheel set photo shows an incomplete set",
+      "resolution": "Withdraw the known mismatched set photos and show the same unavailable-photo placeholder.",
+      "verification": "Migration test plus local API verification. An approved photo showing the actual four-wheel set is still required.",
+      "commit": "a751ecd6a1ae8c2ea3c9e08c8a3d5d68e433160a"
+    },
+    {
+      "id": "BUG-016",
+      "status": "fixed",
+      "title": "Header search keyboard close/focus behavior",
+      "resolution": "Use a named dialog with Escape, focus containment and focus restoration.",
+      "verification": "Edge keyboard test passes after hydration.",
+      "commit": "a08d41d9768e846b3910584d4de0afc405f8689c"
+    },
+    {
+      "id": "BUG-017",
+      "status": "fixed",
+      "title": "Information sidebar keyboard focus escapes",
+      "resolution": "Use a named dialog with Escape, focus containment and focus restoration.",
+      "verification": "Edge tabs repeatedly through the dialog and verifies focus restoration.",
+      "commit": "f748155b172a2cb3ddcd0cb30a5a82eedb4a2e00"
+    },
+    {
+      "id": "HIST-CAT-001",
+      "status": "fixed",
+      "title": "Category Active text does not toggle",
+      "resolution": "Wrap checkbox and text in a label.",
+      "verification": "Edge fixture confirms the text toggles the checkbox.",
+      "commit": "dc94ad2ce7563f842c9f61f9b3fbff6245906d47"
+    },
+    {
+      "id": "OBS-CONT-001",
+      "status": "fixed",
+      "title": "Mark Read remains after first opening",
+      "resolution": "Update selected message and list using current state after mark-read succeeds.",
+      "verification": "Edge mock response confirms Mark Read disappears immediately.",
+      "commit": "3a4513c8f0d6dd7ee93806aa259b535695a65e75"
+    },
+    {
+      "id": "OBS-CONT-002",
+      "status": "not_reproduced",
+      "title": "Delete cancellation previously had an ambiguous outcome",
+      "resolution": "Native confirm cancellation exits before sending DELETE; no application change required.",
+      "verification": "Edge controlled fixture explicitly dismisses confirm, observes zero DELETE requests and retains the record. Historical data loss is neither established nor disproved by this check.",
+      "commit": null
+    },
+    {
+      "id": "OBS-CONT-003",
+      "status": "fixed",
+      "title": "Checkout draft overwritten on return from payment",
+      "resolution": "Restore the draft before customer prefill and persist the business choice.",
+      "verification": "Component tests cover already-loaded customer plus restored draft, and late customer loading after typing.",
+      "commit": "552f61cd52248ec72994f1f3c684473259016c38"
+    },
+    {
+      "id": "OBS-CONT-004",
+      "status": "fixed",
+      "title": "Older order disappears after the sixteenth order",
+      "resolution": "Add pagination and server-side search/status filters; group search OR conditions and order ties by ID.",
+      "verification": "Frontend tests cover next-page, global search, combined filters and retry. Backend tests cover 16 orders and search/status intersection. No new real payment was made.",
+      "commit": "c231daa659c3595a4322030734c971584b8c2988"
+    },
+    {
+      "id": "OBS-CONT-005",
+      "status": "fixed",
+      "title": "Renaming a product changes its public URL",
+      "resolution": "Keep the existing slug when editing the name.",
+      "verification": "Authenticated backend test renames the product then retrieves it through its original public URL. Previously changed unknown URLs are not reconstructed.",
+      "commit": "e54770c27c5a7b6d87a4dcd9326b41e52bca5f32"
+    },
+    {
+      "id": "OBS-CONT-006",
+      "status": "existing_policy",
+      "title": "Variant stock zero blocks buying when product tracking is off",
+      "resolution": "Retain existing explicit variant-stock priority; product-level tracking only controls fallback stock.",
+      "verification": "Existing stock unit tests and backend suite pass. No new stock policy was invented.",
+      "commit": null
+    },
+    {
+      "id": "EK-GOZ-001",
+      "status": "not_reproduced",
+      "title": "Initial Mangal search was inconsistent",
+      "resolution": "Current GET search consistently filters the catalogue.",
+      "verification": "Edge repeats first-entry/Enter search from fresh Shop loads three times, getting one Mangal result; missing query returns zero. Historical initial conditions remain unknown.",
+      "commit": null
+    }
+  ]
+}
