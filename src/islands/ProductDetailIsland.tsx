@@ -359,6 +359,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   const shareText = encodeURIComponent(`${product?.name || "Product"} | Midia M Metal`);
   const description = (product?.description || "").trim();
   const descriptionHasHtml = /<\/?[a-z][\s\S]*>/i.test(description);
+  const descriptionHasTable = /<table[\s>]/i.test(description);
   const hasEditorial = hasProductEditorial(description);
   const formatVariantColumnValue = (columnKey: string, variant: Record<string, any> | null): string => {
     if (!variant && !product) return "";
@@ -1087,7 +1088,12 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
             </div>
 
             {tab === "description" ? (
-              <div className="w-full">
+              <div
+                className="w-full min-w-0 max-w-full overflow-x-auto"
+                role={descriptionHasTable ? "region" : undefined}
+                aria-label={descriptionHasTable ? "Product description and tables" : undefined}
+                tabIndex={descriptionHasTable ? 0 : undefined}
+              >
                 {description ? (
                   descriptionHasHtml ? (
                     hasEditorial ? <div className="product-story" dangerouslySetInnerHTML={{ __html: sanitizeHtml(insertProductSpecifications(description, specificationEntries)) }} /> : <div
