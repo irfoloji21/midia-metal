@@ -833,7 +833,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
 
           <div className="min-w-0 pt-2">
             <div className="flex items-start justify-between gap-4">
-              <h1 className="font-sans text-[30px] md:text-[40px] leading-[1] font-semibold text-[#10275c]">{getStandardizedDisplayTitle(product, selectedVariants)}</h1>
+              <h1 className="min-w-0 flex-1 [overflow-wrap:anywhere] font-sans text-[30px] md:text-[40px] leading-[1] font-semibold text-[#10275c]">{getStandardizedDisplayTitle(product, selectedVariants)}</h1>
               <button
                 onClick={() => {
                   if (isInWishlist(product.id)) {
