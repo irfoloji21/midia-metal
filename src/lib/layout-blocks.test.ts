@@ -94,6 +94,40 @@ describe('protected layout blocks', () => {
     expect(() => updateSectionText('<div><p>Second</p></div>', first.id, 'wrong')).toThrow('field has changed');
   });
 
+  it('preserves native normal overrides inside headings and inherited bold/italic across saves', () => {
+    const markup = '<h2><strong><em><span style="font-weight: normal; font-style: normal; text-decoration: none;">Normal inside a heading</span></em></strong></h2>';
+    const expected = '<h2><strong><em><span style="font-weight:normal; font-style:normal; text-decoration:none;">Normal inside a heading</span></em></strong></h2>';
+    const cleaned = sanitizeLayoutText(markup);
+    expect(cleaned).toBe(expected);
+    expect(sanitizeLayoutText(cleaned)).toBe(expected);
+    const layout = createLayoutBlock('image-left');
+    const fields = readProtectedSection(layout);
+    const saved = updateSectionText(layout, fields.textFields[0].id, cleaned);
+    const reopened = readProtectedSection(saved);
+    expect(reopened.textFields[0].html).toBe(expected);
+    expect(updateSectionText(saved, reopened.textFields[0].id, expected)).toBe(saved);
+    expect(reopened.imageFields).toEqual(fields.imageFields);
+  });
+
+  it('allows only enumerated text styles and never positioning, sizing, colors or CSS functions', () => {
+    for (const value of ['normal', 'bold', '100', '200', '300', '400', '500', '600', '700', '800', '900']) {
+      expect(sanitizeLayoutText(`<span style="font-weight:${value}">Text</span>`)).toBe(`<span style="font-weight:${value};">Text</span>`);
+    }
+    for (const value of ['inherit', 'bolder', '550', 'var(--weight)', 'bold!important', 'expression(alert(1))', 'url(https://example.test)']) {
+      expect(sanitizeLayoutText(`<span style="font-weight:${value};font-style:oblique;text-decoration:line-through">Text</span>`)).toBe('<span>Text</span>');
+    }
+    expect(sanitizeLayoutText('<p style="position:fixed;display:none;width:999px;color:red;font-size:100px;FONT-WEIGHT:700;font-style:italic;text-decoration:underline" onclick="bad()">Text</p>'))
+      .toBe('<p style="font-weight:700; font-style:italic; text-decoration:underline;">Text</p>');
+    expect(sanitizeLayoutText('<span data-style="font-weight:bold" title="style=\'font-style:italic\'">Text</span>'))
+      .toBe('<span title="style=\'font-style:italic\'">Text</span>');
+  });
+
+  it('keeps the same safe overrides in inline text without allowing layout markup', () => {
+    const cleaned = sanitizeLayoutText('<span class="layout-copy" style="font-weight:bold; font-weight:normal; font-style:italic; position:fixed">Text</span><img src="/bad.png">', true);
+    expect(cleaned).toBe('<span style="font-weight:normal; font-style:italic;">Text</span>');
+    expect(sanitizeLayoutText(cleaned, true)).toBe(cleaned);
+  });
+
   it('preserves real DD7 tables, image positions and visual wrappers when editing leaf fields', () => {
     const [template] = getContentTemplates('product');
     const original = template.sections.map(section => section.html).join('');

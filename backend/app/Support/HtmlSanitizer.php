@@ -75,6 +75,47 @@ class HtmlSanitizer
             ]);
         };
 
+        $extractTextStyle = static function (string $attributes, bool $includeColor = false): string {
+            // Match the actual attribute, excluding data-style and text inside other attributes.
+            if (! preg_match('/"[^"]*"(*SKIP)(*F)|\'[^\']*\'(*SKIP)(*F)|(?:^|\s)style\s*=\s*(["\'])(.*?)\1/is', $attributes, $match)) {
+                return '';
+            }
+            $rawStyle = html_entity_decode($match[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $allowed = [
+                'font-weight' => '/^(?:normal|bold|[1-9]00)$/',
+                'font-style' => '/^(?:normal|italic)$/',
+                'text-decoration' => '/^(?:none|underline)$/',
+            ];
+            $values = [];
+            foreach (explode(';', $rawStyle) as $declaration) {
+                $parts = explode(':', $declaration, 2);
+                if (count($parts) !== 2) {
+                    continue;
+                }
+                $property = strtolower(trim($parts[0]));
+                $value = strtolower(trim($parts[1]));
+                if (isset($allowed[$property]) && preg_match($allowed[$property], $value)) {
+                    $values[$property] = $value;
+                }
+            }
+            $safe = [];
+            foreach ($allowed as $property => $pattern) {
+                if (isset($values[$property])) {
+                    $safe[] = $property.':'.$values[$property].';';
+                }
+            }
+            $textStyle = implode(' ', $safe);
+            // Keep the existing span colour semantics, independent of the new enum-only styles.
+            if ($includeColor && preg_match('/(?:^|;)\s*color\s*:\s*([^;]+)/i', $rawStyle, $colorMatch)) {
+                $color = trim($colorMatch[1]);
+                if (preg_match('/^(#[0-9a-fA-F]{3,8}|rgb(a)?\([^)]+\)|hsl(a)?\([^)]+\)|[a-zA-Z]+)$/', $color)) {
+                    return 'color:'.$color.($textStyle ? '; '.$textStyle : '');
+                }
+            }
+
+            return $textStyle;
+        };
+
         // Only these presentation classes are accepted from the rich text editor.
         $extractLayoutClasses = static function (string $attributes): string {
             // Skip other quoted attributes; data-class is not a class attribute.
@@ -153,8 +194,11 @@ class HtmlSanitizer
         }, $content) ?? '';
 
         foreach (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th'] as $tagName) {
-            $content = preg_replace_callback('/<'.$tagName.'\b([^>]*)>/i', function ($matches) use ($tagName, $extractStyle, $extractLayoutClasses) {
+            $content = preg_replace_callback('/<'.$tagName.'\b([^>]*)>/i', function ($matches) use ($tagName, $extractStyle, $extractTextStyle, $extractLayoutClasses) {
                 $style = $extractStyle($matches[1] ?? '');
+                if (in_array($tagName, ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'td', 'th'], true)) {
+                    $style = trim($style.' '.$extractTextStyle($matches[1] ?? ''));
+                }
                 $attributes = $style ? ' style="'.e($style).'"' : '';
                 if ($classes = $extractLayoutClasses($matches[1] ?? '')) {
                     $attributes .= ' class="'.$classes.'"';
@@ -171,12 +215,22 @@ class HtmlSanitizer
             }, $content) ?? '';
         }
 
-        $content = preg_replace_callback('/<a\b([^>]*)>/i', function ($matches) {
+        foreach (['strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li', 'blockquote'] as $tagName) {
+            $content = preg_replace_callback('/<'.$tagName.'\b([^>]*)>/i', function ($matches) use ($tagName, $extractTextStyle) {
+                $style = $extractTextStyle($matches[1] ?? '');
+
+                return '<'.$tagName.($style ? ' style="'.e($style).'"' : '').'>';
+            }, $content) ?? '';
+        }
+
+        $content = preg_replace_callback('/<a\b([^>]*)>/i', function ($matches) use ($extractTextStyle) {
             $attributes = $matches[1] ?? '';
+            $style = $extractTextStyle($attributes);
+            $styleAttribute = $style ? ' style="'.e($style).'"' : '';
 
             if (! preg_match('/href\s*=\s*"([^"]+)"/i', $attributes, $hrefMatch) &&
                 ! preg_match("/href\s*=\s*'([^']+)'/i", $attributes, $hrefMatch)) {
-                return '<a>';
+                return '<a'.$styleAttribute.'>';
             }
 
             $href = trim(html_entity_decode($hrefMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
@@ -184,33 +238,16 @@ class HtmlSanitizer
             // Browsers ignore embedded ASCII control characters in URL schemes.
             $schemeValue = preg_replace('/[\x00-\x20\x7f]+/', '', $href);
             if (preg_match('/^javascript:/i', $schemeValue)) {
-                return '<a>';
+                return '<a'.$styleAttribute.'>';
             }
 
-            return '<a href="'.e($href).'" target="_blank" rel="noopener noreferrer">';
+            return '<a href="'.e($href).'" target="_blank" rel="noopener noreferrer"'.$styleAttribute.'>';
         }, $content) ?? '';
 
-        $content = preg_replace_callback('/<span\b([^>]*)>/i', function ($matches) {
-            $attributes = $matches[1] ?? '';
+        $content = preg_replace_callback('/<span\b([^>]*)>/i', function ($matches) use ($extractTextStyle) {
+            $style = $extractTextStyle($matches[1] ?? '', true);
 
-            if (! preg_match('/style\s*=\s*"([^"]*)"/i', $attributes, $styleMatch) &&
-                ! preg_match("/style\s*=\s*'([^']*)'/i", $attributes, $styleMatch)) {
-                return '<span>';
-            }
-
-            $style = $styleMatch[1] ?? '';
-
-            if (! preg_match('/(?:^|;)\s*color\s*:\s*([^;]+)/i', $style, $colorMatch)) {
-                return '<span>';
-            }
-
-            $color = trim($colorMatch[1]);
-
-            if (! preg_match('/^(#[0-9a-fA-F]{3,8}|rgb(a)?\([^)]+\)|hsl(a)?\([^)]+\)|[a-zA-Z]+)$/', $color)) {
-                return '<span>';
-            }
-
-            return '<span style="color:'.e($color).'">';
+            return $style ? '<span style="'.e($style).'">' : '<span>';
         }, $content) ?? '';
 
         $content = preg_replace_callback('/<img\b([^>]*)>/i', function ($matches) use ($sanitizeStyle) {

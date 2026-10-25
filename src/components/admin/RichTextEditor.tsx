@@ -22,6 +22,7 @@ import {
   ArrowLeftRight,
   ImageUp,
   TextCursorInput,
+  Pilcrow,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { isWordHtml, normalizeWordHtml } from "@/lib/word-paste";
@@ -56,11 +57,33 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
   const activeImgRowRef = useRef<HTMLElement | null>(null);
   const replacementImageRef = useRef<HTMLImageElement | null>(null);
   const contentRevisionRef = useRef(0);
+  const emittedContentRef = useRef<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
   const [selectedCell, setSelectedCell] = useState<HTMLTableCellElement | null>(null);
   const [imageRect, setImageRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+  const [formats, setFormats] = useState<Record<string, boolean>>({});
+
+  const currentBlock = () => {
+    const selection = window.getSelection();
+    if (!selection?.rangeCount || !editorRef.current?.contains(selection.getRangeAt(0).commonAncestorContainer)) return "";
+    return (document.queryCommandValue?.("formatBlock") || "p").replace(/[<>]/g, "").toLowerCase();
+  };
+
+  const updateFormats = () => {
+    const selection = window.getSelection();
+    const inside = !!selection?.rangeCount && !!editorRef.current?.contains(selection.getRangeAt(0).commonAncestorContainer);
+    const block = inside ? currentBlock() : "";
+    const next: Record<string, boolean> = {
+      bold: inside && !!document.queryCommandState?.("bold"),
+      italic: inside && !!document.queryCommandState?.("italic"),
+      underline: inside && !!document.queryCommandState?.("underline"),
+      p: block === "p" || block === "div",
+      h2: block === "h2", h3: block === "h3", blockquote: block === "blockquote",
+    };
+    setFormats(previous => Object.keys(next).every(key => next[key] === previous[key]) ? previous : next);
+  };
 
   const updateImageRect = () => {
     if (!selectedImage || !wrapperRef.current) return;
@@ -101,7 +124,12 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
 
   useEffect(() => {
     const content = textOnly ? sanitizeLayoutText(value || "") : value || "";
+    // A parent echoes our sanitized HTML while the browser still owns the live
+    // caret/undo history. Cosmetic serialization changes must not replace it.
+    if (textOnly && editorRef.current && emittedContentRef.current === content
+      && sanitizeLayoutText(editorRef.current.innerHTML) === content) return;
     if (editorRef.current && editorRef.current.innerHTML !== content) {
+      emittedContentRef.current = null;
       contentRevisionRef.current += 1;
       editorRef.current.innerHTML = content;
       setSelectedCell(null);
@@ -111,6 +139,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
       activeImgRowRef.current = null;
       draggingImageRef.current = null;
       setIsUploading(false);
+      setFormats({});
     }
   }, [value, textOnly]);
 
@@ -119,7 +148,10 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
     if (textOnly) {
       const clean = sanitizeLayoutText(content);
       // Merely focusing a legacy text slot must not rewrite its stored formatting.
-      if (clean !== sanitizeLayoutText(value || "")) onChange(clean);
+      if (clean !== sanitizeLayoutText(value || "")) {
+        emittedContentRef.current = clean;
+        onChange(clean);
+      }
       return;
     }
     onChange(content);
@@ -259,14 +291,32 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
     if (!editorRef.current.contains(range.commonAncestorContainer)) return;
     selectionRef.current = range.cloneRange();
     setSelectedCell(cellAtCaret() || null);
+    updateFormats();
   };
 
+  useEffect(() => {
+    const onSelectionChange = () => {
+      saveSelection();
+      updateFormats();
+    };
+    document.addEventListener("selectionchange", onSelectionChange);
+    return () => document.removeEventListener("selectionchange", onSelectionChange);
+  }, []);
+
   const restoreSelection = () => {
-    if (!selectionRef.current) return;
+    const saved = selectionRef.current;
+    if (!saved || !editorRef.current?.contains(saved.commonAncestorContainer)) return;
     const selection = window.getSelection();
     if (!selection) return;
+    if (selection.rangeCount) {
+      const live = selection.getRangeAt(0);
+      // Replacing an identical range clears the browser's pending typing style.
+      // In particular, a second Bold/Italic click would turn it on again.
+      if (live.startContainer === saved.startContainer && live.startOffset === saved.startOffset
+        && live.endContainer === saved.endContainer && live.endOffset === saved.endOffset) return;
+    }
     selection.removeAllRanges();
-    selection.addRange(selectionRef.current);
+    selection.addRange(saved);
   };
 
   const getSafeInsertionRange = () => {
@@ -491,10 +541,12 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
   const runCommand = (command: string, commandValue?: string) => {
     editorRef.current?.focus();
     restoreSelection();
-    if (command === "foreColor") {
-      document.execCommand("styleWithCSS", false, "true");
-    }
-    document.execCommand(command, false, commandValue);
+    // Prefer semantic bold/italic tags, including after using the colour picker.
+    document.execCommand("styleWithCSS", false, command === "foreColor" ? "true" : "false");
+    const requestedBlock = commandValue?.replace(/[<>]/g, "").toLowerCase();
+    const nextValue = command === "formatBlock" && requestedBlock !== "p" && requestedBlock === currentBlock() ? "<p>" : commandValue;
+    document.execCommand(command, false, nextValue);
+    if (command === "removeFormat") document.execCommand("formatBlock", false, "<p>");
     saveSelection();
     emitChange();
   };
@@ -657,14 +709,15 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
   };
 
   const buttons = [
-    { title: "Bold", icon: Bold, action: () => runCommand("bold") },
-    { title: "Italic", icon: Italic, action: () => runCommand("italic") },
-    { title: "Underline", icon: Underline, action: () => runCommand("underline") },
-    { title: "Heading 2", icon: Heading2, action: () => runCommand("formatBlock", "<h2>") },
-    { title: "Heading 3", icon: Heading3, action: () => runCommand("formatBlock", "<h3>") },
+    { title: "Bold", icon: Bold, active: !!formats.bold, action: () => runCommand("bold") },
+    { title: "Italic", icon: Italic, active: !!formats.italic, action: () => runCommand("italic") },
+    { title: "Underline", icon: Underline, active: !!formats.underline, action: () => runCommand("underline") },
+    { title: "Normal paragraph", icon: Pilcrow, active: !!formats.p, action: () => runCommand("formatBlock", "<p>") },
+    { title: "Heading 2", icon: Heading2, active: !!formats.h2, action: () => runCommand("formatBlock", "<h2>") },
+    { title: "Heading 3", icon: Heading3, active: !!formats.h3, action: () => runCommand("formatBlock", "<h3>") },
     { title: "Bullet List", icon: List, action: () => insertListFallback("ul") },
     { title: "Numbered List", icon: ListOrdered, action: () => insertListFallback("ol") },
-    { title: "Quote", icon: Quote, action: () => runCommand("formatBlock", "<blockquote>") },
+    { title: "Quote", icon: Quote, active: !!formats.blockquote, action: () => runCommand("formatBlock", "<blockquote>") },
     { title: "Link", icon: Link2, action: addLink },
     { title: "Upload Image", icon: ImagePlus, action: openImagePicker },
     { title: "Image Row (Side-by-Side)", icon: LayoutGrid, action: () => insertImageRow() },
@@ -678,8 +731,8 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
     <div>
       {label ? <label className="block text-sm font-medium text-gray-700">{label}</label> : null}
       <div ref={wrapperRef} className="mt-1 border border-gray-300 rounded-md overflow-hidden bg-white relative">
-        <div className="border-b border-gray-200 bg-gray-50 p-2 flex flex-wrap gap-1">
-          {buttons.filter(({ title }) => !textOnly || !['Upload Image', 'Image Row (Side-by-Side)', '2 images side by side', '3 images side by side', 'Text Color'].includes(title)).map(({ title, icon: Icon, action }) => (
+        <div role="toolbar" aria-label={`${label || "Rich text"} formatting`} className="border-b border-gray-200 bg-gray-50 p-2 flex flex-wrap gap-1">
+          {buttons.filter(({ title }) => !textOnly || !['Upload Image', 'Image Row (Side-by-Side)', '2 images side by side', '3 images side by side', 'Text Color'].includes(title)).map(({ title, icon: Icon, action, active }) => (
             <button
               key={title}
               type="button"
@@ -688,9 +741,10 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
                 saveSelection();
               }}
               onClick={action}
-              className="inline-flex items-center justify-center w-8 h-8 rounded border border-gray-200 bg-white text-gray-600 hover:text-[#eb5c10] hover:border-[#eb5c10] transition-colors"
+              className={`inline-flex items-center justify-center w-8 h-8 rounded border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#eb5c10] ${active ? "border-[#eb5c10] bg-[#fff0e6] text-[#b84300] ring-1 ring-[#eb5c10]" : "border-gray-200 bg-white text-gray-600 hover:text-[#eb5c10] hover:border-[#eb5c10]"}`}
               title={title}
               aria-label={title}
+              aria-pressed={active}
             >
               <Icon className="w-4 h-4" />
             </button>
@@ -756,7 +810,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           aria-multiline="true"
           contentEditable
           suppressContentEditableWarning
-          onFocus={() => { if (textOnly) document.execCommand?.("defaultParagraphSeparator", false, "p"); }}
+          onFocus={() => { if (textOnly) document.execCommand?.("defaultParagraphSeparator", false, "p"); updateFormats(); }}
           onClick={handleEditorClick}
           onMouseUp={saveSelection}
           onKeyUp={saveSelection}
@@ -884,7 +938,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
             setSelectionFromPoint(event.clientX, event.clientY);
             await insertUploadedImages(files);
           }}
-          onInput={emitChange}
+          onInput={() => { saveSelection(); emitChange(); }}
           onPaste={handlePaste}
           onBlur={() => {
             saveSelection();

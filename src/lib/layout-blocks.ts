@@ -24,6 +24,23 @@ const inlineTags = ['b', 'strong', 'i', 'em', 'u', 'a', 'span', 'br'];
 const richTags = [...inlineTags, 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote'];
 const blockSelector = 'p,h1,h2,h3,h4,h5,h6,ul,ol,li,blockquote,div,table,thead,tbody,tfoot,tr,td,th';
 const forbiddenSelector = 'script,style,iframe,object,embed,svg,math,form,input,button,textarea,select,option,link,meta,noscript,template';
+const textStyleValues: Record<string, RegExp> = {
+  'font-weight': /^(?:normal|bold|[1-9]00)$/,
+  'font-style': /^(?:normal|italic)$/,
+  'text-decoration': /^(?:none|underline)$/,
+};
+
+function safeTextStyle(style: string): string {
+  const values: Record<string, string> = {};
+  for (const declaration of style.split(';')) {
+    const separator = declaration.indexOf(':');
+    if (separator < 0) continue;
+    const property = declaration.slice(0, separator).trim().toLowerCase();
+    const value = declaration.slice(separator + 1).trim().toLowerCase();
+    if (Object.hasOwn(textStyleValues, property) && textStyleValues[property].test(value)) values[property] = value;
+  }
+  return Object.keys(textStyleValues).filter(property => values[property]).map(property => `${property}:${values[property]};`).join(' ');
+}
 
 function safeUrl(value: string, image = false): string | null {
   const url = value.trim();
@@ -44,6 +61,14 @@ export function sanitizeLayoutText(html: string, inline = false): string {
   body.querySelectorAll(forbiddenSelector).forEach(element => element.remove());
   body.querySelectorAll('img,video,audio,source,picture').forEach(element => element.remove());
 
+  // Native editing uses explicit normal values to turn off inherited heading/bold styles.
+  // Preserve those text-only overrides, never arbitrary layout or positioning CSS.
+  for (const element of body.querySelectorAll('[style]')) {
+    const style = safeTextStyle(element.getAttribute('style') || '');
+    if (style) element.setAttribute('style', style);
+    else element.removeAttribute('style');
+  }
+
   // contentEditable uses div for Enter. Keep those line breaks without accepting layout divs.
   for (const element of Array.from(body.querySelectorAll(inline ? blockSelector : 'div,table,thead,tbody,tfoot,tr,td,th')).reverse()) {
     const fragment = document.createDocumentFragment();
@@ -60,7 +85,7 @@ export function sanitizeLayoutText(html: string, inline = false): string {
   }
   const clean = DOMPurify.sanitize(body.innerHTML, {
     ALLOWED_TAGS: inline ? inlineTags : richTags,
-    ALLOWED_ATTR: ['href', 'title', 'target', 'rel'],
+    ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'style'],
     ALLOW_DATA_ATTR: false,
     ALLOW_ARIA_ATTR: false,
     KEEP_CONTENT: true,
