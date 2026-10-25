@@ -1,5 +1,5 @@
 import { priceRangeError } from "@/lib/price-filter";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X, Copy, ChevronDown, ChevronRight } from "lucide-react";
@@ -46,6 +46,20 @@ import {
     createEmptySizeVariant,
 } from "@/lib/adminProductUtils";
 
+type SpecificationRow = { id: number; name: string; value: string };
+
+function validateSpecifications(rows: SpecificationRow[]): string {
+    const names = new Set<string>();
+    for (const row of rows) {
+        const name = row.name.trim();
+        if (!name || !row.value.trim()) return "Enter both a name and a value for each specification, or remove the empty row.";
+        const normalizedName = name.toLowerCase();
+        if (names.has(normalizedName)) return `Specification names must be unique: "${name}" is used more than once.`;
+        names.add(normalizedName);
+    }
+    return "";
+}
+
 function CombinationAttributeInput({
     value,
     optionName,
@@ -85,6 +99,10 @@ export default function AdminProducts() {
 
     const [isEditing, setIsEditing] = useState(false);
     const [currentProduct, setCurrentProduct] = useState<any>(null);
+    const [specificationRows, setSpecificationRows] = useState<SpecificationRow[]>([]);
+    const [newSpecification, setNewSpecification] = useState({ name: "", value: "" });
+    const [specificationError, setSpecificationError] = useState("");
+    const nextSpecificationId = useRef(0);
     const [tagsInput, setTagsInput] = useState("");
     const [newSizeVariant, setNewSizeVariant] = useState(createEmptySizeVariant());
     const [newCombinationVariant, setNewCombinationVariant] = useState(createEmptyCombinationVariant());
@@ -269,6 +287,11 @@ export default function AdminProducts() {
             }
         ;
         setCurrentProduct(nextProduct);
+        const rows = Object.entries(nextProduct.specifications || {}).map(([name, value], id) => ({ id, name, value: String(value ?? "") }));
+        setSpecificationRows(rows);
+        nextSpecificationId.current = rows.length;
+        setNewSpecification({ name: "", value: "" });
+        setSpecificationError("");
         setTagsInput(Array.isArray(nextProduct.tags) ? nextProduct.tags.join(", ") : "");
         setNewSizeVariant(createEmptySizeVariant());
         setNewCombinationVariant(createEmptyCombinationVariant(prod?.combination_variant_options_draft || prod?.variant_options || []));
@@ -279,24 +302,18 @@ export default function AdminProducts() {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            // Check if there's a pending specification to add
-            const keyEl = document.getElementById('new_spec_key') as HTMLInputElement;
-            const valEl = document.getElementById('new_spec_value') as HTMLInputElement;
+            const rows = newSpecification.name.trim() || newSpecification.value.trim()
+                ? [...specificationRows, { ...newSpecification, id: nextSpecificationId.current }]
+                : specificationRows;
+            const error = validateSpecifications(rows);
+            setSpecificationError(error);
+            if (error) {
+                toast.error(error);
+                return;
+            }
             const finalProduct = { ...currentProduct };
             if (derivedPrice !== null && !finalProduct.price_on_request) finalProduct.price = derivedPrice.toFixed(2);
-
-            if (keyEl && valEl) {
-                const key = keyEl.value.trim();
-                const val = valEl.value.trim();
-                if (key && val) {
-                    finalProduct.specifications = {
-                        ...(finalProduct.specifications || {}),
-                        [key]: val
-                    };
-                    keyEl.value = "";
-                    valEl.value = "";
-                }
-            }
+            finalProduct.specifications = Object.fromEntries(rows.map((row) => [row.name.trim(), row.value.trim()]));
 
             finalProduct.tags = tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean);
             finalProduct.product_code = String(finalProduct.product_code ?? "").trim() || null;
@@ -1665,18 +1682,36 @@ export default function AdminProducts() {
                                         />
                                     </div>
                                     <div className="col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Specifications</label>
-                                        <div className="space-y-3">
-                                            {Object.entries(currentProduct.specifications || {}).map(([key, value]: [string, any], index) => (
-                                                <div key={index} className="flex items-center gap-2">
-                                                    <div className="flex-1 text-sm bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-md font-medium">{key}</div>
-                                                    <div className="flex-1 text-sm bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-md">{value}</div>
+                                        <p id="specifications-label" className="block text-sm font-medium text-gray-700 mb-2">Specifications</p>
+                                        <div role="group" aria-labelledby="specifications-label" aria-describedby={specificationError ? "specifications-error" : undefined} className="space-y-3">
+                                            {specificationRows.map((row, index) => (
+                                                <div key={row.id} className="flex items-center gap-2">
+                                                    <input
+                                                        type="text"
+                                                        aria-label={`Specification ${index + 1} name`}
+                                                        value={row.name}
+                                                        onChange={(event) => {
+                                                            setSpecificationRows((rows) => rows.map((item) => item.id === row.id ? { ...item, name: event.target.value } : item));
+                                                            setSpecificationError("");
+                                                        }}
+                                                        className="min-w-0 flex-1 text-sm border border-gray-300 px-3 py-1.5 rounded-md font-medium focus:border-indigo-500 focus:ring-indigo-500"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        aria-label={`Specification ${index + 1} value`}
+                                                        value={row.value}
+                                                        onChange={(event) => {
+                                                            setSpecificationRows((rows) => rows.map((item) => item.id === row.id ? { ...item, value: event.target.value } : item));
+                                                            setSpecificationError("");
+                                                        }}
+                                                        className="min-w-0 flex-1 text-sm border border-gray-300 px-3 py-1.5 rounded-md focus:border-indigo-500 focus:ring-indigo-500"
+                                                    />
                                                     <button
                                                         type="button"
+                                                        aria-label={`Remove specification ${index + 1}`}
                                                         onClick={() => {
-                                                            const newSpecs = { ...currentProduct.specifications };
-                                                            delete newSpecs[key];
-                                                            setCurrentProduct({ ...currentProduct, specifications: newSpecs });
+                                                            setSpecificationRows((rows) => rows.filter((item) => item.id !== row.id));
+                                                            setSpecificationError("");
                                                         }}
                                                         className="p-1.5 text-red-500 hover:bg-red-50 rounded-md transition-colors"
                                                     >
@@ -1689,38 +1724,45 @@ export default function AdminProducts() {
                                                     type="text"
                                                     placeholder="e.g. Color"
                                                     id="new_spec_key"
-                                                    className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-1.5 border"
+                                                    aria-label="New specification name"
+                                                    value={newSpecification.name}
+                                                    onChange={(event) => {
+                                                        setNewSpecification((draft) => ({ ...draft, name: event.target.value }));
+                                                        setSpecificationError("");
+                                                    }}
+                                                    className="min-w-0 flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-1.5 border"
                                                 />
                                                 <input
                                                     type="text"
                                                     placeholder="e.g. Silver"
                                                     id="new_spec_value"
-                                                    className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-1.5 border"
+                                                    aria-label="New specification value"
+                                                    value={newSpecification.value}
+                                                    onChange={(event) => {
+                                                        setNewSpecification((draft) => ({ ...draft, value: event.target.value }));
+                                                        setSpecificationError("");
+                                                    }}
+                                                    className="min-w-0 flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-1.5 border"
                                                 />
                                                 <button
                                                     type="button"
+                                                    aria-label="Add specification"
                                                     onClick={() => {
-                                                        const keyEl = document.getElementById('new_spec_key') as HTMLInputElement;
-                                                        const valEl = document.getElementById('new_spec_value') as HTMLInputElement;
-                                                        const key = keyEl.value.trim();
-                                                        const val = valEl.value.trim();
-                                                        if (key && val) {
-                                                            setCurrentProduct({
-                                                                ...currentProduct,
-                                                                specifications: {
-                                                                    ...(currentProduct.specifications || {}),
-                                                                    [key]: val
-                                                                }
-                                                            });
-                                                            keyEl.value = "";
-                                                            valEl.value = "";
-                                                        }
+                                                        if (!newSpecification.name.trim() && !newSpecification.value.trim()) return;
+                                                        const rows = [...specificationRows, { ...newSpecification, id: nextSpecificationId.current }];
+                                                        const error = validateSpecifications(rows);
+                                                        setSpecificationError(error);
+                                                        if (error) return;
+                                                        nextSpecificationId.current += 1;
+                                                        setSpecificationRows(rows);
+                                                        setNewSpecification({ name: "", value: "" });
                                                     }}
                                                     className="p-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-md transition-colors"
                                                 >
                                                     <Plus className="w-4 h-4" />
                                                 </button>
                                             </div>
+                                            {specificationError && <p id="specifications-error" role="alert" className="text-sm text-red-600">{specificationError}</p>}
                                         </div>
                                     </div>
                                     <div className="col-span-2">
