@@ -18,14 +18,17 @@ import {
   AlignJustify,
   LayoutGrid,
   Columns2,
+  Columns3,
   ArrowLeftRight,
   ImageUp,
   TextCursorInput,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+import { isWordHtml, normalizeWordHtml } from "@/lib/word-paste";
 import { toast } from "sonner";
 import "@/service-content.css";
 import "@/product-editorial.css";
+import "@/content-sections.css";
 
 type RichTextEditorProps = {
   label: string;
@@ -33,12 +36,14 @@ type RichTextEditorProps = {
   onChange: (value: string) => void;
   helperText?: string;
   serviceLayout?: boolean;
+  wordPaste?: boolean;
+  documentLayout?: boolean;
 };
 
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 const MAX_IMAGE_SIZE_LABEL = "2MB";
 
-export default function RichTextEditor({ label, value, onChange, helperText = "Saved as formatted HTML.", serviceLayout = false }: RichTextEditorProps) {
+export default function RichTextEditor({ label, value, onChange, helperText = "Saved as formatted HTML.", serviceLayout = false, wordPaste = false, documentLayout = false }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -47,9 +52,11 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
   const draggingImageRef = useRef<HTMLImageElement | null>(null);
   const activeImgRowRef = useRef<HTMLElement | null>(null);
   const replacementImageRef = useRef<HTMLImageElement | null>(null);
+  const contentRevisionRef = useRef(0);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
+  const [selectedCell, setSelectedCell] = useState<HTMLTableCellElement | null>(null);
   const [imageRect, setImageRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
 
   const updateImageRect = () => {
@@ -91,7 +98,15 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== (value || "")) {
+      contentRevisionRef.current += 1;
       editorRef.current.innerHTML = value || "";
+      setSelectedCell(null);
+      setSelectedImage(null);
+      selectionRef.current = null;
+      replacementImageRef.current = null;
+      activeImgRowRef.current = null;
+      draggingImageRef.current = null;
+      setIsUploading(false);
     }
   }, [value]);
 
@@ -101,6 +116,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
 
   const handleEditorClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
+    setSelectedCell(target.closest("td,th") as HTMLTableCellElement | null);
     if (target.tagName === "IMG") {
       setSelectedImage(target as HTMLImageElement);
     } else {
@@ -118,6 +134,64 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
       node = node.parentElement;
     }
     activeImgRowRef.current = foundRow;
+  };
+
+  const selectedTable = selectedCell?.closest('table');
+  const tableRows = selectedTable ? Array.from(selectedTable.rows) : [];
+  const simpleTable = tableRows.length > 0 && tableRows.every(row => row.cells.length === tableRows[0].cells.length && Array.from(row.cells).every(cell => cell.colSpan === 1 && cell.rowSpan === 1));
+  const cellAtCaret = (): HTMLTableCellElement | null | undefined => {
+    const selection = window.getSelection();
+    const node = selection?.focusNode;
+    // A toolbar can own focus while the editor still owns the saved selection.
+    if (!selection?.rangeCount || !node || !editorRef.current?.contains(node)) return undefined;
+    const element = node instanceof Element ? node : node.parentElement;
+    return element?.closest<HTMLTableCellElement>('td,th') || null;
+  };
+  const changeTable = (action: 'add-row' | 'remove-row' | 'add-column' | 'remove-column') => {
+    const caretCell = cellAtCaret();
+    const cell = caretCell === undefined ? selectedCell : caretCell;
+    if (!cell || !editorRef.current?.contains(cell)) return;
+    const table = cell.closest('table');
+    const rows = table ? Array.from(table.rows) : [];
+    if (!table || !rows.length || !rows.every(row => row.cells.length === rows[0].cells.length && Array.from(row.cells).every(item => item.colSpan === 1 && item.rowSpan === 1))) return;
+    const row = cell.parentElement as HTMLTableRowElement;
+    const column = cell.cellIndex;
+    let focusCell: HTMLTableCellElement | null = cell;
+    if (action === 'add-row') {
+      const nextRow = document.createElement('tr');
+      Array.from(row.cells).forEach(() => { const cell = document.createElement('td'); cell.innerHTML = '<br>'; nextRow.append(cell); });
+      if (row.parentElement?.tagName === 'THEAD') {
+        const body = table.tBodies[0] || table.createTBody();
+        body.insertBefore(nextRow, body.firstChild);
+      } else row.after(nextRow);
+      focusCell = nextRow.cells[0];
+    } else if (action === 'remove-row' && rows.length > 1) {
+      const index = rows.indexOf(row);
+      focusCell = (rows[index + 1] || rows[index - 1]).cells[Math.min(column, row.cells.length - 1)];
+      row.remove();
+    } else if (action === 'add-column') {
+      rows.forEach(item => {
+        const cell = document.createElement(item.cells[column].tagName.toLowerCase());
+        cell.innerHTML = '<br>';
+        item.cells[column].after(cell);
+      });
+      focusCell = row.cells[column + 1];
+    } else if (action === 'remove-column' && row.cells.length > 1) {
+      rows.forEach(item => item.cells[column].remove());
+      focusCell = row.cells[Math.min(column, row.cells.length - 1)];
+    }
+    setSelectedCell(focusCell);
+    emitChange();
+    editorRef.current.focus();
+    if (focusCell) {
+      const range = document.createRange();
+      range.selectNodeContents(focusCell);
+      range.collapse(true);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      selectionRef.current = range.cloneRange();
+    }
   };
 
   const applyImageWidth = (width: string) => {
@@ -171,6 +245,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
     const range = selection.getRangeAt(0);
     if (!editorRef.current.contains(range.commonAncestorContainer)) return;
     selectionRef.current = range.cloneRange();
+    setSelectedCell(cellAtCaret() || null);
   };
 
   const restoreSelection = () => {
@@ -235,6 +310,27 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
     emitChange();
   };
 
+  const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
+    if (!wordPaste) return;
+    const html = event.clipboardData.getData("text/html");
+    if (!isWordHtml(html)) return;
+    event.preventDefault();
+    const normalized = normalizeWordHtml(html);
+    if (normalized.missingImages) {
+      toast.error("Word did not include a usable copy of every image. Copy from Word Online, or add the images using the image button.");
+      return;
+    }
+    saveSelection();
+    setSelectedImage(null);
+    // Native insertion keeps the entire paste in the browser's undo history.
+    if (document.execCommand?.("insertHTML", false, normalized.html)) {
+      saveSelection();
+      emitChange();
+    } else {
+      insertHtmlAtSelection(normalized.html);
+    }
+  };
+
   const setSelectionFromPoint = (x: number, y: number) => {
     const docWithCaret = document as Document & {
       caretRangeFromPoint?: (px: number, py: number) => Range | null;
@@ -272,6 +368,10 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
 
   const insertUploadedImages = async (files: File[]) => {
     if (!files.length) return;
+    const uploadEditor = editorRef.current;
+    if (!uploadEditor) return;
+    const uploadRevision = contentRevisionRef.current;
+    const isCurrentEditor = () => editorRef.current === uploadEditor && uploadEditor.isConnected && contentRevisionRef.current === uploadRevision;
 
     const oversized = files.find((file) => file.size > MAX_IMAGE_SIZE_BYTES);
     if (oversized) {
@@ -301,12 +401,16 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
     try {
       for (const file of files) {
         const url = await uploadImage(file);
+        // A section can close, or another record can load, while the request runs.
+        if (!isCurrentEditor()) return;
+        if (replacement && !uploadEditor.contains(replacement)) return;
         const alt = file.name.replace(/\.[^/.]+$/, "");
 
         if (replacement && editorRef.current?.contains(replacement)) {
+          const linkedImage = replacement.closest<HTMLAnchorElement>('a[href]');
+          if (linkedImage && linkedImage.href === replacement.src) linkedImage.setAttribute('href', url);
           replacement.src = url;
-          replacement.style.cssText = "max-width:100%;height:auto;";
-          // Keep the descriptive alt text; it can be edited separately.
+          // Keep the image's sizing, alignment and descriptive alt text.
           emitChange();
           break;
         } else if (mediaTarget && editorRef.current?.contains(mediaTarget)) {
@@ -346,11 +450,11 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           );
         }
       }
-      toast.success(files.length > 1 ? "Images uploaded" : "Image uploaded");
+      if (isCurrentEditor()) toast.success(files.length > 1 ? "Images uploaded" : "Image uploaded");
     } catch (error: any) {
-      toast.error(error?.message || "Failed to upload image");
+      if (isCurrentEditor()) toast.error(error?.message || "Failed to upload image");
     } finally {
-      setIsUploading(false);
+      if (isCurrentEditor()) setIsUploading(false);
     }
   };
 
@@ -425,21 +529,23 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
     insertHtmlAtSelection(`<${type}>${listItems}</${type}><p><br></p>`);
   };
 
-  const insertImageRow = () => {
+  const insertImageRow = (columns?: 2 | 3) => {
     const editor = editorRef.current;
     if (!editor) return;
+    editor.focus();
+    restoreSelection();
 
     // Create the flex row container with a visual hint 
     const row = document.createElement("div");
-    row.className = "img-row";
-    row.setAttribute("style", "display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;margin:8px 0;min-height:60px;padding:6px;border:2px dashed #eb5c10;border-radius:6px;position:relative;");
+    row.className = columns ? `img-row img-row--${columns}` : "img-row";
+    if (!columns) row.setAttribute("style", "display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;margin:8px 0;min-height:60px;padding:6px;border:2px dashed #eb5c10;border-radius:6px;position:relative;");
 
     // Create a placeholder hint span (cleared when images drop in)
     const hint = document.createElement("span");
     hint.style.cssText = "color:#eb5c10;font-size:12px;opacity:0.7;pointer-events:none;align-self:center;";
     hint.setAttribute("contenteditable", "false");
     hint.textContent = "← Drop or upload images here to place side-by-side";
-    row.appendChild(hint);
+    if (!columns) row.appendChild(hint);
 
     // Find current block-level ancestor in the editor
     const sel = window.getSelection();
@@ -531,7 +637,9 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
     { title: "Quote", icon: Quote, action: () => runCommand("formatBlock", "<blockquote>") },
     { title: "Link", icon: Link2, action: addLink },
     { title: "Upload Image", icon: ImagePlus, action: openImagePicker },
-    { title: "Image Row (Side-by-Side)", icon: LayoutGrid, action: insertImageRow },
+    { title: "Image Row (Side-by-Side)", icon: LayoutGrid, action: () => insertImageRow() },
+    { title: "2 images side by side", icon: Columns2, action: () => insertImageRow(2) },
+    { title: "3 images side by side", icon: Columns3, action: () => insertImageRow(3) },
     { title: "Text Color", icon: Palette, action: openColorPicker },
     { title: "Clear Format", icon: Eraser, action: () => runCommand("removeFormat") },
   ];
@@ -574,11 +682,13 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           />
         </div>
 
-        {serviceLayout && (
+        {(serviceLayout || selectedImage) && (
           <div className="flex flex-wrap gap-2 border-b border-gray-200 p-2 bg-[#f4f6f8]">
             {[
-              { label: "Add image + text", icon: Columns2, action: insertServiceSection, disabled: false },
-              { label: "Swap sides", icon: ArrowLeftRight, action: swapServiceSection, disabled: false },
+              ...(serviceLayout ? [
+                { label: "Add image + text", icon: Columns2, action: insertServiceSection, disabled: false },
+                { label: "Swap sides", icon: ArrowLeftRight, action: swapServiceSection, disabled: false },
+              ] : []),
               { label: "Replace photo", icon: ImageUp, disabled: !selectedImage, action: () => {
                 replacementImageRef.current = selectedImage;
                 imageInputRef.current?.click();
@@ -598,6 +708,16 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
             ))}
           </div>
         )}
+
+        {selectedCell && editorRef.current?.contains(selectedCell) && <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 bg-slate-50 p-2" role="toolbar" aria-label="Table editing">
+          {[
+            { label: 'Add row below', action: 'add-row', disabled: !simpleTable },
+            { label: 'Remove row', action: 'remove-row', disabled: !simpleTable || tableRows.length <= 1 },
+            { label: 'Add column right', action: 'add-column', disabled: !simpleTable },
+            { label: 'Remove column', action: 'remove-column', disabled: !simpleTable || (selectedCell.parentElement as HTMLTableRowElement)?.cells.length <= 1 },
+          ].map(item => <button key={item.action} type="button" disabled={item.disabled} onMouseDown={event => event.preventDefault()} onClick={() => changeTable(item.action as 'add-row' | 'remove-row' | 'add-column' | 'remove-column')} className="rounded border border-gray-300 bg-white px-2 py-1.5 text-xs font-medium text-primary disabled:opacity-40">{item.label}</button>)}
+          {!simpleTable && <span className="text-xs text-gray-500">Merged cells: edit the text directly. Row and column changes are available in simple tables.</span>}
+        </div>}
 
         <div
           ref={editorRef}
@@ -724,15 +844,18 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
             const files = Array.from(event.dataTransfer.files || []).filter((file) => file.type.startsWith("image/"));
             if (!files.length) return;
 
+            const row = (event.target as HTMLElement).closest<HTMLElement>(".img-row");
+            activeImgRowRef.current = row && editorRef.current?.contains(row) ? row : null;
             setSelectionFromPoint(event.clientX, event.clientY);
             await insertUploadedImages(files);
           }}
           onInput={emitChange}
+          onPaste={handlePaste}
           onBlur={() => {
             saveSelection();
             emitChange();
           }}
-          className={`${serviceLayout ? "service-rich-content service-rich-editor" : ""} min-h-[220px] max-h-[600px] overflow-y-auto p-3 focus:outline-none text-sm leading-6 text-gray-700 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:my-1 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:my-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:my-2 [&_blockquote]:border-l-4 [&_blockquote]:border-[#eb5c10] [&_blockquote]:pl-3 [&_blockquote]:italic [&_table]:w-full [&_table]:border-separate [&_table]:[border-spacing:18px_0] [&_td]:align-top [&_td]:pr-4 [&_td]:pb-3 [&_th]:align-top [&_th]:pr-4 [&_th]:pb-3 [&_img]:max-w-full ${isDragOver ? "bg-[#fff7f2] ring-2 ring-[#eb5c10]/40" : ""}`}
+          className={`${serviceLayout ? "service-rich-content service-rich-editor" : ""} ${documentLayout ? "section-document" : ""} min-h-[220px] max-h-[600px] overflow-y-auto p-3 focus:outline-none text-sm leading-6 text-gray-700 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:my-1 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:my-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:my-2 [&_blockquote]:border-l-4 [&_blockquote]:border-[#eb5c10] [&_blockquote]:pl-3 [&_blockquote]:italic [&_table]:w-full [&_table]:border-separate [&_table]:[border-spacing:18px_0] [&_td]:align-top [&_td]:pr-4 [&_td]:pb-3 [&_th]:align-top [&_th]:pr-4 [&_th]:pb-3 [&_img]:max-w-full ${isDragOver ? "bg-[#fff7f2] ring-2 ring-[#eb5c10]/40" : ""}`}
         />
 
         {selectedImage && imageRect && (
@@ -745,7 +868,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
               height: imageRect.height,
             }}
           >
-            {!serviceLayout && <>
+            {!serviceLayout && !selectedImage.closest('.img-row--2, .img-row--3') && <>
             {/* Corners */}
             <div className="absolute w-3 h-3 bg-white border border-[#eb5c10] cursor-nwse-resize -top-1.5 -left-1.5 pointer-events-auto" onMouseDown={(e) => handleResizeStart(e, "nw")} />
             <div className="absolute w-3 h-3 bg-white border border-[#eb5c10] cursor-nesw-resize -top-1.5 -right-1.5 pointer-events-auto" onMouseDown={(e) => handleResizeStart(e, "ne")} />

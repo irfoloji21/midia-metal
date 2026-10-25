@@ -1,0 +1,370 @@
+{
+  "product": [
+    {
+      "id": "longwell-dd7-fan",
+      "title": "DD7 fan product sections",
+      "sourceLabel": "LONGWELL DD7-5 EC Centrifugal Fan",
+      "sections": [
+        {
+          "id": "dd7-introduction",
+          "title": "Introduction with product image",
+          "description": "Fan overview, key points and the front photograph.",
+          "html": "<div class=\"word-paste\"><div class=\"word-table word-table--bordered\"><table style=\"border-collapse:collapse; border-spacing:0px;\"><tbody><tr><td style=\"width:55.291%;\"><p><strong>LONGWELL · LWDD7-5-EC</strong></p><h2 class=\"word-heading-1\">A compact blower with EC speed control</h2><p>The DD7-5 combines a centrifugal fan with a 200 W electronically commutated motor. Its direct-drive arrangement, rectangular outlet flange and mounting base provide a defined starting point for integrating the fan into a ventilation assembly.</p><p>The published duty points cover 852–1,400 m³/h. Select a point that meets both your airflow and pressure requirement, then check the drawing against the space and connection available.</p><ul><li><p><strong>Power supply:</strong> 220 V, 50 Hz</p></li></ul><ul><li><p><strong>Control input:</strong> 0–10 V or PWM signal</p></li></ul><ul><li><p><strong>Exact model:</strong> LWDD7-5-EC</p></li></ul></td><td style=\"width:3.875%;\"><p></p></td><td style=\"width:40.835%;\"><p style=\"text-align:center;\"><img src=\"/storage/product-content/1d284edac344fbc9f22a19bad80b44b720fe8c4c599ffbacbff25367bb47b847.png\" alt=\"LONGWELL LWDD7-5-EC centrifugal blower with rectangular outlet flange and mounting base\" loading=\"lazy\" style=\"width:274px;\"></p><p>Manufacturer product photograph: LONGWELL.</p></td></tr></tbody></table></div><p></p></div>"
+        },
+        {
+          "id": "dd7-overview",
+          "title": "Detailed product overview",
+          "description": "Model identity and replacement considerations.",
+          "html": "<div class=\"word-paste\"><h2 class=\"word-heading-1\">LONGWELL DD7-5 EC centrifugal fan — product overview</h2><p>The LONGWELL LWDD7-5-EC brings the fan housing, impeller and electronically commutated motor together in a direct-drive assembly. The rectangular discharge flange provides a clearly defined connection point, while the base and supporting frame can be compared with the mounting arrangement in your equipment. This overview brings together the model information, product views and selection considerations so that the complete assembly can be reviewed before an enquiry or order.</p><p>For a replacement project, start with the full model reference rather than the DD7 series name alone. Compare the existing fan’s identification plate, connection dimensions and required performance with the information on this page. Two fans with similar names or a similar external appearance may have different motors, outlet dimensions or operating characteristics. The photographs illustrate the listed LWDD7-5-EC model; the dimension drawing and performance table provide the numerical reference for comparison.</p></div>"
+        },
+        {
+          "id": "dd7-airflow",
+          "title": "Airflow requirement",
+          "description": "Operating points and system pressure.",
+          "html": "<div class=\"word-paste\"><h3 class=\"word-heading-2\">Understanding the airflow requirement</h3><p>The published performance information describes a range of operating points rather than a single airflow figure for every installation. The highest listed airflow is 1,400 m³/h at zero static pressure. At a listed static pressure of 160 Pa, the corresponding airflow is 1,134 m³/h. These values should be considered together: the airflow required by the application and the pressure at that airflow form the duty point used to assess the fan.</p><p>When preparing an enquiry, include the target airflow, the calculated system pressure and a description of the equipment or duct connection. This gives a more useful starting point than selecting by maximum airflow alone. The performance table further down this description keeps the published airflow, pressure, speed and noise readings together, making it easier to compare a proposed duty with the available data.</p></div>"
+        },
+        {
+          "id": "dd7-motor",
+          "title": "Motor, supply and control",
+          "description": "Motor rating, power supply and control signals.",
+          "html": "<div class=\"word-paste\"><h3 class=\"word-heading-2\">Motor, supply and control</h3><p>This model is listed with a 200 W EC motor, a 220 V / 50 Hz supply and 0–10 V or PWM speed control. The supply rating and control signal describe different parts of the connection. A controller therefore needs to be checked against the exact motor and its connection information. The product photographs show the motor position and external cable, while the model-specific wiring information is needed to identify individual terminals and connections.</p><p>For a replacement fan, record the control arrangement already used by the equipment as well as the mains supply. Include any controller reference with your enquiry so that the intended combination can be reviewed. The published specification does not identify a controller as part of the supplied package; confirm the items required for the complete installation when ordering.</p></div>"
+        },
+        {
+          "id": "dd7-two-views",
+          "title": "Two product views",
+          "description": "Front and motor-side photographs with an introduction.",
+          "html": "<div class=\"word-paste\"><h3 class=\"word-heading-2\">Front and motor-side views</h3><p>These two views show the outlet flange, mounting base and motor arrangement from different sides. Use them alongside the drawing to understand where the fan body, supports and electrical cable sit within the assembly.</p><div class=\"word-table word-table--bordered\"><table style=\"border-collapse:collapse; border-spacing:0px;\"><tbody><tr><td style=\"width:48.882%;\"><p style=\"text-align:center;\"><img src=\"/storage/product-content/0f1e1f41197410e81580a8b413e7ba494cbb63d79100e1c15834868b63623905.png\" alt=\"Front view of the DD7-5 EC fan showing its rectangular outlet and mounting base\" loading=\"lazy\" style=\"width:196px;\"></p></td><td style=\"width:2.235%;\"><p></p></td><td style=\"width:48.882%;\"><p style=\"text-align:center;\"><img src=\"/storage/product-content/7b35cb5fdad378230d7bbeb55431ef340df9acb059c8f3d6ebcbd24764438122.png\" alt=\"Side view of the DD7-5 EC fan showing the motor, support frame and cable\" loading=\"lazy\" style=\"width:196px;\"></p></td></tr></tbody></table></div><p></p></div>"
+        },
+        {
+          "id": "dd7-dimension-overview",
+          "title": "Dimensions and access",
+          "description": "Connection dimensions and space around the assembly.",
+          "html": "<div class=\"word-paste\"><h3 class=\"word-heading-2\">Dimensions and access around the assembly</h3><p>The drawing lists an overall height of 302 mm and a side-view overall length of 285 mm. The rectangular outlet flange is 222 × 220 mm, with fixing centres of 203 × 200 mm and eight Ø7 mm holes. These dimensions describe the illustrated connection and fixing arrangement; the flange’s outside dimensions should not be treated as the clear air opening.</p><p>Compare the drawing with the available position in the equipment, including the space around the inlet, the route of the cable and access to the mounting points. An overall envelope alone does not describe every connection detail. Photographs of the existing installation and measurements of its outlet and fixing pattern can help explain the intended fit when discussing a replacement.</p></div>"
+        },
+        {
+          "id": "dd7-three-views",
+          "title": "Three product views",
+          "description": "Front, motor-side and rear photographs.",
+          "html": "<div class=\"word-paste\"><h3 class=\"word-heading-2\">Three views of the same model</h3><p>The front, motor-side and rear photographs below provide a visual reference for the complete assembly. Together they show the relationship between the housing, outlet flange, motor and mounting feet.</p><div class=\"word-table word-table--bordered\"><table style=\"border-collapse:collapse; border-spacing:0px;\"><tbody><tr><td style=\"width:31.845%;\"><p style=\"text-align:center;\"><img src=\"/storage/product-content/17db8a09852f36b26d51b30ea384d0b582af2c358cfc12545cbf22d7c40ee311.png\" alt=\"DD7-5 EC fan front angle with the discharge flange visible\" loading=\"lazy\" style=\"width:151px;\"></p></td><td style=\"width:2.232%;\"><p></p></td><td style=\"width:31.845%;\"><p style=\"text-align:center;\"><img src=\"/storage/product-content/69f7f3d036b9a7b32bd868f32a8064506b3c0a8e2010fecb7e3654661130f7ca.png\" alt=\"DD7-5 EC fan motor-side angle with the electrical cable visible\" loading=\"lazy\" style=\"width:151px;\"></p></td><td style=\"width:2.232%;\"><p></p></td><td style=\"width:31.845%;\"><p style=\"text-align:center;\"><img src=\"/storage/product-content/f5d67a169017417b27bd2fa84433e73a425a3996e5a6627dcdd0b82e4e8ec315.png\" alt=\"DD7-5 EC fan rear angle showing the housing and mounting feet\" loading=\"lazy\" style=\"width:151px;\"></p></td></tr></tbody></table></div><p></p></div>"
+        },
+        {
+          "id": "dd7-enquiry-checklist",
+          "title": "Product enquiry checklist",
+          "description": "The information needed for a product enquiry.",
+          "html": "<div class=\"word-paste\"><h3 class=\"word-heading-2\">Key details for your product enquiry</h3><ul><li><p><strong>Product reference:</strong> LONGWELL LWDD7-5-EC.</p></li></ul><ul><li><p><strong>Assembly:</strong> direct-drive centrifugal blower with an EC motor.</p></li></ul><ul><li><p><strong>Duty information:</strong> state the required airflow and static pressure together.</p></li></ul><ul><li><p><strong>Connection details:</strong> compare the outlet flange, fixing centres and available space.</p></li></ul><ul><li><p><strong>Order details:</strong> confirm the supplied accessories, availability and delivery arrangements.</p></li></ul><p>Keep the full model reference with the drawing and performance data when comparing this fan with an existing unit. The following technical information, dimensional views and documentation notes can then be reviewed as one product description.</p><p></p></div>"
+        },
+        {
+          "id": "dd7-control-layout",
+          "title": "Motor-side image and control details",
+          "description": "A side-by-side photograph and technical explanation.",
+          "html": "<div class=\"word-paste\"><div class=\"word-table word-table--bordered\"><table style=\"border-collapse:collapse; border-spacing:0px;\"><tbody><tr><td style=\"width:55.291%;\"><p style=\"text-align:center;\"><img src=\"/storage/product-content/8839016aed585c93e5cb8b9daed2ee004b3c6478d0970eb2052abd4fe125a1c8.png\" alt=\"Motor side of the LWDD7-5-EC blower showing the EC motor, supporting frame and electrical cable\" loading=\"lazy\" style=\"width:332px;\"></p><p>Motor-side view. External controls and accessories are not confirmed as included.</p></td><td style=\"width:3.875%;\"><p></p></td><td style=\"width:40.835%;\"><p><strong>Motor &amp; control</strong></p><h2 class=\"word-heading-1\">Match the control to your system</h2><p>LONGWELL specifies an EC motor with a 0–10 V or PWM control signal. These are control inputs; they should not be confused with the fan’s mains supply.</p><p>The catalogue lists Class F insulation, NMB ball bearings and an IP55 protection rating. Rotation is clockwise when viewed from the rotor.</p><p>Before connecting a controller, obtain the wiring information for this exact model and confirm signal compatibility. The published product page does not identify the terminal connections or a supplied speed controller.</p></td></tr></tbody></table></div><p></p></div>"
+        },
+        {
+          "id": "dd7-dimension-drawing",
+          "title": "Dimension drawing",
+          "description": "Connection sizes, drawing and caption.",
+          "html": "<div class=\"word-paste\"><p><strong>Dimensions &amp; connections</strong></p><h2 class=\"word-heading-1\">Check the fit before ordering</h2><p>The manufacturer’s drawing shows a 302 mm overall height, a 285 mm side-view length and a 222 × 220 mm outlet flange. The outlet fixing pattern is 203 × 200 mm with eight Ø7 mm holes. All drawing dimensions are in millimetres.</p><p style=\"text-align:center;\"><img src=\"/storage/product-content/79f7b2c7931dcefb7b31424772cd2efff8120a95a5552455e04a6e8c534f25fe.png\" alt=\"Manufacturer dimension drawing of LWDD7-5-EC with side and front views, overall sizes and outlet fixing holes\" loading=\"lazy\" style=\"width:566px;\"></p><p>Original LONGWELL dimension drawing. Click to enlarge. The (283) mm width is shown as a reference dimension; flange dimensions are not the clear air opening.</p><p></p></div>"
+        },
+        {
+          "id": "dd7-performance",
+          "title": "Performance chart and table",
+          "description": "Airflow/pressure chart, nine duty points and reading notes.",
+          "html": "<div class=\"word-paste\"><p><strong>Airflow &amp; pressure</strong></p><h2 class=\"word-heading-1\">Choose the operating point, not just the maximum airflow</h2><p>Maximum published airflow is 1,400 m³/h at zero static pressure. As the pressure requirement increases, the published airflow falls. For example, the table gives 1,134 m³/h at 160 Pa static pressure.</p><p style=\"text-align:center;\"><img src=\"/storage/product-content/b46f99b453a06326765c5bb97532173b25e966cf9e91ecd326c438c02623b137.png\" alt=\"Airflow against static and total pressure, plotted from the nine published LONGWELL LWDD7-5-EC operating points\" loading=\"lazy\" style=\"width:503px;\"></p><p>Redrawn from the manufacturer’s nine data points. Lines connect published points; they are not additional measurements or a constant-speed curve.</p><div class=\"word-table word-table--bordered\"><table style=\"border-collapse:collapse; border-spacing:0px;\"><tbody><tr><td style=\"width:20%;\"><p style=\"text-align:center;\"><strong>Airflow (m³/h)</strong></p></td><td style=\"width:20%;\"><p style=\"text-align:center;\"><strong>Static pressure (Pa)</strong></p></td><td style=\"width:20%;\"><p style=\"text-align:center;\"><strong>Total pressure (Pa)</strong></p></td><td style=\"width:20%;\"><p style=\"text-align:center;\"><strong>Speed (rpm)</strong></p></td><td style=\"width:20%;\"><p style=\"text-align:center;\"><strong>Noise (dB(A))</strong></p></td></tr><tr><td style=\"width:20%;\"><p style=\"text-align:center;\">852</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">280</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">304</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">1,450</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">60.0</p></td></tr><tr><td style=\"width:20%;\"><p style=\"text-align:center;\">994</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">235</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">268</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">1,440</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">59.9</p></td></tr><tr><td style=\"width:20%;\"><p style=\"text-align:center;\">1,022</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">220</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">255</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">1,430</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">60.0</p></td></tr><tr><td style=\"width:20%;\"><p style=\"text-align:center;\">1,046</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">205</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">242</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">1,430</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">59.9</p></td></tr><tr><td style=\"width:20%;\"><p style=\"text-align:center;\">1,134</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">160</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">203</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">1,410</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">60.1</p></td></tr><tr><td style=\"width:20%;\"><p style=\"text-align:center;\">1,224</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">120</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">170</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">1,370</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">60.1</p></td></tr><tr><td style=\"width:20%;\"><p style=\"text-align:center;\">1,291</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">80</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">134</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">1,300</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">60.2</p></td></tr><tr><td style=\"width:20%;\"><p style=\"text-align:center;\">1,330</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">50</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">108</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">1,250</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">60.2</p></td></tr><tr><td style=\"width:20%;\"><p style=\"text-align:center;\">1,400</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">0</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">65</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">1,200</p></td><td style=\"width:20%;\"><p style=\"text-align:center;\">60.3</p></td></tr></tbody></table></div><p></p><p><strong>Reading the data:</strong> static and total pressure are different values. At 1,400 m³/h, static pressure is 0 Pa while total pressure is 65 Pa. The catalogue reference speed is 1,440 ± 10 rpm; speeds in the test table vary from 1,200 to 1,450 rpm. Noise readings are supplied without a measurement distance or test method.</p><p></p></div>"
+        },
+        {
+          "id": "dd7-installation",
+          "title": "Selection and installation",
+          "description": "Checklist and rear product photograph.",
+          "html": "<div class=\"word-paste\"><div class=\"word-table word-table--bordered\"><table style=\"border-collapse:collapse; border-spacing:0px;\"><tbody><tr><td style=\"width:55.291%;\"><p><strong>Selection</strong><strong> &amp; installation</strong></p><h2 class=\"word-heading-1\">Plan the connection and available space</h2><ul><li><p><strong>Required duty:</strong> provide your target airflow and system pressure together.</p></li></ul><ul><li><p><strong>Electrical supply:</strong> confirm compatibility with the stated 220 V / 50 Hz rating and the chosen control signal.</p></li></ul><ul><li><p><strong>Mechanical fit:</strong> compare the drawing with your outlet, mounting position, inlet clearance and service access.</p></li></ul><ul><li><p><strong>Application:</strong> confirm suitability for the air being moved and the operating temperature before specifying the fan.</p></li></ul><ul><li><p><strong>Installation:</strong> use the model-specific instructions to determine wiring, support, guarding and any required accessories.</p></li></ul><p>The published page does not provide rated current, net weight, temperature limits or terminal assignments. Contact us with the exact model code and your requirements so these details can be checked before purchase.</p></td><td style=\"width:3.875%;\"><p></p></td><td style=\"width:40.835%;\"><p style=\"text-align:center;\"><img src=\"/storage/product-content/022a5583890e119556c489b40b5c6a0c1c430c01e907fb75b4775b507b67236f.png\" alt=\"Rear view of LONGWELL LWDD7-5-EC centrifugal fan casing and mounting feet\" loading=\"lazy\" style=\"width:274px;\"></p><p>Rear view of the same manufacturer-listed model.</p></td></tr></tbody></table></div><p></p></div>"
+        },
+        {
+          "id": "dd7-questions",
+          "title": "Product questions",
+          "description": "Four existing DD7 questions and answers.",
+          "html": "<div class=\"word-paste\"><p><strong>Product questions</strong></p><h2 class=\"word-heading-1\">Frequently asked questions</h2><h3 class=\"word-heading-2\">Will it deliver 1,400 m³/h through any duct system?</h3><p>No. That figure is the published point at zero static pressure. Ductwork, fittings and other components contribute to system resistance. Select the fan using the required airflow and pressure together.</p><h3 class=\"word-heading-2\">Is DD7-5 the same as every fan sold as DD7 or DD7/7?</h3><p>No. Use the complete model code <strong>LWDD7-5-EC</strong> when comparing specifications or asking for a replacement. Similar series names do not establish interchangeability.</p><h3 class=\"word-heading-2\">Is a speed controller included?</h3><p>The manufacturer specifies 0–10 V / PWM control capability but does not list the package contents. Confirm the controller, connectors and any other accessories required with your order.</p><h3 class=\"word-heading-2\">What should I confirm before purchasing?</h3><p>Confirm the duty point, electrical compatibility and mechanical fit, along with current availability, delivery arrangements, supplied accessories and applicable warranty terms. The technical data below does not establish those commercial details.</p><p></p></div>"
+        },
+        {
+          "id": "dd7-documents",
+          "title": "Documentation reference",
+          "description": "Model reference and documentation information table.",
+          "html": "<div class=\"word-paste\"><p><strong>Documents &amp; support</strong></p><h2 class=\"word-heading-1\">Keep the technical details to hand</h2><p>For a fit or application enquiry, quote <strong>LWDD7-5-EC</strong>.</p><h3 class=\"word-heading-2\">Documentation &amp; environmental information</h3><p>The reference information below brings the product identity and document status together. Where a detail is not included in the available product data, it is identified here so that the exact information can be requested with the model reference.</p><div class=\"word-table word-table--bordered\"><table style=\"border-collapse:collapse; border-spacing:0px;\"><tbody><tr><td style=\"width:33.036%;\"><p><strong>Manufacturer</strong></p></td><td style=\"width:66.964%;\"><p>LONGWELL</p></td></tr><tr><td style=\"width:33.036%;\"><p><strong>Product reference</strong></p></td><td style=\"width:66.964%;\"><p>LWDD7-5-EC</p></td></tr><tr><td style=\"width:33.036%;\"><p><strong>Country of origin</strong></p></td><td style=\"width:66.964%;\"><p>Not stated in the available product data.</p></td></tr><tr><td style=\"width:33.036%;\"><p><strong>RoHS documentation</strong></p></td><td style=\"width:66.964%;\"><p>A model-specific declaration is not included in the available product data. Confirm documentation with your enquiry.</p></td></tr><tr><td style=\"width:33.036%;\"><p><strong>Product conformity documents</strong></p></td><td style=\"width:66.964%;\"><p>Confirm the documents available for this exact model and the intended market.</p></td></tr><tr><td style=\"width:33.036%;\"><p><strong>Net weight (kg)</strong></p></td><td style=\"width:66.964%;\"><p>Not stated in the available product data.</p></td></tr><tr><td style=\"width:33.036%;\"><p><strong>Enquiries</strong></p></td><td style=\"width:66.964%;\"><p><a href=\"https://test.midiawork.com/contact\" target=\"_blank\" rel=\"noopener noreferrer\"><u>Contact us</u></a> with the full model reference and the documents you require.</p></td></tr></tbody></table></div><p></p><p><br></p></div>"
+        }
+      ]
+    }
+  ],
+  "service": [
+    {
+      "id": "ventilation-systems",
+      "title": "Ventilation service sections",
+      "sourceLabel": "Ventilation Systems",
+      "sections": [
+        {
+          "id": "ventilation-section-1",
+          "title": "A system that fits your kitchen",
+          "description": "Service introduction with a project photograph.",
+          "html": "<div class=\"service-section\"><div class=\"service-copy\"><div class=\"service-eyebrow\">Commercial kitchen extraction</div><h2>A system that fits your kitchen</h2><p>Every kitchen has its own equipment layout, available space and route for extraction. We design and install ventilation systems that bring the canopy, ductwork and fan together around these requirements.</p><p>The installation shown here places the canopy directly above the cooking line, alongside the surrounding metal wall panels. Reviewing the equipment positions and site measurements helps establish how each part of the extraction system will fit.</p></div><div class=\"service-media\"><img src=\"/images/services/installed-kitchens/06-kitchen-canopy-and-ductwork-cover.webp\" alt=\"Kitchen extraction canopy with filter panels above a cooking line and patterned metal wall cladding.\" loading=\"lazy\" style=\"max-width:100%;height:auto;display:inline-block;margin:5px;\"></div></div>"
+        },
+        {
+          "id": "ventilation-section-2",
+          "title": "Considered from the kitchen to the exterior",
+          "description": "Installation details with a second photograph.",
+          "html": "<div class=\"service-section service-section--image-left\"><div class=\"service-copy\"><div class=\"service-eyebrow\">Ductwork and installation</div><h2>Considered from the kitchen to the exterior</h2><p>The ductwork route is an essential part of planning a kitchen ventilation installation. Available space, changes of direction and the points where ductwork passes through the building all need to be considered together.</p><p>This exterior view shows a rectangular duct section with a formed transition at its base. Our service covers ductwork design and fabrication, fan installation and commissioning. For a quotation, send a kitchen plan and photographs of the proposed route.</p></div><div class=\"service-media\"><img src=\"/images/services/installed-kitchens/06-kitchen-canopy-and-ductwork-gallery-2.webp\" alt=\"External rectangular metal duct with a formed transition section beside a tiled roof.\" loading=\"lazy\" style=\"max-width:100%;height:auto;display:inline-block;margin:5px;\"></div></div>"
+        }
+      ]
+    }
+  ],
+  "portfolio": [
+    {
+      "id": "cooking-line-canopy-project",
+      "title": "Kitchen installation project sections",
+      "sourceLabel": "Cooking-Line Canopy Installation",
+      "sections": [
+        {
+          "id": "project-overview",
+          "title": "Project overview",
+          "description": "Existing project introduction and cover photograph.",
+          "html": "<div class=\"product-section\"><div class=\"product-split\"><div><h2>Cooking-Line Canopy Installation</h2><p>A continuous canopy, metal wall panels and fitted enclosures define the cooking side of this kitchen.</p></div><div class=\"product-media\"><img src=\"/images/portfolio/approved-kitchens/02-long-cooking-line-canopy-cover.webp\" alt=\"Long metal cooking-line canopy facing a preparation counter, with an arched oven opening at the rear.\" style=\"max-width:100%;height:auto;\"></div></div></div>"
+        },
+        {
+          "id": "project-layout",
+          "title": "Layout and metalwork",
+          "description": "Details taken from the existing project description.",
+          "html": "<div class=\"product-section\"><h2>Layout and metalwork</h2><p>The canopy extends along the cooking-line position, with a sloping filter bank above the work area and an arched oven opening at the far end. Beneath it, metal panels and framed surfaces follow the length of the wall. A separate counter stands opposite, leaving an aisle between the two sides. The wider view shows the overall arrangement, while the second angle gives a closer view of the canopy, filter panels and lower metalwork. Both photographs show the same installation within its existing room layout.</p></div>"
+        },
+        {
+          "id": "project-gallery",
+          "title": "Additional project view",
+          "description": "The existing project gallery photograph.",
+          "html": "<div class=\"product-section\"><h2>Additional project view</h2><img src=\"/images/portfolio/approved-kitchens/02-long-cooking-line-canopy-gallery-1.webp\" alt=\"Additional view of the cooking-line canopy, filter panels and metalwork in the same kitchen.\" style=\"max-width:100%;height:auto;\"></div>"
+        }
+      ]
+    }
+  ],
+  "blog": [
+    {
+      "id": "fabrication-brief-article",
+      "title": "Fabrication brief article sections",
+      "sourceLabel": "Preparing a Clear Brief for Stainless Steel Fabrication",
+      "sections": [
+        {
+          "id": "fabrication-brief-1",
+          "title": "Article introduction",
+          "html": "<p>A fabrication brief brings the essential project information into one place. It describes what is required, how the equipment will be used and which details are confirmed. This helps a fabricator assess the scope without relying on assumptions scattered across photographs, sketches and messages.</p><p>The brief does not need to begin as a complete technical drawing. It does need to distinguish known information from dimensions or design decisions that remain provisional.</p>"
+        },
+        {
+          "id": "fabrication-brief-2",
+          "title": "Define the item and its purpose",
+          "html": "<h2>Define the item and its purpose</h2><p>Each item should have a clear description and reference. For a commercial kitchen project, that might be a stainless steel preparation table, sink unit, extraction canopy or wall cladding section.</p><p>The description should explain the intended use and its relationship to nearby equipment. A short account of the working arrangement is often more informative than a list of dimensions without context.</p>"
+        },
+        {
+          "id": "fabrication-brief-3",
+          "title": "Organise dimensions on a drawing",
+          "html": "<h2>Organise dimensions on a drawing</h2><p>A sketch should label the overall length, depth and height using consistent units. Sink positions, openings and connection points should be measured from identified reference edges.</p><p>Estimated dimensions should be marked as such. Where a measurement still needs checking, noting that uncertainty is more useful than presenting it as a production dimension.</p>"
+        },
+        {
+          "id": "fabrication-brief-4",
+          "title": "Give photographs a clear purpose",
+          "html": "<h2>Give photographs a clear purpose</h2><p>A wide view establishes the location and surrounding equipment. Detail photographs record the connections, obstructions or existing surfaces that affect the fit.</p><p>Numbering photographs and referring to them on the sketch helps connect the views. For an existing installation, it is also useful to identify which equipment will remain and which elements belong to the proposed work.</p>"
+        },
+        {
+          "id": "fabrication-brief-5",
+          "title": "Record materials, finishes and quantities",
+          "html": "<h2>Record materials, finishes and quantities</h2><p>Known material and finish requirements should be included with the drawings. Undecided details should be listed for confirmation so they are not replaced by unrecorded assumptions.</p><p>An item schedule should distinguish identical items from different versions. Separate references are useful where units share an overall size but have different sink arrangements, openings or connection positions.</p>"
+        },
+        {
+          "id": "fabrication-brief-6",
+          "title": "Describe the site requirements",
+          "html": "<h2>Describe the site requirements</h2><p>Installation information should cover the location, access route and any restrictions on when the area is available. Doorways, stairs and fixed equipment may affect how a fabricated item reaches its position.</p><p>The brief should identify the installation work required and any connections being coordinated with other trades. A target programme can be recorded without treating an unconfirmed date as an agreed commitment.</p>"
+        },
+        {
+          "id": "fabrication-brief-7",
+          "title": "Maintain a clear revision record",
+          "html": "<h2>Maintain a clear revision record</h2><p>Drawings, photographs and written requirements should use consistent item references. When a detail changes, the current revision should replace the earlier instruction in the project record.</p><p>A clear brief allows the specification and quotation to develop from the same information. It also creates a useful reference for checking the equipment and installation against the agreed scope.</p>"
+        }
+      ]
+    }
+  ],
+  "pages": {
+    "privacy_policy_content": [
+      {
+        "id": "privacy-policy-content",
+        "title": "Privacy Policy sections",
+        "sourceLabel": "Existing Privacy Policy page",
+        "sections": [
+          {
+            "id": "privacy-policy-content-1",
+            "title": "1. Who We Are",
+            "html": "<h2>1. Who We Are</h2><p>Midia M Metal (\"we\", \"our\", \"us\") is committed to protecting and respecting your privacy. This policy explains how we collect, use, and store your personal data when you use our website or contact us regarding our fabrication services.</p>"
+          },
+          {
+            "id": "privacy-policy-content-2",
+            "title": "2. Data We Collect",
+            "html": "<h2>2. Data We Collect</h2><p>We may collect the following information:</p><ul>\n  <li>Name, email address, phone number when you submit a contact or quote form</li>\n  <li>Billing and shipping address when you place an order</li>\n  <li>Payment information (processed securely; we do not store card details)</li>\n  <li>Browser type, IP address, and pages visited via cookies</li>\n</ul>"
+          },
+          {
+            "id": "privacy-policy-content-3",
+            "title": "3. How We Use Your Data",
+            "html": "<h2>3. How We Use Your Data</h2><p>We use your data to process and fulfil orders, respond to enquiries and quote requests, improve our website and services, and comply with legal obligations.</p>"
+          },
+          {
+            "id": "privacy-policy-content-4",
+            "title": "4. Cookies",
+            "html": "<h2>4. Cookies</h2><p>We use cookies to enhance your browsing experience and to remember your cart. Essential cookies required for site functionality cannot be disabled.</p>"
+          },
+          {
+            "id": "privacy-policy-content-5",
+            "title": "5. Data Sharing",
+            "html": "<h2>5. Data Sharing</h2><p>We do not sell, trade, or rent your personal data to third parties. We may share data with trusted service providers only to fulfil your orders.</p>"
+          },
+          {
+            "id": "privacy-policy-content-6",
+            "title": "6. Data Retention",
+            "html": "<h2>6. Data Retention</h2><p>We retain personal data only as long as necessary to provide our services and comply with legal obligations.</p>"
+          },
+          {
+            "id": "privacy-policy-content-7",
+            "title": "7. Your Rights",
+            "html": "<h2>7. Your Rights</h2><p>You may request access, correction, deletion, objection, or portability of your personal data. Contact us at <a href=\"mailto:info@midia-metal.com\" target=\"_blank\" rel=\"noopener noreferrer\">info@midia-metal.com</a>.</p>"
+          },
+          {
+            "id": "privacy-policy-content-8",
+            "title": "8. Contact",
+            "html": "<h2>8. Contact</h2><p>For privacy-related questions, contact <a href=\"mailto:info@midia-metal.com\" target=\"_blank\" rel=\"noopener noreferrer\">info@midia-metal.com</a>.</p>"
+          }
+        ]
+      }
+    ],
+    "terms_conditions_content": [
+      {
+        "id": "terms-conditions-content",
+        "title": "Terms and Conditions sections",
+        "sourceLabel": "Existing Terms and Conditions page",
+        "sections": [
+          {
+            "id": "terms-conditions-content-1",
+            "title": "1. Acceptance",
+            "html": "<h2>1. Acceptance</h2><p>By accessing our website or placing an order with Midia M Metal, you agree to these terms. If you do not agree, please do not use our site.</p>"
+          },
+          {
+            "id": "terms-conditions-content-2",
+            "title": "2. Services & Products",
+            "html": "<h2>2. Services &amp; Products</h2><p>We provide custom metal fabrication services and sell fabricated products online. All products and services are subject to availability.</p>"
+          },
+          {
+            "id": "terms-conditions-content-3",
+            "title": "3. Orders & Pricing",
+            "html": "<h2>3. Orders &amp; Pricing</h2><p>All prices are displayed in GBP and are inclusive of VAT where applicable. We reserve the right to refuse or cancel any order at our discretion.</p>"
+          },
+          {
+            "id": "terms-conditions-content-4",
+            "title": "4. Payment",
+            "html": "<h2>4. Payment</h2><p>Payment must be made in full before dispatch unless otherwise agreed for custom work.</p>"
+          },
+          {
+            "id": "terms-conditions-content-5",
+            "title": "5. Delivery",
+            "html": "<h2>5. Delivery</h2><p>Delivery times are estimates only and are not guaranteed. We are not responsible for delays caused by third-party couriers.</p>"
+          },
+          {
+            "id": "terms-conditions-content-6",
+            "title": "6. Custom Fabrication",
+            "html": "<h2>6. Custom Fabrication</h2><p>Custom-fabricated items are made to order based on your specifications and cannot usually be cancelled once production has started.</p>"
+          },
+          {
+            "id": "terms-conditions-content-7",
+            "title": "7. Liability",
+            "html": "<h2>7. Liability</h2><p>To the maximum extent permitted by law, Midia M Metal shall not be liable for indirect, incidental, or consequential damages.</p>"
+          },
+          {
+            "id": "terms-conditions-content-8",
+            "title": "8. Governing Law",
+            "html": "<h2>8. Governing Law</h2><p>These terms are governed by the laws of England and Wales.</p>"
+          },
+          {
+            "id": "terms-conditions-content-9",
+            "title": "9. Contact",
+            "html": "<h2>9. Contact</h2><p>For questions about these terms, contact <a href=\"mailto:info@midia-metal.com\" target=\"_blank\" rel=\"noopener noreferrer\">info@midia-metal.com</a>.</p>"
+          }
+        ]
+      }
+    ],
+    "cookies_page_content": [
+      {
+        "id": "cookies-page-content",
+        "title": "Cookie Policy sections",
+        "sourceLabel": "Existing Cookie Policy page",
+        "sections": [
+          {
+            "id": "cookies-page-content-1",
+            "title": "1. What Are Cookies?",
+            "html": "<h2>1. What Are Cookies?</h2><p>Cookies are small text files placed on your computer or mobile device by websites that you visit.</p>"
+          },
+          {
+            "id": "cookies-page-content-2",
+            "title": "2. How We Use Cookies",
+            "html": "<h2>2. How We Use Cookies</h2><p>We use cookies for several reasons:</p><ul>\n  <li><strong>Essential Cookies:</strong> Required for the operation of our website, including shopping cart functionality.</li>\n  <li><strong>Performance Cookies:</strong> Help us understand how visitors use the site so we can improve it.</li>\n  <li><strong>Functionality Cookies:</strong> Remember your preferences and improve your browsing experience.</li>\n</ul>"
+          },
+          {
+            "id": "cookies-page-content-3",
+            "title": "3. Managing Cookies",
+            "html": "<h2>3. Managing Cookies</h2><p>Most browsers allow control of cookies through browser settings. You can also review and change your cookie preferences on our site where available.</p>"
+          },
+          {
+            "id": "cookies-page-content-4",
+            "title": "4. Consent",
+            "html": "<h2>4. Consent</h2><p>By using our website, you consent to our use of cookies as described in this policy.</p>"
+          },
+          {
+            "id": "cookies-page-content-5",
+            "title": "5. Contact Us",
+            "html": "<h2>5. Contact Us</h2><p>If you have questions about our use of cookies, contact <a href=\"mailto:info@midia-metal.com\" target=\"_blank\" rel=\"noopener noreferrer\">info@midia-metal.com</a>.</p>"
+          }
+        ]
+      }
+    ],
+    "returns_refunds_content": [
+      {
+        "id": "returns-refunds-content",
+        "title": "Returns and Refunds sections",
+        "sourceLabel": "Existing Returns and Refunds page",
+        "sections": [
+          {
+            "id": "returns-refunds-content-1",
+            "title": "1. Standard Products",
+            "html": "<h2>1. Standard Products</h2><p>We accept returns of standard non-custom products within <strong>14 days</strong> of delivery, provided they are unused and in original condition.</p>"
+          },
+          {
+            "id": "returns-refunds-content-2",
+            "title": "2. Custom Fabricated Items",
+            "html": "<h2>2. Custom Fabricated Items</h2><p>Custom-fabricated items are made to your specific requirements and are non-returnable unless defective or not as agreed.</p>"
+          },
+          {
+            "id": "returns-refunds-content-3",
+            "title": "3. Damaged or Defective Items",
+            "html": "<h2>3. Damaged or Defective Items</h2><p>If an item arrives damaged, contact us within <strong>48 hours</strong> with photographs and order details.</p>"
+          },
+          {
+            "id": "returns-refunds-content-4",
+            "title": "4. Return Shipping",
+            "html": "<h2>4. Return Shipping</h2><p>For standard returns, customers are responsible for return shipping unless the item was defective or incorrectly sent.</p>"
+          },
+          {
+            "id": "returns-refunds-content-5",
+            "title": "5. Refunds",
+            "html": "<h2>5. Refunds</h2><p>Approved refunds are processed within <strong>5 to 10 business days</strong> to the original payment method.</p>"
+          },
+          {
+            "id": "returns-refunds-content-6",
+            "title": "6. Exceptions",
+            "html": "<h2>6. Exceptions</h2><p>We cannot accept returns on installed, used, altered, or special-order items unless faulty.</p>"
+          },
+          {
+            "id": "returns-refunds-content-7",
+            "title": "7. Contact Us",
+            "html": "<h2>7. Contact Us</h2><p>To begin a return or refund request, contact <a href=\"mailto:info@midia-metal.com\" target=\"_blank\" rel=\"noopener noreferrer\">info@midia-metal.com</a>.</p>"
+          }
+        ]
+      }
+    ]
+  }
+}

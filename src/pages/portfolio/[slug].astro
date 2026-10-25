@@ -11,6 +11,7 @@ import { Image } from 'astro:assets';
 import { getApiBase } from '@/lib/api-base';
 import { buildBreadcrumbJsonLd } from '@/lib/seo';
 import portfolioImageAlt from '@/data/portfolio-image-alt.json';
+import '@/content-sections.css';
 
 const siteUrl = import.meta.env.SITE;
 const API = `${getApiBase()}/v1`;
@@ -70,9 +71,13 @@ if (!project) {
               <p class="mt-8 text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">{project.portfolio_category?.name || "Uncategorized"}</p>
               <h1 class="font-sans text-[42px] md:text-[58px] leading-[0.95] font-semibold text-[#10275c] mt-3 mb-6">{project.title}</h1>
 
-              <p class="text-[15px] text-[#58657f] leading-8 mb-6 whitespace-pre-wrap">
-                {project.description || "No description provided."}
-              </p>
+              {typeof project.description_html === 'string' && project.description_html ? (
+                <div class="section-content service-rich-content prose prose-slate max-w-none mb-6" set:html={project.description_html} />
+              ) : (
+                <p class="text-[15px] text-[#58657f] leading-8 mb-6 whitespace-pre-wrap">
+                  {project.description || "No description provided."}
+                </p>
+              )}
 
               {project.gallery && project.gallery.length > 0 && (
                 <div class={`grid grid-cols-1 ${project.gallery.length >= 2 ? 'md:grid-cols-2' : ''} gap-4 mb-8`}>

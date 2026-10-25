@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PortfolioCategory;
 use App\Models\PortfolioProject;
 use App\Services\FrontendContentDeployTrigger;
+use App\Support\PortfolioDescription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -44,6 +45,7 @@ class PortfolioController extends Controller
             'active' => 'boolean',
             'order' => 'integer',
         ]);
+        $validated['description'] = PortfolioDescription::forStorage($validated['description'] ?? null);
         $validated['slug'] = Str::slug($validated['title']).'-'.Str::random(4);
 
         $project = PortfolioProject::create($validated)->load('portfolioCategory');
@@ -80,6 +82,9 @@ class PortfolioController extends Controller
             'active' => 'boolean',
             'order' => 'integer',
         ]);
+        if (array_key_exists('description', $validated)) {
+            $validated['description'] = PortfolioDescription::forStorage($validated['description']);
+        }
         $portfolio->update($validated);
 
         if ($wasPublic || $portfolio->active) {

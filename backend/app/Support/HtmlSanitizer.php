@@ -83,9 +83,13 @@ class HtmlSanitizer
 
             return implode(' ', array_intersect(
                 [
+                    'content-section',
                     'service-section', 'service-section--image-left', 'service-copy', 'service-media', 'service-eyebrow', 'service-caption',
                     'product-section', 'product-split', 'product-media', 'product-eyebrow', 'product-caption',
                     'product-note', 'product-table-wrap', 'product-performance-table', 'product-links', 'product-spec-slot',
+                    'product-reference-table', 'img-row', 'img-row--2', 'img-row--3',
+                    'word-paste', 'word-table', 'word-table--bordered', 'word-table--layout', 'word-spacer',
+                    'word-heading-1', 'word-heading-2', 'word-heading-3', 'word-heading-4', 'word-heading-5', 'word-heading-6',
                 ],
                 preg_split('/\s+/', trim($match[2]))
             ));
@@ -126,12 +130,12 @@ class HtmlSanitizer
 
         $content = strip_tags(
             $content,
-            '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><blockquote><a><span><img><div><table><thead><tbody><tr><td><th>'
+            '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote><a><span><img><div><table><thead><tbody><tfoot><tr><td><th>'
         );
 
         $content = preg_replace_callback('/<div\b([^>]*)>/i', function ($matches) use ($extractStyle, $extractLayoutClasses) {
             $attrs = $matches[1] ?? '';
-            if (strpos($attrs, 'img-row') !== false) {
+            if (preg_match('/class\s*=\s*(["\'])img-row\1/i', $attrs)) {
                 return '<div class="img-row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;margin:8px 0;">';
             }
 
@@ -144,11 +148,22 @@ class HtmlSanitizer
             return $style ? '<div style="'.e($style).'">' : '<div>';
         }, $content) ?? '';
 
-        foreach (['p', 'h1', 'h2', 'h3', 'h4', 'table', 'thead', 'tbody', 'tr', 'td', 'th'] as $tagName) {
-            $content = preg_replace_callback('/<'.$tagName.'\b([^>]*)>/i', function ($matches) use ($tagName, $extractStyle) {
+        foreach (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th'] as $tagName) {
+            $content = preg_replace_callback('/<'.$tagName.'\b([^>]*)>/i', function ($matches) use ($tagName, $extractStyle, $extractLayoutClasses) {
                 $style = $extractStyle($matches[1] ?? '');
+                $attributes = $style ? ' style="'.e($style).'"' : '';
+                if ($classes = $extractLayoutClasses($matches[1] ?? '')) {
+                    $attributes .= ' class="'.$classes.'"';
+                }
+                if (in_array($tagName, ['td', 'th'], true)) {
+                    foreach (['colspan', 'rowspan'] as $span) {
+                        if (preg_match('/\b'.$span.'\s*=\s*(["\'])([1-9][0-9]{0,2})\1/i', $matches[1] ?? '', $match)) {
+                            $attributes .= ' '.$span.'="'.$match[2].'"';
+                        }
+                    }
+                }
 
-                return $style ? '<'.$tagName.' style="'.e($style).'">' : '<'.$tagName.'>';
+                return '<'.$tagName.$attributes.'>';
             }, $content) ?? '';
         }
 

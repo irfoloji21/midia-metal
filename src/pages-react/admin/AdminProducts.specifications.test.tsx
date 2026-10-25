@@ -117,7 +117,7 @@ it('discards specification drafts and validation errors when editing is cancelle
   fireEvent.change(screen.getByRole('textbox', { name: 'New specification name' }), { target: { value: 'unfinished' } });
   fireEvent.click(screen.getByRole('button', { name: 'Save Product' }));
   expect(screen.getByRole('alert')).toBeInTheDocument();
-  fireEvent.click(screen.getByRole('button', { name: 'Cancel', exact: true }));
+  fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
   const row = screen.getByText(fixture.name).closest('tr')!;
   fireEvent.click(within(row).getAllByRole('button')[0]);
   expect(screen.getByRole('textbox', { name: 'Specification 1 value' })).toHaveValue('silver');

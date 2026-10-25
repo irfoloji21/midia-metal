@@ -3,7 +3,7 @@ import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
-import RichTextEditor from "@/components/admin/RichTextEditor";
+import SectionTemplateEditor from "@/components/admin/SectionTemplateEditor";
 import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 
 export default function AdminBlog() {
@@ -102,14 +102,17 @@ export default function AdminBlog() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-wrap justify-between items-center gap-3">
                 <h1 className="text-3xl font-bold font-sans text-[#10275c]">Blog Posts</h1>
+                <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={() => { openEdit(); setCurrentPost((post: any) => ({ ...post, active: false })); }} className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-[#10275c] hover:border-orange">Create from template</button>
                 <button
                     onClick={() => openEdit()}
                     className="flex items-center gap-2 rounded bg-orange px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-hover"
                 >
                     <Plus className="h-4 w-4" /> Add Post
                 </button>
+                </div>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-4 mb-4">
@@ -242,10 +245,11 @@ export default function AdminBlog() {
                                         />
                                     </div>
                                     <div className="col-span-2">
-                                        <RichTextEditor
+                                        <SectionTemplateEditor
+                                            templateKind="blog"
                                             label="Content"
                                             value={currentPost.content || ""}
-                                            onChange={(value) => setCurrentPost({ ...currentPost, content: value })}
+                                            onChange={(value) => setCurrentPost((post: any) => ({ ...post, content: value }))}
                                         />
                                     </div>
                                     <div className="col-span-2 flex items-center">

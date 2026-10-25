@@ -3,7 +3,7 @@ import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { ChevronDown, Plus, Trash2 } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
-import RichTextEditor from "@/components/admin/RichTextEditor";
+import SectionTemplateEditor from "@/components/admin/SectionTemplateEditor";
 import type { SiteSetting, HeroSlide, SettingsSection } from "@/types/settings";
 import { GENERAL_SECTIONS, GENERAL_LABELS, LEGACY_GENERAL_KEYS, changedSettings, generalSettingGroup } from '@/lib/general-settings';
 
@@ -399,8 +399,10 @@ export default function AdminSettings() {
                     || setting.key}
             </label>
             {setting.type === "richtext" ? (
-                <RichTextEditor
-                    label=""
+                <SectionTemplateEditor
+                    templateKind="page"
+                    settingKey={setting.key}
+                    label={LABEL_OVERRIDES[setting.key] || setting.key.replace(/_/g, " ")}
                     value={setting.value || ""}
                     onChange={(value) => updateSetting(setting.key, value)}
                 />

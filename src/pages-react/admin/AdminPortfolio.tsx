@@ -3,6 +3,7 @@ import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
+import SectionTemplateEditor from "@/components/admin/SectionTemplateEditor";
 import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 import { usePaginatedAdminList } from "@/hooks/use-paginated-admin-list";
 import ListPagination from "@/components/admin/ListPagination";
@@ -46,7 +47,7 @@ export default function AdminPortfolio() {
         }
     };
 
-    const openEdit = (project: any = null) => {
+    const openEdit = (project: any = null, fromTemplate = false) => {
         setImageError(false);
         setCurrentProject(
             project || {
@@ -60,7 +61,7 @@ export default function AdminPortfolio() {
                 portfolio_category_id: "",
                 services_list: [],
                 gallery: [],
-                active: true,
+                active: !fromTemplate,
                 order: 0,
             }
         );
@@ -124,14 +125,24 @@ export default function AdminPortfolio() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-wrap justify-between items-center gap-3">
                 <h1 className="text-3xl font-bold font-sans text-[#10275c]">Portfolio Projects</h1>
-                <button
-                    onClick={() => openEdit()}
-                    className="flex items-center gap-2 rounded bg-orange px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-hover"
-                >
-                    <Plus className="h-4 w-4" /> Add Project
-                </button>
+                <div className="flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        onClick={() => openEdit(null, true)}
+                        className="flex items-center gap-2 rounded border border-[#10275c] px-4 py-2 text-sm font-semibold text-[#10275c] hover:bg-slate-50"
+                    >
+                        <Plus className="h-4 w-4" /> Create from template
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => openEdit()}
+                        className="flex items-center gap-2 rounded bg-orange px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-hover"
+                    >
+                        <Plus className="h-4 w-4" /> Add Project
+                    </button>
+                </div>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-4 mb-4">
@@ -198,10 +209,10 @@ export default function AdminPortfolio() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button onClick={() => openEdit(project)} className="text-indigo-600 hover:text-indigo-900 mr-4">
+                                        <button aria-label={`Edit ${project.title}`} onClick={() => openEdit(project)} className="text-indigo-600 hover:text-indigo-900 mr-4">
                                             <Edit2 className="h-4 w-4" />
                                         </button>
-                                        <button onClick={() => handleDelete(project.id)} className="text-red-600 hover:text-red-900">
+                                        <button aria-label={`Delete ${project.title}`} onClick={() => handleDelete(project.id)} className="text-red-600 hover:text-red-900">
                                             <Trash2 className="h-4 w-4" />
                                         </button>
                                     </td>
@@ -219,15 +230,16 @@ export default function AdminPortfolio() {
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mt-20 md:mt-0 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
                             <h2 className="text-xl font-bold font-sans text-[#10275c]">{currentProject.id ? "Edit Project" : "New Project"}</h2>
-                            <button onClick={() => setIsEditing(false)} className="text-gray-400 hover:text-gray-500">
+                            <button aria-label="Close project editor" onClick={() => setIsEditing(false)} className="text-gray-400 hover:text-gray-500">
                                 <X className="h-6 w-6" />
                             </button>
                         </div>
                         <form onSubmit={handleSave} className="p-6 space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700">Title</label>
+                                    <label htmlFor="portfolio-title" className="block text-sm font-medium text-gray-700">Title</label>
                                     <input
+                                        id="portfolio-title"
                                         type="text"
                                         required
                                         value={currentProject.title}
@@ -323,22 +335,22 @@ export default function AdminPortfolio() {
                                 </div>
 
                                 <div className="col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700">Description</label>
-                                    <textarea
-                                        rows={4}
+                                    <SectionTemplateEditor
+                                        label="Description"
+                                        templateKind="portfolio"
                                         value={currentProject.description || ""}
-                                        onChange={(e) => setCurrentProject({ ...currentProject, description: e.target.value })}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                                        onChange={(description) => setCurrentProject((project: any) => ({ ...project, description }))}
                                     />
                                 </div>
                                 <div className="col-span-2 flex items-center">
                                     <input
+                                        id="portfolio-active"
                                         type="checkbox"
                                         checked={currentProject.active}
                                         onChange={(e) => setCurrentProject({ ...currentProject, active: e.target.checked })}
                                         className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                     />
-                                    <span className="ml-2 text-sm text-gray-600">Active</span>
+                                    <label htmlFor="portfolio-active" className="ml-2 text-sm text-gray-600">Active</label>
                                 </div>
                             </div>
                             <div className="pt-4 border-t flex justify-end gap-3 sticky bottom-0 bg-white shadow-[0_-5px_15px_-5px_rgba(0,0,0,0.05)] pb-4">

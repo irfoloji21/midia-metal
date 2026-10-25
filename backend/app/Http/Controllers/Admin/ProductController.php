@@ -100,7 +100,7 @@ class ProductController extends Controller
             $validated['variant_mode'],
             $validated['variant_options'] ?? null,
         );
-        $validated = $this->syncProductFieldsFromVariants($validated);
+        $validated = $this->syncProductFieldsFromVariants($validated, $product);
         $this->assertValidCombinationSetup(
             $validated['variant_mode'],
             $validated['variant_options'] ?? null,
@@ -643,8 +643,15 @@ class ProductController extends Controller
      * @param  array<string, mixed>  $validated
      * @return array<string, mixed>
      */
-    private function syncProductFieldsFromVariants(array $validated): array
+    private function syncProductFieldsFromVariants(array $validated, ?Product $product = null): array
     {
+        // Quote-only products may have no variants. Their nullable form fields
+        // still need the non-null database defaults; edits retain saved values.
+        foreach (['shipping_weight_kg' => 2, 'shipping_length_cm' => 30, 'shipping_width_cm' => 20, 'shipping_height_cm' => 10, 'shipping_class' => 'standard'] as $field => $default) {
+            $validated[$field] = $validated[$field] ?? $product?->{$field} ?? $default;
+        }
+        $validated['ships_separately'] = (bool) ($validated['ships_separately'] ?? $product?->ships_separately ?? false);
+
         $variants = collect($validated['variants'] ?? [])->filter(fn ($variant) => is_array($variant))->values();
         if ($variants->isEmpty()) {
             return $validated;
