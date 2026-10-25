@@ -6,16 +6,22 @@
 .section-document[contenteditable] { min-width: 0; max-width: 100%; color: #526079; font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; }
 .content-section + .content-section { margin-top: 28px; }
 .content-section > h2,
+.layout-copy > h2,
 .section-document[contenteditable] > h2 { color: #10275c; font-size: clamp(24px, 3vw, 32px); font-weight: 600; line-height: 1.25; margin: 0 0 18px; }
 .content-section > h3,
+.layout-copy > h3,
 .section-document[contenteditable] > h3 { color: #10275c; font-size: 21px; font-weight: 600; line-height: 1.35; margin: 24px 0 12px; }
 .content-section > p,
+.layout-copy > p,
 .section-document[contenteditable] > p { margin: 0 0 18px; }
 .content-section > ul,
+.layout-copy > ul,
 .section-document[contenteditable] > ul { list-style: disc; margin: 18px 0; padding-left: 24px; }
 .content-section > ol,
+.layout-copy > ol,
 .section-document[contenteditable] > ol { list-style: decimal; margin: 18px 0; padding-left: 24px; }
 .content-section li,
+.layout-copy li,
 .section-document[contenteditable] li { margin: 6px 0; }
 .content-section img,
 .section-document[contenteditable] img { max-width: 100%; height: auto; }
@@ -26,9 +32,37 @@
 .content-section > table th,
 .section-document[contenteditable] > table th { background: #f1f5f9; color: #10275c; }
 .content-section > :first-child,
+.layout-copy > :first-child,
 .section-document[contenteditable] > :first-child { margin-top: 0; }
 .content-section > :last-child,
+.layout-copy > :last-child,
 .section-document[contenteditable] > :last-child { margin-bottom: 0; }
+/* Layout structure belongs to the block, separate from its editable text slots. */
+.layout-block { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: center; min-width: 0; padding: clamp(20px, 3vw, 36px); background: #fff; color: #526079; font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; }
+.layout-block > .layout-media,
+.layout-block > .layout-copy { min-width: 0; max-width: 100%; }
+.layout-media img { display: block !important; width: 100% !important; max-width: 100% !important; height: auto !important; max-height: 560px; object-fit: contain; float: none !important; margin: 0 auto !important; }
+.layout-block--image .layout-media img { max-height: 680px; }
+.layout-block--images-2 .layout-media img,
+.layout-block--images-3 .layout-media img { aspect-ratio: 4 / 3; max-height: none; }
+.layout-copy > h1,
+.section-document[contenteditable] > h1 { color: #10275c; font-size: clamp(28px, 3.5vw, 36px); font-weight: 600; line-height: 1.2; margin: 0 0 20px; }
+.layout-copy > h4, .layout-copy > h5, .layout-copy > h6,
+.section-document[contenteditable] > h4, .section-document[contenteditable] > h5, .section-document[contenteditable] > h6 { color: #10275c; font-size: 18px; font-weight: 600; line-height: 1.4; margin: 20px 0 10px; }
+.layout-copy a,
+.section-document[contenteditable] a { color: #10275c; text-decoration: underline; text-underline-offset: 3px; }
+.layout-copy blockquote,
+.section-document[contenteditable] blockquote { border-left: 4px solid #eb5c10; padding-left: 12px; font-style: italic; }
+@media (min-width: 768px) {
+  .layout-block--image-left,
+  .layout-block--image-right,
+  .layout-block--images-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+  .layout-block--images-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .layout-block--image-left > .layout-media { grid-column: 1; grid-row: 1; }
+  .layout-block--image-left > .layout-copy { grid-column: 2; grid-row: 1; }
+  .layout-block--image-right > .layout-copy { grid-column: 1; grid-row: 1; }
+  .layout-block--image-right > .layout-media { grid-column: 2; grid-row: 1; }
+}
 /* Wrapped editorial blocks retain their alternating backgrounds after saving. */
 .content-section:nth-child(even) > .product-section:only-child { background: #f7f9fb; }
 .service-rich-content .content-section:nth-child(even) > .service-section:only-child { background: #f1f3f4; }

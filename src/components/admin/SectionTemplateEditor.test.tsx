@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import SectionTemplateEditor from './SectionTemplateEditor';
 import { apiFetch } from '@/lib/api';
-
+import { LAYOUT_BLOCKS } from '@/lib/layout-blocks';
 vi.mock('@/lib/api', () => ({ apiFetch: vi.fn() }));
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
 vi.mock('@/lib/content-templates', () => ({ getContentTemplates: () => [{ id: 'dd7', title: 'DD7 fan', sourceLabel: 'Existing DD7 product', sections: [
@@ -13,95 +13,104 @@ vi.mock('@/lib/content-templates', () => ({ getContentTemplates: () => [{ id: 'd
 const changed = vi.fn();
 function Editor({ initial = '' }: { initial?: string }) {
   const [value, setValue] = useState(initial);
-  return <><SectionTemplateEditor label="Description" value={value} onChange={html => { setValue(html); changed(html); }} templateKind="product" wordPaste /><output data-testid="value">{value}</output><button onClick={() => setValue('<p>Another record</p>')}>Load another record</button></>;
+  return <><SectionTemplateEditor label="Description" value={value} onChange={html => { setValue(html); changed(html); }} templateKind="product" /><output data-testid="value">{value}</output><button onClick={() => setValue('<p>Another record</p>')}>Load another record</button></>;
 }
 const saved = () => screen.getByTestId('value').textContent!;
 const doc = () => new DOMParser().parseFromString(saved(), 'text/html');
+const layoutButton = (type: string) => screen.getByRole('button', { name: LAYOUT_BLOCKS.find(layout => layout.type === type)!.title });
 beforeEach(() => { vi.clearAllMocks(); vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} }); });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
-describe('Section template editing', () => {
-  it('opens existing content without writing, and appends only the chosen template section', () => {
-    const initial = '<h2>Existing work</h2><p>Keep this text</p>';
-    render(<Editor initial={initial} />);
-    expect(changed).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Add from template' }));
-    expect(screen.getByRole('button', { name: 'Add selected sections (0)' })).toBeDisabled();
+describe('Protected section layout editing', () => {
+  it.each(['image-left','image-right','images-2','images-3','text','image'])('offers fixed photo/text slots for %s without editable scaffold', type => {
+    const { container } = render(<Editor />); fireEvent.click(layoutButton(type));
+    expect(doc().querySelector(`.layout-block--${type}`)).not.toBeNull();
+    const photos = type === 'images-3' ? 3 : type === 'images-2' ? 2 : type === 'text' ? 0 : 1;
+    expect(container.querySelectorAll('[data-protected-image-slot]')).toHaveLength(photos);
+    expect(container.querySelectorAll('input[type=file]')).toHaveLength(photos);
+    expect(container.querySelector('[contenteditable] .layout-block,[contenteditable] .layout-media,[contenteditable] img')).toBeNull();
+  });
+  it('clearing all text leaves fixed media/copy slots and section boundaries intact', () => {
+    const { container } = render(<Editor />); fireEvent.click(layoutButton('image-left'));
+    const editor = container.querySelector('[contenteditable=true]')!; editor.innerHTML = ''; fireEvent.input(editor);
+    expect(doc().querySelectorAll('.layout-media')).toHaveLength(1);
+    expect(doc().querySelectorAll('.layout-copy')).toHaveLength(1);
+    expect(doc().querySelectorAll('.content-section')).toHaveLength(1);
+    expect(container.querySelector('[data-protected-image-slot]')).toHaveTextContent('Your photo goes here');
+  });
+  it('opens old content without writing and appends only the selected example', () => {
+    render(<Editor initial='<h2>Existing work</h2><p>Keep this text</p>' />);
+    expect(changed).not.toHaveBeenCalled(); fireEvent.click(screen.getByRole('button', { name: 'Use example content' }));
     fireEvent.click(screen.getByRole('checkbox', { name: 'Performance table' }));
     fireEvent.click(screen.getByRole('button', { name: 'Add selected sections (1)' }));
     expect(doc().querySelectorAll('.content-section')).toHaveLength(2);
-    expect(doc().body.textContent).toContain('Keep this text');
-    expect(doc().body.textContent).toContain('1400');
-    expect(doc().body.textContent).not.toContain('Original intro');
+    expect(doc().body.textContent).toContain('Keep this text'); expect(doc().body.textContent).toContain('1400'); expect(doc().body.textContent).not.toContain('Original intro');
   });
-  it('adds a full template and preserves edits, images and tables when reordered and reopened', () => {
-    const { unmount } = render(<Editor />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add full template' }));
-    const editor = screen.getByRole('textbox', { name: 'Description section 1' });
-    editor.querySelector('p')!.textContent = 'Edited fan overview';
-    fireEvent.input(editor);
-    fireEvent.click(screen.getByRole('button', { name: 'Move section 1 down' }));
-    expect(screen.getByRole('textbox', { name: 'Description section 2' })).toBe(editor);
-    const html = saved();
-    unmount(); render(<Editor initial={html} />);
-    fireEvent.click(screen.getByRole('button', { name: '2. Fan introduction' }));
-    expect(screen.getByRole('textbox')).toHaveTextContent('Edited fan overview');
-    expect(screen.getByAltText('Fan photo')).toHaveAttribute('src', '/old.webp');
-    expect(doc().querySelector('.content-section')?.textContent).toContain('1400');
+  it('requires explicit removal, supports cancel/undo, and retains edits on duplicate/reorder', () => {
+    const { container } = render(<Editor />); fireEvent.click(layoutButton('text'));
+    const editor = container.querySelector('[contenteditable=true]')!; editor.innerHTML = '<h2>My heading</h2><p>My copy</p>'; fireEvent.input(editor);
+    fireEvent.click(screen.getByRole('button', { name: 'Duplicate section 1' })); fireEvent.click(screen.getByRole('button', { name: 'Move section 2 up' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Remove section 1' })); expect(doc().querySelectorAll('.content-section')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('button', { name: 'Keep section' })); expect(doc().querySelectorAll('.content-section')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('button', { name: 'Remove section 1' })); fireEvent.click(screen.getByRole('button', { name: 'Yes, remove section' }));
+    expect(doc().querySelectorAll('.content-section')).toHaveLength(1); fireEvent.click(screen.getByRole('button', { name: 'Undo remove' }));
+    expect(doc().querySelectorAll('.content-section')).toHaveLength(2); expect(doc().querySelectorAll('h2')).toHaveLength(2); expect(doc().body.textContent).toContain('My copy');
   });
-  it('duplicates independently and removes/undoes without losing edits to another section', () => {
-    render(<Editor />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add full template' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Duplicate section 1' }));
-    const copy = screen.getByRole('textbox', { name: 'Description section 2' });
-    copy.querySelector('p')!.textContent = 'Copy only';fireEvent.input(copy);
-    fireEvent.click(screen.getByRole('button', { name: 'Remove section 1' }));
-    expect(doc().querySelectorAll('.content-section')).toHaveLength(2);
-    expect(doc().body.textContent).not.toContain('Original intro');
-    fireEvent.click(screen.getByRole('button', { name: 'Undo remove' }));
-    expect(doc().querySelectorAll('.content-section')).toHaveLength(3);
-    expect(doc().body.textContent).toContain('Original intro');
-    expect(doc().body.textContent).toContain('Copy only');
+  it('uploads into the selected photo slot and preserves the empty neighbour after reopening', async () => {
+    vi.mocked(apiFetch).mockResolvedValue({ url: '/second.webp' }); const { container, unmount } = render(<Editor />); fireEvent.click(layoutButton('images-2'));
+    fireEvent.change(container.querySelectorAll('input[type=file]')[1], { target: { files: [new File(['photo'], 'second.webp', { type: 'image/webp' })] } });
+    await waitFor(() => expect(doc().querySelectorAll('.layout-media')[1].querySelector('img')?.getAttribute('src')).toBe('/second.webp'));
+    expect(doc().querySelectorAll('.layout-media')[0].querySelector('img')).toBeNull(); const html = saved(); unmount(); const next = render(<Editor initial={html} />);
+    fireEvent.click(screen.getByRole('button', { name: `1. ${LAYOUT_BLOCKS.find(x => x.type === 'images-2')!.title}` }));
+    expect(next.container.querySelectorAll('[data-protected-image-slot]')).toHaveLength(2); expect(doc().querySelectorAll('.layout-media')[1].querySelector('img')?.getAttribute('src')).toBe('/second.webp');
   });
-  it('replaces a section picture through upload and keeps it after reopening', async () => {
-    vi.mocked(apiFetch).mockResolvedValue({ url: '/replacement.webp' });
-    const { container, unmount } = render(<Editor />);
-    fireEvent.click(screen.getByRole('checkbox', { name: 'Introduction' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Add selected sections (1)' }));
-    fireEvent.click(screen.getByAltText('Fan photo'));
-    fireEvent.click(screen.getByRole('button', { name: 'Replace photo' }));
-    fireEvent.change(container.querySelector('input[type="file"]')!, { target: { files: [new File(['photo'], 'new.webp', { type: 'image/webp' })] } });
-    await waitFor(() => expect(doc().querySelector('img')?.getAttribute('src')).toBe('/replacement.webp'));
-    const html = saved();unmount();render(<Editor initial={html} />);
-    fireEvent.click(screen.getByRole('button', { name: '1. Fan introduction' }));
-    expect(screen.getByAltText('Fan photo')).toHaveAttribute('src', '/replacement.webp');
-    expect(doc().querySelectorAll('img')).toHaveLength(1);
+  it('merges a finished photo upload with text edited while it was uploading', async () => {
+    let finish!: (value: {url:string}) => void; vi.mocked(apiFetch).mockImplementation(() => new Promise(resolve => { finish = resolve; }) as any);
+    const { container } = render(<Editor />); fireEvent.click(layoutButton('image-left'));
+    fireEvent.change(container.querySelector('input[type=file]')!, { target: { files: [new File(['photo'], 'photo.webp', { type: 'image/webp' })] } });
+    const editor = container.querySelector('[contenteditable=true]')!; editor.innerHTML = '<p>Edited while uploading</p>'; fireEvent.input(editor); finish({url:'/latest.webp'});
+    await waitFor(() => expect(doc().querySelector('img')?.getAttribute('src')).toBe('/latest.webp')); expect(doc().body.textContent).toContain('Edited while uploading');
   });
-  it('offers a safe preview without writing or executing pasted active content', () => {
-    render(<Editor initial='<h2>Sample</h2><p>Hello</p><img src="/fan.webp" onerror="bad()"><script>bad()</script>' />);
-    fireEvent.click(screen.getByRole('button', { name: 'Preview' }));
-    const preview = screen.getByRole('region', { name: 'Description preview' });
-    expect(preview.querySelector('script,[onerror]')).toBeNull();
-    expect(preview).toHaveTextContent('Hello');
-    expect(changed).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Back to editing' }));
-    expect(screen.getByRole('button', { name: '1. Sample' })).toBeVisible();
+  it('keeps both gallery photos when two uploads finish in the same React batch', async () => {
+    const finish: Array<(value:{url:string}) => void> = [];
+    vi.mocked(apiFetch).mockImplementation(() => new Promise(resolve => { finish.push(resolve); }) as any);
+    const { container } = render(<Editor />); fireEvent.click(layoutButton('images-2'));
+    const inputs = container.querySelectorAll('input[type=file]');
+    fireEvent.change(inputs[0], { target: { files: [new File(['a'], 'a.webp', {type:'image/webp'})] } });
+    fireEvent.change(inputs[1], { target: { files: [new File(['b'], 'b.webp', {type:'image/webp'})] } });
+    await act(async () => { finish[0]({url:'/first.webp'}); finish[1]({url:'/second.webp'}); });
+    expect(Array.from(doc().querySelectorAll('.layout-media img')).map(image => image.getAttribute('src'))).toEqual(['/first.webp','/second.webp']);
   });
-  it('drops old undo/selection state when another saved record is loaded', () => {
-    render(<Editor />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add full template' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Remove section 1' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Load another record' }));
-    expect(screen.queryByRole('button', { name: 'Undo remove' })).not.toBeInTheDocument();
-    expect(saved()).toBe('<p>Another record</p>');
-    expect(screen.getByRole('button', { name: '1. Another record' })).toBeVisible();
+  it('discards an upload after another saved record is loaded', async () => {
+    let finish!: (value:{url:string}) => void; vi.mocked(apiFetch).mockImplementation(() => new Promise(resolve => { finish = resolve; }) as any);
+    const { container } = render(<Editor />); fireEvent.click(layoutButton('image'));
+    fireEvent.change(container.querySelector('input[type=file]')!, { target: { files: [new File(['x'], 'photo.webp', {type:'image/webp'})] } });
+    fireEvent.click(screen.getByRole('button',{name:'Load another record'})); finish({url:'/stale.webp'});
+    await waitFor(() => expect(saved()).toBe('<p>Another record</p>')); expect(screen.queryByRole('button',{name:'Undo remove'})).not.toBeInTheDocument();
   });
-  it('can delete the last section then start again with an editable text section', () => {
-    render(<Editor initial='<p>Remove me</p>' />);
-    fireEvent.click(screen.getByRole('button', { name: 'Remove section 1' }));
-    expect(saved()).toBe('');
-    fireEvent.click(screen.getByRole('button', { name: 'Text section' }));
-    expect(screen.getByRole('textbox')).toHaveTextContent('Add your text here.');
-    expect(doc().querySelectorAll('.content-section')).toHaveLength(1);
+  it('prevents saving or switching sections until the selected photo finishes uploading', async () => {
+    let finish!: (value:{url:string}) => void; vi.mocked(apiFetch).mockImplementation(() => new Promise(resolve => { finish = resolve; }) as any);
+    const submit = vi.fn((event: React.FormEvent) => event.preventDefault());
+    const { container } = render(<form onSubmit={submit}><Editor /><button type="submit">Save form</button></form>);
+    fireEvent.click(layoutButton('image'));
+    fireEvent.change(container.querySelector('input[type=file]')!, { target: { files: [new File(['x'], 'photo.webp', {type:'image/webp'})] } });
+    expect(screen.getByRole('button', {name:'Remove section 1'})).toBeDisabled();
+    expect(screen.getByRole('button', {name:'Add layout'})).toBeDisabled();
+    fireEvent.submit(container.querySelector('form')!);
+    expect(submit).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent('Please wait for the photo upload');
+    finish({url:'/finished.webp'});
+    await waitFor(() => expect(doc().querySelector('img')?.getAttribute('src')).toBe('/finished.webp'));
+    await waitFor(() => expect(screen.getByRole('button', {name:'Remove section 1'})).toBeEnabled());
+    fireEvent.submit(container.querySelector('form')!); expect(submit).toHaveBeenCalledTimes(1);
+  });
+  it('rejects non-photo files without deleting the photo area', () => {
+    const { container } = render(<Editor />); fireEvent.click(layoutButton('image'));
+    fireEvent.change(container.querySelector('input[type=file]')!, { target: { files: [new File(['bad'], 'bad.svg', {type:'image/svg+xml'})] } });
+    expect(screen.getByRole('alert')).toHaveTextContent('Choose a JPG'); expect(apiFetch).not.toHaveBeenCalled(); expect(doc().querySelectorAll('.layout-media')).toHaveLength(1);
+  });
+  it('sanitizes preview without changing the saved original', () => {
+    render(<Editor initial='<h2>Sample</h2><img src="/fan.webp" onerror="bad()"><script>bad()</script>' />); fireEvent.click(screen.getByRole('button',{name:'Preview'}));
+    expect(screen.getByRole('region',{name:'Description preview'}).querySelector('script,[onerror]')).toBeNull(); expect(changed).not.toHaveBeenCalled();
   });
 });

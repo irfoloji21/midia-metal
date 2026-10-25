@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { isWordHtml, normalizeWordHtml } from "@/lib/word-paste";
+import { sanitizeLayoutText } from "@/lib/layout-blocks";
+import { plainTextContent } from "@/lib/content-sections";
 import { toast } from "sonner";
 import "@/service-content.css";
 import "@/product-editorial.css";
@@ -38,12 +40,13 @@ type RichTextEditorProps = {
   serviceLayout?: boolean;
   wordPaste?: boolean;
   documentLayout?: boolean;
+  textOnly?: boolean;
 };
 
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 const MAX_IMAGE_SIZE_LABEL = "2MB";
 
-export default function RichTextEditor({ label, value, onChange, helperText = "Saved as formatted HTML.", serviceLayout = false, wordPaste = false, documentLayout = false }: RichTextEditorProps) {
+export default function RichTextEditor({ label, value, onChange, helperText = "Saved as formatted HTML.", serviceLayout = false, wordPaste = false, documentLayout = false, textOnly = false }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -97,9 +100,10 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
   }, [selectedImage]);
 
   useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML !== (value || "")) {
+    const content = textOnly ? sanitizeLayoutText(value || "") : value || "";
+    if (editorRef.current && editorRef.current.innerHTML !== content) {
       contentRevisionRef.current += 1;
-      editorRef.current.innerHTML = value || "";
+      editorRef.current.innerHTML = content;
       setSelectedCell(null);
       setSelectedImage(null);
       selectionRef.current = null;
@@ -108,13 +112,21 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
       draggingImageRef.current = null;
       setIsUploading(false);
     }
-  }, [value]);
+  }, [value, textOnly]);
 
   const emitChange = () => {
-    onChange(editorRef.current?.innerHTML || "");
+    const content = editorRef.current?.innerHTML || "";
+    if (textOnly) {
+      const clean = sanitizeLayoutText(content);
+      // Merely focusing a legacy text slot must not rewrite its stored formatting.
+      if (clean !== sanitizeLayoutText(value || "")) onChange(clean);
+      return;
+    }
+    onChange(content);
   };
 
   const handleEditorClick = (e: React.MouseEvent) => {
+    if (textOnly) return;
     const target = e.target as HTMLElement;
     setSelectedCell(target.closest("td,th") as HTMLTableCellElement | null);
     if (target.tagName === "IMG") {
@@ -148,6 +160,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
     return element?.closest<HTMLTableCellElement>('td,th') || null;
   };
   const changeTable = (action: 'add-row' | 'remove-row' | 'add-column' | 'remove-column') => {
+    if (textOnly) return;
     const caretCell = cellAtCaret();
     const cell = caretCell === undefined ? selectedCell : caretCell;
     if (!cell || !editorRef.current?.contains(cell)) return;
@@ -311,6 +324,23 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
   };
 
   const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
+    if (textOnly) {
+      event.preventDefault();
+      const clipboardHtml = event.clipboardData.getData("text/html");
+      const clipboardText = event.clipboardData.getData("text/plain");
+      if (!clipboardHtml && !clipboardText) return;
+      const source = clipboardHtml
+        ? (isWordHtml(clipboardHtml) ? normalizeWordHtml(clipboardHtml).html : clipboardHtml)
+        : plainTextContent(clipboardText);
+      const html = sanitizeLayoutText(source);
+      if (!html.trim() || !new DOMParser().parseFromString(html, 'text/html').body.textContent?.trim()) return;
+      saveSelection();
+      if (document.execCommand?.("insertHTML", false, html)) {
+        saveSelection();
+        emitChange();
+      } else insertHtmlAtSelection(html);
+      return;
+    }
     if (!wordPaste) return;
     const html = event.clipboardData.getData("text/html");
     if (!isWordHtml(html)) return;
@@ -367,7 +397,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
   };
 
   const insertUploadedImages = async (files: File[]) => {
-    if (!files.length) return;
+    if (textOnly || !files.length) return;
     const uploadEditor = editorRef.current;
     if (!uploadEditor) return;
     const uploadRevision = contentRevisionRef.current;
@@ -649,7 +679,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
       {label ? <label className="block text-sm font-medium text-gray-700">{label}</label> : null}
       <div ref={wrapperRef} className="mt-1 border border-gray-300 rounded-md overflow-hidden bg-white relative">
         <div className="border-b border-gray-200 bg-gray-50 p-2 flex flex-wrap gap-1">
-          {buttons.map(({ title, icon: Icon, action }) => (
+          {buttons.filter(({ title }) => !textOnly || !['Upload Image', 'Image Row (Side-by-Side)', '2 images side by side', '3 images side by side', 'Text Color'].includes(title)).map(({ title, icon: Icon, action }) => (
             <button
               key={title}
               type="button"
@@ -665,24 +695,24 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
               <Icon className="w-4 h-4" />
             </button>
           ))}
-          <input
+          {!textOnly && <input
             ref={imageInputRef}
             type="file"
             accept="image/*"
             multiple
             className="hidden"
             onChange={handleImagePickerChange}
-          />
-          <input
+          />}
+          {!textOnly && <input
             ref={colorInputRef}
             type="color"
             defaultValue="#10275c"
             className="hidden"
             onChange={(e) => applyColor(e.target.value)}
-          />
+          />}
         </div>
 
-        {(serviceLayout || selectedImage) && (
+        {!textOnly && (serviceLayout || selectedImage) && (
           <div className="flex flex-wrap gap-2 border-b border-gray-200 p-2 bg-[#f4f6f8]">
             {[
               ...(serviceLayout ? [
@@ -709,7 +739,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           </div>
         )}
 
-        {selectedCell && editorRef.current?.contains(selectedCell) && <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 bg-slate-50 p-2" role="toolbar" aria-label="Table editing">
+        {!textOnly && selectedCell && editorRef.current?.contains(selectedCell) && <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 bg-slate-50 p-2" role="toolbar" aria-label="Table editing">
           {[
             { label: 'Add row below', action: 'add-row', disabled: !simpleTable },
             { label: 'Remove row', action: 'remove-row', disabled: !simpleTable || tableRows.length <= 1 },
@@ -726,10 +756,12 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           aria-multiline="true"
           contentEditable
           suppressContentEditableWarning
+          onFocus={() => { if (textOnly) document.execCommand?.("defaultParagraphSeparator", false, "p"); }}
           onClick={handleEditorClick}
           onMouseUp={saveSelection}
           onKeyUp={saveSelection}
           onDragStart={(event) => {
+            if (textOnly) { event.preventDefault(); return; }
             const target = event.target as HTMLElement;
             if (serviceLayout && target.closest(".service-media")) {
               event.preventDefault();
@@ -745,10 +777,12 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           }}
           onDragEnter={(event) => {
             event.preventDefault();
+            if (textOnly) return;
             setIsDragOver(true);
           }}
           onDragOver={(event) => {
             event.preventDefault();
+            if (textOnly) return;
             setIsDragOver(true);
             setSelectionFromPoint(event.clientX, event.clientY);
           }}
@@ -759,6 +793,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           onDrop={async (event) => {
             event.preventDefault();
             setIsDragOver(false);
+            if (textOnly) return;
 
             // Internal image drag — smart drop: into img-row container if target is one, else root level
             if (draggingImageRef.current && event.dataTransfer.getData("text/x-internal-img") === "1") {
@@ -858,7 +893,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
           className={`${serviceLayout ? "service-rich-content service-rich-editor" : ""} ${documentLayout ? "section-document" : ""} min-h-[220px] max-h-[600px] overflow-y-auto p-3 focus:outline-none text-sm leading-6 text-gray-700 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:my-1 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:my-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:my-2 [&_blockquote]:border-l-4 [&_blockquote]:border-[#eb5c10] [&_blockquote]:pl-3 [&_blockquote]:italic [&_table]:w-full [&_table]:border-separate [&_table]:[border-spacing:18px_0] [&_td]:align-top [&_td]:pr-4 [&_td]:pb-3 [&_th]:align-top [&_th]:pr-4 [&_th]:pb-3 [&_img]:max-w-full ${isDragOver ? "bg-[#fff7f2] ring-2 ring-[#eb5c10]/40" : ""}`}
         />
 
-        {selectedImage && imageRect && (
+        {!textOnly && selectedImage && imageRect && (
           <div
             className="absolute pointer-events-none border-2 border-[#eb5c10] z-10"
             style={{
@@ -951,7 +986,7 @@ export default function RichTextEditor({ label, value, onChange, helperText = "S
       </div>
       {helperText ? (
         <p className="mt-1 text-xs text-gray-500">
-          {helperText} Drag and drop images into the editor, or use Upload Image. Max image size: {MAX_IMAGE_SIZE_LABEL}.
+          {helperText}{!textOnly && <> Drag and drop images into the editor, or use Upload Image. Max image size: {MAX_IMAGE_SIZE_LABEL}.</>}
           {isUploading ? " Uploading..." : ""}
         </p>
       ) : null}

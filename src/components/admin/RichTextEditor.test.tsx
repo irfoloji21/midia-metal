@@ -9,9 +9,9 @@ vi.mock("@/lib/api", () => ({ apiFetch: vi.fn() }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
 
 const initial = '<div class="service-section"><div class="service-copy"><h2>Made to fit</h2><p>Original text</p></div><div class="service-media"><img src="/old.webp" alt="Original description"></div></div>';
-function Editor({ value = initial, serviceLayout = true, wordPaste = false, documentLayout = false }: { value?: string; serviceLayout?: boolean; wordPaste?: boolean; documentLayout?: boolean }) {
+function Editor({ value = initial, serviceLayout = true, wordPaste = false, documentLayout = false, textOnly = false }: { value?: string; serviceLayout?: boolean; wordPaste?: boolean; documentLayout?: boolean; textOnly?: boolean }) {
   const [content, setContent] = useState(value);
-  return <><RichTextEditor label="Content" serviceLayout={serviceLayout} wordPaste={wordPaste} documentLayout={documentLayout} value={content} onChange={setContent} /><output data-testid="saved-content">{content}</output></>;
+  return <><RichTextEditor label="Content" serviceLayout={serviceLayout} wordPaste={wordPaste} documentLayout={documentLayout} textOnly={textOnly} value={content} onChange={setContent} /><output data-testid="saved-content">{content}</output></>;
 }
 function selectInside(node: Node) {
   const range = document.createRange();
@@ -304,5 +304,99 @@ describe('Image upload boundaries and replacement links', () => {
     chooseReplacement(container, 'Contact photo');
     await waitFor(() => expect(screen.getByAltText('Contact photo')).toHaveAttribute('src', '/replacement.webp'));
     expect(screen.getByAltText('Contact photo').closest('a')).toHaveAttribute('href', '/contact');
+  });
+});
+
+describe('Protected layout text slots', () => {
+  const clipboard = (html: string, text = '') => ({ getData: (type: string) => type === 'text/html' ? html : type === 'text/plain' ? text : '' });
+
+  it('offers formatting tools without image, layout or table controls', () => {
+    const { container } = render(<Editor value='<p>Text slot</p>' textOnly serviceLayout />);
+    for (const name of ['Bold', 'Italic', 'Underline', 'Heading 2', 'Bullet List', 'Link']) {
+      expect(screen.getByRole('button', { name })).toBeVisible();
+    }
+    for (const name of ['Upload Image', 'Image Row (Side-by-Side)', '2 images side by side', '3 images side by side', 'Add image + text', 'Swap sides', 'Replace photo', 'Text Color', 'Add row below']) {
+      expect(screen.queryByRole('button', { name })).not.toBeInTheDocument();
+    }
+    expect(container.querySelector('input[type="file"]')).toBeNull();
+    expect(screen.queryByText(/Drag and drop images/)).not.toBeInTheDocument();
+  });
+
+  it('keeps safe pasted formatting while removing layout, images, tables and active attributes', () => {
+    render(<Editor value='' textOnly serviceLayout={false} />);
+    const editor = screen.getByRole('textbox');
+    const html = '<div class="layout-block layout-block--images-2"><div class="layout-media"><img src="/unwanted.webp"></div><div class="layout-copy"><h2 onclick="bad()">Heading</h2><p><strong>Bold</strong> <em>italic</em> <u>underlined</u></p><ul><li>First</li></ul><a href="javascript:bad()">Unsafe link</a><a href="https://example.com/details">Safe link</a><span style="position:fixed" class="danger">Span text</span></div></div><table><tr><td>Table words</td></tr></table><script>bad()</script>';
+    expect(fireEvent.paste(editor, { clipboardData: clipboard(html) })).toBe(false);
+    expect(editor.querySelector('h2')).toHaveTextContent('Heading');
+    expect(editor.querySelector('strong')).toHaveTextContent('Bold');
+    expect(editor.querySelector('em')).toHaveTextContent('italic');
+    expect(editor.querySelector('u')).toHaveTextContent('underlined');
+    expect(editor.querySelector('li')).toHaveTextContent('First');
+    expect(editor.querySelector('a[href="https://example.com/details"]')).toHaveTextContent('Safe link');
+    expect(editor.querySelector('img,table,div,script,[onclick],[class],[style],a[href^="javascript:"]')).toBeNull();
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
+  it('preserves Word headings and bold text without importing its pictures', () => {
+    render(<Editor value='' textOnly wordPaste />);
+    const editor = screen.getByRole('textbox');
+    fireEvent.paste(editor, { clipboardData: clipboard('<p class="MsoHeading1">Word heading</p><p><span style="font-weight:bold">Bold text</span></p><img src="/fan.webp">') });
+    expect(editor.querySelector('h2')).toHaveTextContent('Word heading');
+    expect(editor.querySelector('strong')).toHaveTextContent('Bold text');
+    expect(editor.querySelector('img,div,table')).toBeNull();
+  });
+
+  it('blocks dropped files and image-only paste without deleting selected text', () => {
+    render(<Editor value='<p>Keep selected text</p>' textOnly />);
+    const editor = screen.getByRole('textbox');
+    const range = document.createRange();
+    range.selectNodeContents(editor.querySelector('p')!);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+    const transfer = { files: [new File(['photo'], 'photo.webp', { type: 'image/webp' })], getData: () => '' };
+    expect(fireEvent.drop(editor, { dataTransfer: transfer })).toBe(false);
+    expect(fireEvent.paste(editor, { clipboardData: clipboard('<img src="/photo.webp">') })).toBe(false);
+    expect(fireEvent.paste(editor, { clipboardData: { ...clipboard(''), files: transfer.files } })).toBe(false);
+    expect(editor).toHaveTextContent('Keep selected text');
+    expect(editor.querySelector('img')).toBeNull();
+    expect(apiFetch).not.toHaveBeenCalled();
+    expect(screen.getByTestId('saved-content').textContent).toBe('<p>Keep selected text</p>');
+  });
+
+  it('treats plain clipboard markup as literal text', () => {
+    render(<Editor value='' textOnly />);
+    const editor = screen.getByRole('textbox');
+    fireEvent.paste(editor, { clipboardData: clipboard('', '<img src="not-an-image">\nSecond line') });
+    expect(editor).toHaveTextContent('<img src="not-an-image">');
+    expect(editor).toHaveTextContent('Second line');
+    expect(editor.querySelector('img')).toBeNull();
+  });
+
+  it('does not rewrite untouched legacy text on focus and blur', () => {
+    const original = '<span class="legacy-copy" style="color:#10275c">Keep <strong>existing formatting</strong>.</span>';
+    render(<Editor value={original} textOnly />);
+    const editor = screen.getByRole('textbox');
+    fireEvent.focus(editor);
+    fireEvent.blur(editor);
+    expect(screen.getByTestId('saved-content').textContent).toBe(original);
+    editor.innerHTML = '<p>Changed <strong>text</strong>.</p>';
+    fireEvent.input(editor);
+    expect(screen.getByTestId('saved-content').textContent).toBe('<p>Changed <strong>text</strong>.</p>');
+  });
+
+  it('clears all slot text without removing the surrounding fixed image or layout', () => {
+    function FixedLayout() {
+      const [text, setText] = useState('<h2>Heading</h2><p>Editable text</p>');
+      return <div className="layout-block layout-block--image-left" data-testid="fixed-layout"><div className="layout-media"><img src="/fixed.webp" alt="Fixed photo slot" /></div><div className="layout-copy"><RichTextEditor label="Text slot" textOnly value={text} onChange={setText} /></div></div>;
+    }
+    render(<FixedLayout />);
+    const editor = screen.getByRole('textbox');
+    editor.innerHTML = '';
+    fireEvent.input(editor);
+    expect(editor.innerHTML).toBe('');
+    expect(screen.getByTestId('fixed-layout')).toHaveClass('layout-block--image-left');
+    expect(screen.getByAltText('Fixed photo slot')).toHaveAttribute('src', '/fixed.webp');
+    expect(screen.getByTestId('fixed-layout').querySelectorAll(':scope > .layout-media')).toHaveLength(1);
+    expect(screen.getByTestId('fixed-layout').querySelectorAll(':scope > .layout-copy')).toHaveLength(1);
   });
 });

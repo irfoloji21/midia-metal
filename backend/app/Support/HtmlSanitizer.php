@@ -85,6 +85,9 @@ class HtmlSanitizer
             return implode(' ', array_intersect(
                 [
                     'content-section',
+                    'layout-block', 'layout-block--image-left', 'layout-block--image-right',
+                    'layout-block--images-2', 'layout-block--images-3', 'layout-block--text', 'layout-block--image',
+                    'layout-media', 'layout-copy',
                     'service-section', 'service-section--image-left', 'service-copy', 'service-media', 'service-eyebrow', 'service-caption',
                     'product-section', 'product-split', 'product-media', 'product-eyebrow', 'product-caption',
                     'product-note', 'product-table-wrap', 'product-performance-table', 'product-links', 'product-spec-slot',
