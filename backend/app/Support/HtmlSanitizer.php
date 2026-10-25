@@ -77,7 +77,8 @@ class HtmlSanitizer
 
         // Only these presentation classes are accepted from the rich text editor.
         $extractLayoutClasses = static function (string $attributes): string {
-            if (! preg_match('/\bclass\s*=\s*(["\'])(.*?)\1/i', $attributes, $match)) {
+            // Skip other quoted attributes; data-class is not a class attribute.
+            if (! preg_match('/"[^"]*"(*SKIP)(*F)|\'[^\']*\'(*SKIP)(*F)|(?:^|\s)class\s*=\s*(["\'])(.*?)\1/is', $attributes, $match)) {
                 return '';
             }
 
@@ -91,7 +92,7 @@ class HtmlSanitizer
                     'word-paste', 'word-table', 'word-table--bordered', 'word-table--layout', 'word-spacer',
                     'word-heading-1', 'word-heading-2', 'word-heading-3', 'word-heading-4', 'word-heading-5', 'word-heading-6',
                 ],
-                preg_split('/\s+/', trim($match[2]))
+                preg_split('/\s+/', trim(html_entity_decode($match[2], ENT_QUOTES | ENT_HTML5, 'UTF-8')))
             ));
         };
 
@@ -175,9 +176,11 @@ class HtmlSanitizer
                 return '<a>';
             }
 
-            $href = trim($hrefMatch[1]);
+            $href = trim(html_entity_decode($hrefMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 
-            if (preg_match('/^\s*javascript:/i', $href)) {
+            // Browsers ignore embedded ASCII control characters in URL schemes.
+            $schemeValue = preg_replace('/[\x00-\x20\x7f]+/', '', $href);
+            if (preg_match('/^javascript:/i', $schemeValue)) {
                 return '<a>';
             }
 
@@ -215,7 +218,7 @@ class HtmlSanitizer
                 return '';
             }
 
-            $src = trim($srcMatch[1]);
+            $src = trim(html_entity_decode($srcMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 
             if (
                 preg_match('/^\s*javascript:/i', $src) ||
@@ -229,7 +232,7 @@ class HtmlSanitizer
                 preg_match('/alt\s*=\s*"([^"]*)"/i', $attributes, $altMatch) ||
                 preg_match("/alt\s*=\s*'([^']*)'/i", $attributes, $altMatch)
             ) {
-                $alt = trim($altMatch[1]);
+                $alt = trim(html_entity_decode($altMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
             }
 
             $style = '';
@@ -252,7 +255,7 @@ class HtmlSanitizer
             }
 
             if (! $style) {
-                $style = 'max-width:100%;height:auto;display:inline-block;margin:5px;';
+                $style = 'height:auto; max-width:100%; display:inline-block; margin:5px;';
             }
 
             return '<img src="'.e($src).'" alt="'.e($alt).'" loading="lazy" style="'.$style.'" />';
