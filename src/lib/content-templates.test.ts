@@ -18,6 +18,12 @@ describe('existing-content section templates', () => {
     expect(template.sections).toHaveLength(14);
     const combined = parse(template.sections.map(section => section.html).join(''));
     expect(combined.querySelectorAll('img')).toHaveLength(10);
+    for (const image of combined.querySelectorAll('img')) {
+      // Uploaded content must retain its source host, independent of the page route/proxy.
+      expect(image.getAttribute('src')).toMatch(/^https:\/\/api-test\.midiawork\.com\/storage\/product-content\/[a-f0-9]{64}\.png$/);
+      const imageLink = image.closest('a');
+      if (imageLink) expect(imageLink.getAttribute('href')).toBe(image.getAttribute('src'));
+    }
     expect(combined.querySelectorAll('table')).toHaveLength(7);
     expect(combined.querySelector('.product-spec-slot')).toBeNull();
     expect(combined.textContent).toContain('0–10 V');
@@ -65,7 +71,7 @@ describe('existing-content section templates', () => {
     expect(getContentTemplates('page')).toEqual([]);
   });
 
-  it('contains attributable nonempty sections and portable safe image references', () => {
+  it('contains attributable nonempty sections and safe owned image references', () => {
     const templates = allTemplates();
     expect(templates).toHaveLength(8);
     expect(new Set(templates.map(template => template.id)).size).toBe(templates.length);
@@ -82,7 +88,7 @@ describe('existing-content section templates', () => {
           for (const attribute of element.attributes) expect(attribute.name).not.toMatch(/^on/i);
         }
         for (const image of body.querySelectorAll('img')) {
-          expect(image.getAttribute('src')).toMatch(/^\/(?:images\/|storage\/product-content\/)/);
+          expect(image.getAttribute('src')).toMatch(/^(?:\/images\/|https:\/\/api-test\.midiawork\.com\/storage\/product-content\/)/);
           expect(image.getAttribute('alt')?.trim()).toBeTruthy();
         }
         for (const link of body.querySelectorAll('a')) {
