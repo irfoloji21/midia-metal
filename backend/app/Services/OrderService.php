@@ -189,7 +189,8 @@ class OrderService
      */
     private function sendAdminNotification(Order $order): void
     {
-        $adminEmail = (string) (SiteSetting::where('key', 'contact_email')->value('value')
+        $adminEmail = (string) (config('services.business_notification_email')
+            ?: SiteSetting::where('key', 'contact_email')->value('value')
             ?: config('mail.from.address')
             ?: 'softwaredevelopment2181@gmail.com');
 
