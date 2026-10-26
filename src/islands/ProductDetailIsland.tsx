@@ -11,13 +11,13 @@ import {
   Facebook,
   Twitter,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useModalFocus } from '@/hooks/use-modal-focus';
 import { apiFetch, ApiError } from "@/lib/api";
 import { useReviewEligibility } from "@/lib/use-review-eligibility";
 import { normalizeMediaUrl } from "@/lib/media";
 import ProductImage from "@/components/ProductImage";
-import { hasProductEditorial, insertProductSpecifications } from "@/lib/product-editorial";
+import { hasProductEditorial, hasProductSections, insertProductSpecifications } from "@/lib/product-editorial";
 import "@/product-editorial.css";
 import { useStore } from "@nanostores/react";
 import { addToCart } from "@/stores/cart";
@@ -361,6 +361,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   const descriptionHasHtml = /<\/?[a-z][\s\S]*>/i.test(description);
   const descriptionHasTable = /<table[\s>]/i.test(description);
   const hasEditorial = hasProductEditorial(description);
+  const hasStructuredDescription = useMemo(() => hasEditorial || hasProductSections(description), [description, hasEditorial]);
   const formatVariantColumnValue = (columnKey: string, variant: Record<string, any> | null): string => {
     if (!variant && !product) return "";
 
@@ -1054,8 +1055,8 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
       </section >
 
       <section className="container mx-auto px-4 lg:px-8 pb-14">
-        <div className={`grid grid-cols-1 ${specificationEntries.length > 0 && !hasEditorial ? "xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]" : ""} gap-10 xl:gap-12 items-start`}>
-          <div className="min-w-0">
+        <div data-product-details-layout={hasStructuredDescription ? "sections" : "legacy"} className={`grid grid-cols-1 ${specificationEntries.length > 0 && !hasStructuredDescription ? "xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]" : ""} gap-10 xl:gap-12 items-start`}>
+          <div className="min-w-0" data-product-detail-content="">
             <div className="flex flex-wrap gap-0 mb-10">
               <button
                 onClick={() => setTab("description")}
@@ -1079,6 +1080,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
 
             {tab === "description" ? (
               <div
+                data-product-description=""
                 className="w-full min-w-0 max-w-full overflow-x-auto"
                 role={descriptionHasTable ? "region" : undefined}
                 aria-label={descriptionHasTable ? "Product description and tables" : undefined}
@@ -1208,7 +1210,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
           </div>
 
           {specificationEntries.length > 0 && !hasEditorial && (
-            <aside className="min-w-0">
+            <aside className="min-w-0" aria-label="Product specifications">
               <div className="overflow-hidden rounded border border-[#d5deea] bg-white">
                 <div className="border-b border-[#d5deea] px-8 py-6">
                   <h3 className="font-sans text-[24px] md:text-[28px] font-semibold text-primary">Specifications</h3>

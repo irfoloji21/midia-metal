@@ -1,3 +1,20 @@
+import { parseHtmlFragment } from './public-html';
+import type { RootContent } from 'hast';
+
+/** Only rendered section elements opt a description into the section canvas. */
+export function hasProductSections(html: string | null | undefined): boolean {
+  const nodes: RootContent[] = [...parseHtmlFragment(html || '').children];
+  const nonRenderedTags = new Set(['script', 'style', 'template', 'noscript']);
+  while (nodes.length) {
+    const node = nodes.pop()!;
+    if (node.type !== 'element' || nonRenderedTags.has(node.tagName)) continue;
+    const classes = Array.isArray(node.properties.className) ? node.properties.className : [];
+    if (classes.includes('content-section') || classes.includes('layout-block')) return true;
+    nodes.push(...node.children);
+  }
+  return false;
+}
+
 export const hasProductEditorial = (html: string) => /class=["']product-section(?:\s|["'])/.test(html);
 
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, char => ({
