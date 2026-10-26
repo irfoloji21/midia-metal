@@ -82,7 +82,6 @@ export default function AdminServices() {
             <div className="flex flex-wrap justify-between items-center gap-3">
                 <h1 className="text-3xl font-bold font-sans text-[#10275c]">Services</h1>
                 <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => { openEdit(); setCurrentService((service: any) => ({ ...service, active: false })); }} className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-[#10275c] hover:border-orange">Create from template</button>
                 <button
                     onClick={() => openEdit()}
                     className="flex items-center gap-2 rounded bg-orange px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-hover"
@@ -191,6 +190,7 @@ export default function AdminServices() {
                                 <div className="col-span-2">
                                     <SectionTemplateEditor
                                         templateKind="service"
+                                        layoutOnly
                                         label="Content"
                                         serviceLayout
                                         value={currentService.content || ""}

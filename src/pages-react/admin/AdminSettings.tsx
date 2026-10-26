@@ -401,6 +401,7 @@ export default function AdminSettings() {
             {setting.type === "richtext" ? (
                 <SectionTemplateEditor
                     templateKind="page"
+                    layoutOnly
                     settingKey={setting.key}
                     label={LABEL_OVERRIDES[setting.key] || setting.key.replace(/_/g, " ")}
                     value={setting.value || ""}

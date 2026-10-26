@@ -30,9 +30,10 @@ afterEach(cleanup);
 describe('Portfolio section template integration', () => {
   it('creates an unpublished project and saves the selected section content', async () => {
     render(<AdminPortfolio />);
-    fireEvent.click(screen.getByRole('button', { name: 'Create from template' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add Project' }));
     expect(screen.getByTestId('section-editor')).toHaveAttribute('data-template-kind', 'portfolio');
     expect(screen.getByLabelText('Description')).toHaveValue('');
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Active' }));
     expect(screen.getByRole('checkbox', { name: 'Active' })).not.toBeChecked();
     fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'New project' } });
     fireEvent.change(screen.getByLabelText('Main Project Image (required)'), { target: { value: '/images/project.webp' } });
@@ -61,9 +62,9 @@ describe('Portfolio section template integration', () => {
     expect(JSON.parse(write![1]!.body as string)).toMatchObject({ description, active: true, gallery: ['/images/gallery.webp'], client: 'Original client' });
   });
 
-  it('does not create a project when a template draft is cancelled', async () => {
+  it('does not create a project when a new project draft is cancelled', async () => {
     render(<AdminPortfolio />);
-    fireEvent.click(screen.getByRole('button', { name: 'Create from template' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add Project' }));
     fireEvent.click(screen.getByRole('button', { name: 'Choose project section' }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(apiFetch).toHaveBeenCalledWith('/admin/portfolio-categories'));

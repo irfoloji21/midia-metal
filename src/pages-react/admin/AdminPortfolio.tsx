@@ -130,13 +130,6 @@ export default function AdminPortfolio() {
                 <div className="flex flex-wrap gap-2">
                     <button
                         type="button"
-                        onClick={() => openEdit(null, true)}
-                        className="flex items-center gap-2 rounded border border-[#10275c] px-4 py-2 text-sm font-semibold text-[#10275c] hover:bg-slate-50"
-                    >
-                        <Plus className="h-4 w-4" /> Create from template
-                    </button>
-                    <button
-                        type="button"
                         onClick={() => openEdit()}
                         className="flex items-center gap-2 rounded bg-orange px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-hover"
                     >
@@ -338,6 +331,7 @@ export default function AdminPortfolio() {
                                     <SectionTemplateEditor
                                         label="Description"
                                         templateKind="portfolio"
+                                        layoutOnly
                                         value={currentProject.description || ""}
                                         onChange={(description) => setCurrentProject((project: any) => ({ ...project, description }))}
                                     />
