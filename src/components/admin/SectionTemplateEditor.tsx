@@ -12,6 +12,7 @@ type Props = {
   value: string;
   onChange: (value: string) => void;
   templateKind: ContentTemplateKind;
+  layoutOnly?: boolean;
   settingKey?: string;
   helperText?: string;
   serviceLayout?: boolean;
@@ -26,7 +27,7 @@ function LayoutDiagram({ type }: { type: LayoutBlockType }) {
   return <span aria-hidden="true" className="mb-3 flex w-full gap-2 rounded border border-slate-200 bg-white p-2">{type === 'image-left' ? <>{photo}{copy}</> : type === 'image-right' ? <>{copy}{photo}</> : type === 'images-2' ? <>{photo}{photo}</> : type === 'images-3' ? <>{photo}{photo}{photo}</> : type === 'image' ? photo : copy}</span>;
 }
 
-export default function SectionTemplateEditor({ label, value, onChange, templateKind, settingKey }: Props) {
+export default function SectionTemplateEditor({ label, value, onChange, templateKind, settingKey, layoutOnly = false }: Props) {
   const instanceId = useId();
   const [sections, setSections] = useState(() => readContentSections(value || '', templateKind === 'portfolio'));
   const sectionsRef = useRef(sections);
@@ -106,9 +107,11 @@ export default function SectionTemplateEditor({ label, value, onChange, template
         <div><p className="font-semibold text-[#10275c]">Build with protected layouts</p><p className="mt-1 text-sm text-gray-600">Choose a layout, then fill its photo and text areas. The layout stays in place.</p></div>
         <div className="flex flex-wrap gap-2">
           <button type="button" className={`${control} !bg-[#10275c] !text-white`} aria-expanded={showLayouts} aria-controls={`${instanceId}-layouts`} onClick={() => { setShowLayouts(!showLayouts); setShowTemplates(false); }}><Plus className="h-4 w-4" />Add layout</button>
-          {templates.length > 0 && <button type="button" className={control} aria-expanded={showTemplates} aria-controls={`${instanceId}-templates`} onClick={() => { setShowTemplates(!showTemplates); setShowLayouts(false); }}><LayoutTemplate className="h-4 w-4" />Use example content</button>}
-          <button type="button" className={control} onClick={() => append([blankTableSection], 'Table section added.')}><Plus className="h-4 w-4" />Table section</button>
-          <button type="button" className={control} aria-pressed={showPreview} onClick={() => setShowPreview(!showPreview)}><Eye className="h-4 w-4" />{showPreview ? 'Back to editing' : 'Preview'}</button>
+          {!layoutOnly && <>
+            {templates.length > 0 && <button type="button" className={control} aria-expanded={showTemplates} aria-controls={`${instanceId}-templates`} onClick={() => { setShowTemplates(!showTemplates); setShowLayouts(false); }}><LayoutTemplate className="h-4 w-4" />Use example content</button>}
+            <button type="button" className={control} onClick={() => append([blankTableSection], 'Table section added.')}><Plus className="h-4 w-4" />Table section</button>
+            <button type="button" className={control} aria-pressed={showPreview} onClick={() => setShowPreview(!showPreview)}><Eye className="h-4 w-4" />{showPreview ? 'Back to editing' : 'Preview'}</button>
+          </>}
         </div>
       </div>
       {showLayouts && <div id={`${instanceId}-layouts`} className="mt-4 grid gap-3 border-t border-slate-200 pt-4 sm:grid-cols-2 lg:grid-cols-3">{LAYOUT_BLOCKS.map(layout => <button key={layout.type} type="button" aria-label={layout.title} className="rounded-lg border border-slate-300 bg-white p-3 text-left hover:border-orange focus:outline-none focus:ring-2 focus:ring-orange" onClick={() => append([createLayoutBlock(layout.type)], `${layout.title} added. Fill the photo and text areas below.`)}><LayoutDiagram type={layout.type} /><span className="block text-sm font-semibold text-[#10275c]">{layout.title}</span><span className="mt-1 block text-xs text-slate-500">{layout.description}</span></button>)}</div>}

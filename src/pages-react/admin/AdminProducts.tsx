@@ -1396,7 +1396,6 @@ export default function AdminProducts() {
             <div className="flex flex-wrap justify-between items-center gap-3">
                 <h1 className="text-3xl font-bold font-sans text-[#10275c]">Products</h1>
                 <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => { openEdit(); setCurrentProduct((product: any) => ({ ...product, active: false })); }} className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-[#10275c] hover:border-orange">Create from template</button>
                 <button
                     type="button"
                     onClick={() => openEdit()}
@@ -1571,6 +1570,17 @@ export default function AdminProducts() {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700" htmlFor="product-price">{derivedPrice !== null ? 'Starting price (from variants)' : 'Price'}</label>
+                                        <input
+                                            id="product-price"
+                                            type="text"
+                                            required={!currentProduct.price_on_request}
+                                            disabled={Boolean(currentProduct.price_on_request)}
+                                            readOnly={derivedPrice !== null}
+                                            aria-describedby={derivedPrice !== null ? 'product-price-help' : undefined}
+                                            value={derivedPrice !== null ? derivedPrice.toFixed(2) : currentProduct.price}
+                                            onChange={(e) => setCurrentProduct({ ...currentProduct, price: e.target.value })}
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                                        />
                                         <label className="mt-2 flex items-center gap-2 text-sm text-gray-700">
                                             <input
                                                 type="checkbox"
@@ -1585,17 +1595,6 @@ export default function AdminProducts() {
                                                 Customers will see “Contact us for price” and can request a quote instead of buying online. No price is required. Any saved prices are kept but hidden from customers.
                                             </p>
                                         )}
-                                        <input
-                                            id="product-price"
-                                            type="text"
-                                            required={!currentProduct.price_on_request}
-                                            disabled={Boolean(currentProduct.price_on_request)}
-                                            readOnly={derivedPrice !== null}
-                                            aria-describedby={derivedPrice !== null ? 'product-price-help' : undefined}
-                                            value={derivedPrice !== null ? derivedPrice.toFixed(2) : currentProduct.price}
-                                            onChange={(e) => setCurrentProduct({ ...currentProduct, price: e.target.value })}
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                                        />
                                         {derivedPrice !== null && <p id="product-price-help" className="mt-2 text-sm text-gray-600">The starting price is calculated from the lowest variant price. Edit prices in the variant rows below.</p>}
                                     </div>
                                     <div>
@@ -1771,6 +1770,7 @@ export default function AdminProducts() {
                                     <div className="col-span-2">
                                         <SectionTemplateEditor
                                             templateKind="product"
+                                            layoutOnly
                                             label="Description"
                                             wordPaste
                                             value={currentProduct.description || ""}
