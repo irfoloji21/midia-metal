@@ -1,4 +1,4 @@
-import { fromHtml } from 'hast-util-from-html';
+import { parseHtmlFragment } from './public-html';
 import type { RootContent } from 'hast';
 
 const omittedTags = new Set(['script', 'style', 'template', 'noscript', 'iframe', 'object', 'svg']);
@@ -7,7 +7,7 @@ const separatedTags = new Set(['div', 'p', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', '
 /** Cards receive plain text only. Match the backend's explicit rich-description marker. */
 export function portfolioExcerpt(description: string | null | undefined, maxLength = 180): string {
   if (!description?.trim() || maxLength < 1) return '';
-  const tree = fromHtml(description, { fragment: true });
+  const tree = parseHtmlFragment(description);
   const pending: RootContent[] = [...tree.children];
   let structured = false;
   while (pending.length) {
