@@ -75,4 +75,5 @@ const objectFitClass = fit === 'cover' ? 'object-cover' : 'object-contain';
 
   initializeAdaptiveProductImages();
   document.addEventListener('astro:page-load', initializeAdaptiveProductImages);
+  document.addEventListener('shop:results-updated', initializeAdaptiveProductImages);
 </script>

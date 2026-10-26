@@ -13,9 +13,8 @@ import { getStandardizedDisplayPrice, getStandardizedDisplayTitle, shouldShowOld
 import { getAvailableStock } from '@/lib/stock';
 import { normalizeMediaUrl } from '@/lib/media';
 import AdaptiveProductImage from '@/components/AdaptiveProductImage.astro';
-import { priceRangeError } from '@/lib/price-filter';
+import { resolveShopPriceFilter, matchesShopPrice } from '@/lib/shop-price-filter';
 
-const DEFAULT_PRICE_RANGE: [number, number] = [0, 5000];
 const INITIAL_VISIBLE_COUNT = 18;
 const SHOW_MORE_COUNT = 9;
 
@@ -37,11 +36,10 @@ const categoryParam = searchParams.get('category') || '';
 const sortBy = searchParams.get('sort') || 'latest';
 const selectedTags = searchParams.getAll('tag');
 const inStockOnly = searchParams.get('stock') === '1';
-const rawMinPrice = searchParams.get('min_price') || String(DEFAULT_PRICE_RANGE[0]);
-const rawMaxPrice = searchParams.get('max_price') || String(DEFAULT_PRICE_RANGE[1]);
-const filterPriceError = priceRangeError(rawMinPrice, rawMaxPrice);
-const minPrice = filterPriceError ? DEFAULT_PRICE_RANGE[0] : Number(rawMinPrice);
-const maxPrice = filterPriceError ? DEFAULT_PRICE_RANGE[1] : Number(rawMaxPrice);
+const rawMinPrice = searchParams.get('min_price') || '0';
+const rawMaxPrice = searchParams.get('max_price') || '';
+const priceFilter = resolveShopPriceFilter(rawMinPrice, rawMaxPrice);
+const filterPriceError = priceFilter.error;
 
 let products: any[] = [];
 let categories: any[] = [];
@@ -85,9 +83,7 @@ if (selectedTags.length > 0) {
 
 filteredProducts = filteredProducts.filter((product: any) => {
   const price = parsePriceValue(getStandardizedDisplayPrice(product));
-  const matchesPrice = Boolean(filterPriceError) || (product.price_on_request
-    ? minPrice === DEFAULT_PRICE_RANGE[0] && maxPrice === DEFAULT_PRICE_RANGE[1]
-    : price >= minPrice && price <= maxPrice);
+  const matchesPrice = matchesShopPrice(price, Boolean(product.price_on_request), priceFilter);
   const matchesStock = !inStockOnly || !product.track_stock || Number(getAvailableStock(product) ?? 0) > 0;
   return matchesPrice && matchesStock;
 });
@@ -109,8 +105,7 @@ const hasActiveSidebarFilters = Boolean(
   categoryParam ||
   selectedTags.length > 0 ||
   inStockOnly ||
-  minPrice !== DEFAULT_PRICE_RANGE[0] ||
-  maxPrice !== DEFAULT_PRICE_RANGE[1]
+  priceFilter.active
 );
 
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
@@ -152,8 +147,9 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
       data-show-more-count={SHOW_MORE_COUNT}
       class="container mx-auto px-4 lg:px-8 pt-16 md:pt-20 pb-20 md:pb-24"
     >
+      <button type="submit" hidden>Apply filters</button>
       <div class="shop-layout grid gap-6 md:gap-8 lg:gap-10 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_370px]">
-        <div>
+        <div data-shop-results aria-live="polite" aria-atomic="true">
           <div class="flex items-center justify-between mb-8 gap-4">
             <p class="text-[13px] text-[#9aa6bc]">
               Showing <span data-showing-count>{initialVisibleProducts}</span> of {filteredProducts.length} results
@@ -242,12 +238,13 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
                 <input
                   type="text"
                   name="search"
+                  aria-label="Search products"
                   placeholder="Search for products ..."
                   value={searchParam}
-                  onchange="this.form?.requestSubmit()"
                   class="w-full h-12 border border-[#d1dbe8] bg-transparent px-4 text-[14px] text-primary placeholder:text-[#9aa6bc] outline-none"
                 />
               </div>
+              <p data-shop-search-status role="status" hidden class="mt-3 text-sm text-[#6e7a92]"></p>
             </div>
 
             <div>
@@ -280,9 +277,9 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
               <div class="h-1 bg-orange mb-4"></div>
               <div class="grid grid-cols-2 gap-3">
                 <input aria-label="Minimum price" aria-invalid={Boolean(filterPriceError)} aria-describedby={filterPriceError ? 'shop-price-error' : undefined} type="number" name="min_price" min="0" step="0.01" value={rawMinPrice} onchange="this.form?.requestSubmit()" class="min-w-0 w-full h-11 border border-[#d1dbe8] bg-transparent px-3 text-[14px] text-primary outline-none" />
-                <input aria-label="Maximum price" aria-invalid={Boolean(filterPriceError)} aria-describedby={filterPriceError ? 'shop-price-error' : undefined} type="number" name="max_price" min="0" step="0.01" value={rawMaxPrice} onchange="this.form?.requestSubmit()" class="min-w-0 w-full h-11 border border-[#d1dbe8] bg-transparent px-3 text-[14px] text-primary outline-none" />
+                <input aria-label="Maximum price" aria-invalid={Boolean(filterPriceError)} aria-describedby={filterPriceError ? 'shop-price-error' : undefined} type="number" name="max_price" min="0" step="0.01" value={rawMaxPrice} placeholder="No maximum" onchange="this.form?.requestSubmit()" class="min-w-0 w-full h-11 border border-[#d1dbe8] bg-transparent px-3 text-[14px] text-primary outline-none" />
               </div>
-              {filterPriceError ? <p id="shop-price-error" role="alert" class="mt-3 text-sm text-red-700">{filterPriceError} The price filter has not been applied.</p> : <p class="text-[15px] text-[#9aa6bc] mt-5">Price: £{minPrice} — £{maxPrice}</p>}
+              {filterPriceError ? <p id="shop-price-error" role="alert" class="mt-3 text-sm text-red-700">{filterPriceError} The price filter has not been applied.</p> : <p class="text-[15px] text-[#9aa6bc] mt-5">{priceFilter.label}</p>}
               <div class="mt-5 flex flex-wrap items-center gap-4">
                 <label class="inline-flex items-center gap-3 text-[14px] font-medium text-primary cursor-pointer">
                   <input type="checkbox" name="stock" value="1" checked={inStockOnly} onchange="this.form?.requestSubmit()" class="h-4 w-4 accent-orange" />
@@ -314,8 +311,11 @@ const initialVisibleProducts = Math.min(INITIAL_VISIBLE_COUNT, filteredProducts.
 
 <script>
   import { initializeShopPagination } from '@/lib/shop-pagination';
+  import { initializeShopLiveSearch } from '@/lib/shop-live-search';
 
   initializeShopPagination();
+  initializeShopLiveSearch();
   // Astro replaces the page contents during navigation without rerunning module scripts.
   document.addEventListener('astro:page-load', initializeShopPagination);
+  document.addEventListener('astro:page-load', initializeShopLiveSearch);
 </script>

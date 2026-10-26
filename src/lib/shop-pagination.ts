@@ -2,7 +2,8 @@ const initializedCatalogues = new WeakSet<HTMLElement>();
 
 export function initializeShopPagination() {
   document.querySelectorAll<HTMLElement>('[data-shop-catalogue]').forEach((catalogue) => {
-    if (initializedCatalogues.has(catalogue)) return;
+    const results = catalogue.querySelector<HTMLElement>('[data-shop-results]') || catalogue;
+    if (initializedCatalogues.has(results)) return;
 
     const cards = Array.from(catalogue.querySelectorAll<HTMLElement>('[data-product-card]'));
     const showingCount = catalogue.querySelector<HTMLElement>('[data-showing-count]');
@@ -12,7 +13,7 @@ export function initializeShopPagination() {
     const showMoreCount = Number(catalogue.dataset.showMoreCount);
     if (!showMoreButton || !showLessButton || cards.length <= initialVisibleCount) return;
 
-    initializedCatalogues.add(catalogue);
+    initializedCatalogues.add(results);
     let visibleCount = initialVisibleCount;
 
     const updateVisibleProducts = (nextCount: number) => {
