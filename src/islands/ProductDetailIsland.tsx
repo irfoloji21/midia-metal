@@ -17,6 +17,7 @@ import { apiFetch, ApiError } from "@/lib/api";
 import { useReviewEligibility } from "@/lib/use-review-eligibility";
 import { normalizeMediaUrl } from "@/lib/media";
 import ProductImage from "@/components/ProductImage";
+import { PRODUCT_IMAGE_BACKGROUND } from "@/lib/product-image";
 import { hasProductEditorial, hasProductSections, insertProductSpecifications } from "@/lib/product-editorial";
 import "@/product-editorial.css";
 import { useStore } from "@nanostores/react";
@@ -803,8 +804,8 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
         />
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-10 xl:gap-12 items-start">
           <div className="flex flex-col gap-4 max-w-[550px]">
-            <div className="relative group bg-white border border-[#e1e5eb] p-8 flex items-center justify-center">
-              <ProductImage src={allImages[mainImageIndex]} alt={product.name} className="w-full aspect-square" />
+            <div className="relative group border border-[#e1e5eb] p-8 flex items-center justify-center" style={{ backgroundColor: PRODUCT_IMAGE_BACKGROUND }}>
+              <ProductImage background={PRODUCT_IMAGE_BACKGROUND} src={allImages[mainImageIndex]} alt={product.name} className="w-full aspect-square" />
               <button
                 aria-label="Enlarge product image"
                 onClick={() => {
@@ -824,9 +825,10 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                     aria-label={`View product image ${idx + 1}`}
                     aria-pressed={idx === mainImageIndex}
                     onClick={() => setMainImageIndex(idx)}
-                    className={`border-2 transition-colors overflow-hidden bg-white ${idx === mainImageIndex ? 'border-orange' : 'border-[#e1e5eb] hover:border-[#cad4e4]'}`}
+                    className={`border-2 transition-colors overflow-hidden ${idx === mainImageIndex ? 'border-orange' : 'border-[#e1e5eb] hover:border-[#cad4e4]'}`}
+                    style={{ backgroundColor: PRODUCT_IMAGE_BACKGROUND }}
                   >
-                    <ProductImage src={img} alt={idx === 0 ? product.name : `${product.name} - image ${idx + 1}`} className="w-full aspect-square" />
+                    <ProductImage background={PRODUCT_IMAGE_BACKGROUND} src={img} alt={idx === 0 ? product.name : `${product.name} - image ${idx + 1}`} className="w-full aspect-square" />
                   </button>
                 ))}
               </div>
@@ -1242,8 +1244,8 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
               key={p.id}
               className="group"
             >
-              <div className="mb-5 bg-[#f7f8fa] border border-[#d5deea]">
-                      <ProductImage src={p.image} alt={p.name} className="w-full aspect-[1.02]" imageClassName="transition-transform duration-300 group-hover:scale-[1.02]" />
+              <div className="mb-5 border border-[#d5deea]" style={{ backgroundColor: PRODUCT_IMAGE_BACKGROUND }}>
+                      <ProductImage background={PRODUCT_IMAGE_BACKGROUND} src={p.image} alt={p.name} className="w-full aspect-[1.02]" imageClassName="transition-transform duration-300 group-hover:scale-[1.02]" />
               </div>
               <h3 className="font-sans text-[18px] md:text-[20px] leading-tight font-semibold text-orange">
                 {getStandardizedDisplayTitle(p)}
@@ -1309,6 +1311,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
               <img
                 src={allImages[lightboxIndex]}
                 alt={product.name}
+                style={{ backgroundColor: PRODUCT_IMAGE_BACKGROUND }}
                 className="max-w-full max-h-[92vh] object-contain select-none shadow-2xl"
               />
 

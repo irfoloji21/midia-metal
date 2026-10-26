@@ -10,6 +10,7 @@ interface Props {
   width?: number;
   height?: number;
   loading?: 'eager' | 'lazy';
+  background?: string;
 }
 
 const {
@@ -21,19 +22,20 @@ const {
   width,
   height,
   loading = 'lazy',
+  background,
 } = Astro.props;
 const imageSrc = normalizeMediaUrl(src);
 const objectFitClass = fit === 'cover' ? 'object-cover' : 'object-contain';
 ---
 
-<div class={`adaptive-product-image relative isolate overflow-hidden ${wrapperClass}`} style="background-color: #f3f5f7" data-adaptive-product-frame>
-  <img
+<div class={`adaptive-product-image relative isolate overflow-hidden ${wrapperClass}`} style={{ backgroundColor: background ?? '#f3f5f7' }} data-adaptive-product-frame>
+  {!background && <img
     src={imageSrc}
     alt=""
     aria-hidden="true"
     loading={loading}
     class="adaptive-product-image__backdrop absolute inset-0 h-full w-full scale-110 object-cover blur-2xl opacity-50"
-  />
+  />}
   <img
     src={imageSrc}
     alt={alt}
@@ -41,7 +43,7 @@ const objectFitClass = fit === 'cover' ? 'object-cover' : 'object-contain';
     height={height}
     loading={loading}
     decoding="async"
-    data-adaptive-product-source
+    data-adaptive-product-source={background ? undefined : true}
     class={`relative z-[1] block h-full w-full ${objectFitClass} ${imageClass}`}
   />
 </div>

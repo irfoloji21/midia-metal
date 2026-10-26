@@ -12,6 +12,7 @@ import { getStandardizedDisplayPrice, getStandardizedDisplayTitle } from '@/lib/
 import { buildBreadcrumbJsonLd, buildItemListJsonLd } from '@/lib/seo';
 import { normalizeMediaUrl } from '@/lib/media';
 import AdaptiveProductImage from '@/components/AdaptiveProductImage.astro';
+import { PRODUCT_IMAGE_BACKGROUND } from '@/lib/product-image';
 
 const siteUrl = import.meta.env.SITE;
 const API = `${getApiBase()}/v1`;
@@ -126,8 +127,9 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 md:gap-x-8 gap-y-10">
           {products.map((product: any) => (
             <a href={`/shop/${product.slug || product.id}`} class="group">
-              <div class="bg-[#f7f8fa] mb-4">
+              <div class="mb-4" style={{ backgroundColor: PRODUCT_IMAGE_BACKGROUND }}>
                 <AdaptiveProductImage
+                  background={PRODUCT_IMAGE_BACKGROUND}
                   src={normalizeMediaUrl(product.image)}
                   alt={product.name}
                   class="w-full aspect-square"

@@ -8,6 +8,7 @@ interface ProductImageProps {
   className?: string;
   imageClassName?: string;
   fit?: "contain" | "cover";
+  background?: string;
 }
 
 const localStorageProxyUrl = (value: unknown) => {
@@ -34,6 +35,7 @@ export default function ProductImage({
   className = "",
   imageClassName = "",
   fit = "contain",
+  background,
 }: ProductImageProps) {
   const imageSrc = localStorageProxyUrl(src);
   const objectFitClass = fit === "cover" ? "object-cover" : "object-contain";
@@ -46,8 +48,8 @@ export default function ProductImage({
   }, [imageSrc]);
 
   return (
-    <div className={`relative isolate overflow-hidden ${className}`} style={{ backgroundColor }}>
-      {!canSample && imageSrc && (
+    <div className={`relative isolate overflow-hidden ${className}`} style={{ backgroundColor: background ?? backgroundColor }}>
+      {!background && !canSample && imageSrc && (
         <img
           src={imageSrc}
           alt=""
@@ -60,6 +62,7 @@ export default function ProductImage({
           src={imageSrc}
           alt={alt}
           onLoad={(event) => {
+            if (background) return;
             const sampled = sampleImageEdgeColor(event.currentTarget);
             if (sampled) {
               setBackgroundColor(sampled);
