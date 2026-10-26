@@ -1,5 +1,5 @@
 ---
-export const prerender = true;
+export const prerender = false;
 
 /**
  * portfolio/index.astro — Portfolio list page (PURE ASTRO + PortfolioFilter island)
@@ -14,11 +14,12 @@ import PortfolioFilter from '@/islands/PortfolioFilter';
 import { getApiBase } from '@/lib/api-base';
 import { buildBreadcrumbJsonLd, buildItemListJsonLd } from '@/lib/seo';
 import { fetchSettings, getPageTitle, getPageDescription } from '@/lib/settings';
+import { portfolioExcerpt } from '@/lib/portfolio-description';
 
 const siteUrl = import.meta.env.SITE;
 const API_BASE = getApiBase();
 
-// --- Data Fetching (runs at build time) ---
+// --- Data Fetching (runs on each request) ---
 const settings = await fetchSettings();
 
 let categories: any[] = [];
@@ -30,9 +31,12 @@ try {
     fetch(`${API_BASE}/v1/portfolio`).then(r => r.ok ? r.json() : []),
   ]);
   categories = catsRes || [];
-  projects = projRes || [];
+  projects = (Array.isArray(projRes) ? projRes : []).map(({ description, ...project }: any) => ({
+    ...project,
+    excerpt: portfolioExcerpt(description),
+  }));
 } catch (err) {
-  console.error('Failed to load portfolio data at build time:', err);
+  console.error('Failed to load portfolio data on request:', err);
 }
 
 const t = (key: string, def: string) => settings[key] || def;

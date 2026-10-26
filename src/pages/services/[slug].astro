@@ -10,6 +10,7 @@ import '@/service-content.css';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getApiBase } from '@/lib/api-base';
 import { buildBreadcrumbJsonLd, buildServiceJsonLd } from '@/lib/seo';
+import { serviceContentLayout } from '@/lib/service-content-layout';
 
 const siteUrl = import.meta.env.SITE;
 const API = `${getApiBase()}/v1`;
@@ -43,7 +44,7 @@ if (!service) {
 
 const t = (key: string, def = '') => settings[key] || def;
 const contactPhone = t('contact_phone');
-const hasSections = /class="service-section(?:[ "])/.test(service.content || '');
+const contentLayout = serviceContentLayout(service.content);
 
 // Handle missing service (shouldn't happen with SSR redirect above, but be safe)
 const pageTitle = service?.title || 'Service';
@@ -159,9 +160,9 @@ const serviceJsonLd = buildServiceJsonLd({
       </div>
     </nav>
 
-    <article aria-label={pageTitle}>
-      {hasSections ? (
-        <div class="service-rich-content" set:html={service.content} />
+    <article aria-label={pageTitle} data-service-content-layout={contentLayout}>
+      {contentLayout !== 'legacy' ? (
+        <div class:list={['service-rich-content', contentLayout === 'sections' && 'max-w-[1248px] mx-auto px-6 py-14']} set:html={service.content} />
       ) : (
         <div class="max-w-[1248px] mx-auto px-6 py-14 grid md:grid-cols-2 gap-10 items-start">
           <div class="prose prose-slate max-w-none prose-headings:text-primary" set:html={service.content || ''} />

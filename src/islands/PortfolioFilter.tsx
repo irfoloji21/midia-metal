@@ -4,7 +4,7 @@ import portfolioImageAlt from "@/data/portfolio-image-alt.json";
 const imageAltByUrl: Record<string, string> = portfolioImageAlt;
 
 type Category = { id: number; name: string };
-type Project = { id: number; slug: string; title: string; image: string; description?: string; portfolio_category?: { name: string } };
+type Project = { id: number; slug: string; title: string; image: string; excerpt?: string; portfolio_category?: { name: string } };
 
 export default function PortfolioFilter({ categories, projects }: { categories: Category[]; projects: Project[] }) {
   const [active, setActive] = useState("All");
@@ -35,7 +35,7 @@ export default function PortfolioFilter({ categories, projects }: { categories: 
                 <div className="pt-4">
                   <p className="text-[11px] uppercase tracking-[0.22em] font-semibold text-[#8f9ab0] mb-2">{project.portfolio_category?.name || "Uncategorized"}</p>
                   <h3 className="font-sans text-[23px] md:text-[28px] leading-[1.02] font-semibold text-orange">{project.title}</h3>
-                  <p className="text-[14px] leading-7 text-[#6e7a92] mt-3">{project.description?.split(/\n\s*\n/)[0] || ""}</p>
+                  {project.excerpt && <p className="text-[14px] leading-7 text-[#6e7a92] mt-3">{project.excerpt}</p>}
                 </div>
               </a>
             ))}
