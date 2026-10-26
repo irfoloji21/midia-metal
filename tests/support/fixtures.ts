@@ -40,6 +40,7 @@ export const checkoutForm = {
 };
 export const paymentSetup = {
   client_secret: 'pi_e2e_secret_fixture', payment_intent_id: 'pi_e2e', payment_token: 'payment-token-e2e',
+  amount: 56.5,
 };
 export const confirmation = {
   order_number: 'ORD-BANK-123', created_at: '2026-10-22T12:00:00Z',

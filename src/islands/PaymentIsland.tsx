@@ -482,7 +482,7 @@ function PaymentIsland() {
                   key={m.id}
                   className={`flex items-start gap-4 p-5 border cursor-pointer transition-colors ${method === m.id ? "border-orange bg-[#fff3e9]" : "border-[#cad4e4] bg-[#f0f3f7] hover:border-orange/60"}`}
                 >
-                  <input type="radio" name="payment" disabled={isSubmitting || !!confirmedPayment} checked={method === m.id} onChange={() => setMethod(m.id)} className="accent-orange mt-1" />
+                  <input type="radio" name="payment" disabled={isSubmitting || !!confirmedPayment} checked={method === m.id} onChange={() => { setPaymentError(''); setMethod(m.id); }} className="accent-orange mt-1" />
                   <m.icon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-[16px] font-semibold text-primary leading-none">{m.label}</p>
