@@ -10,6 +10,7 @@ const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 export default function ProtectedSectionFields({ value, onChange, label, onUploadingChange }: Props) {
   const instance = useId();
   const wrapper = useRef<HTMLDivElement>(null);
+  const photoInputs = useRef(new Map<string, HTMLInputElement>());
   const fields = useMemo(() => readProtectedSection(value), [value]);
   const latest = useRef({ value, onChange });
   latest.current = { value, onChange };
@@ -79,11 +80,12 @@ export default function ProtectedSectionFields({ value, onChange, label, onUploa
     const inputId = `${instance}-photo-${index}`;
     return <div key={field.id} className="min-w-0 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 p-3" data-protected-image-slot="" onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); event.stopPropagation(); void upload(field.id, Array.from(event.dataTransfer.files)); }}>
       <div className="mb-2 flex items-center justify-between text-sm font-semibold text-[#10275c]"><span>Photo {index + 1}</span><LockKeyhole className="h-4 w-4 text-slate-400" aria-hidden="true" /></div>
-      <label htmlFor={inputId} className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-md border border-slate-200 bg-white p-3 text-center hover:border-orange ${busy ? 'pointer-events-none opacity-60' : ''}`}>
+      <button type="button" aria-label={`${field.src ? 'Replace' : 'Choose'} ${label} photo ${index + 1}`} disabled={busy} onClick={() => photoInputs.current.get(field.id)?.click()} className={`flex min-h-40 w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-md border border-slate-200 bg-white p-3 text-center hover:border-orange ${busy ? 'cursor-wait opacity-60' : ''}`}>
         {field.src ? <img src={field.src} alt={field.alt || `Photo ${index + 1}`} className="h-44 w-full object-contain" draggable={false} /> : <><ImagePlus className="h-10 w-10 text-slate-400" aria-hidden="true" /><span className="text-sm text-slate-600">Your photo goes here</span></>}
         <span className="inline-flex items-center gap-2 rounded-md bg-[#10275c] px-4 py-2 text-sm font-semibold text-white">{busy ? <><Loader2 className="h-4 w-4 animate-spin" />Uploading…</> : field.src ? 'Replace photo' : 'Choose photo'}</span>
-      </label>
-      <input id={inputId} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only" aria-label={`${label} photo ${index + 1}`} disabled={busy} onChange={event => { const files = Array.from(event.currentTarget.files || []); event.currentTarget.value = ''; void upload(field.id, files); }} />
+      </button>
+      {/* A focusable off-screen file input can scroll the outer modal away from its panel. */}
+      <input ref={node => { if (node) photoInputs.current.set(field.id, node); else photoInputs.current.delete(field.id); }} id={inputId} type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden aria-label={`${label} photo ${index + 1}`} disabled={busy} onChange={event => { const files = Array.from(event.currentTarget.files || []); event.currentTarget.value = ''; void upload(field.id, files); }} />
       <p className="mt-2 text-xs text-slate-500">Choose a file or drop it here. JPG, PNG, WebP, GIF · max 2MB.</p>
       {errors[field.id] && <p role="alert" className="mt-2 text-sm text-red-700">{errors[field.id]}</p>}
       <label className="mt-3 block text-xs font-medium text-slate-600">Photo description<input aria-label={`${label} photo ${index + 1} description`} type="text" value={field.alt} disabled={!field.src} placeholder={field.src ? 'Describe the photo' : 'Choose a photo first'} className="mt-1 block w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 disabled:bg-slate-100" onChange={event => { const alt = event.target.value; edit(html => updateSectionImage(html, field.id, { src: field.src, alt })); }} /></label>
