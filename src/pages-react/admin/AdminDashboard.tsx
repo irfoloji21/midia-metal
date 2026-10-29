@@ -6,30 +6,63 @@ import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/
 export default function AdminDashboard() {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [dashboardError, setDashboardError] = useState(false);
+    const [dashboardAttempt, setDashboardAttempt] = useState(0);
 
     const [topProducts, setTopProducts] = useState<any[]>([]);
+    const [topProductsLoading, setTopProductsLoading] = useState(true);
+    const [topProductsError, setTopProductsError] = useState(false);
+    const [topProductsAttempt, setTopProductsAttempt] = useState(0);
     const { sort, toggleSort } = useTableSort("total_revenue", "desc");
 
     useEffect(() => {
+        let cancelled = false;
+        const controller = new AbortController();
+        setLoading(true);
+        setDashboardError(false);
         async function loadStats() {
             try {
-                const [dashRes, topRes] = await Promise.all([
-                    apiFetch<Record<string, any>>("/admin/dashboard"),
-                    apiFetch<any[]>("/admin/stats/top-products")
-                ]);
-                setData(dashRes);
-                setTopProducts(topRes);
-            } catch (e) {
-                console.error(e);
+                const dashRes = await apiFetch<Record<string, any>>("/admin/dashboard", { signal: controller.signal });
+                if (!cancelled) setData(dashRes);
+            } catch {
+                if (!cancelled) setDashboardError(true);
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false);
             }
         }
-        loadStats();
-    }, []);
+        void loadStats();
+        return () => { cancelled = true; controller.abort(); };
+    }, [dashboardAttempt]);
 
-    if (loading) return <div className="text-center py-20">Loading dashboard...</div>;
-    if (!data) return <div className="text-center py-20 text-red-500">Failed to load data</div>;
+    useEffect(() => {
+        let cancelled = false;
+        const controller = new AbortController();
+        setTopProductsLoading(true);
+        setTopProductsError(false);
+        async function loadTopProducts() {
+            try {
+                const topRes = await apiFetch<any[]>("/admin/stats/top-products", { signal: controller.signal });
+                if (!cancelled) setTopProducts(topRes);
+            } catch {
+                if (!cancelled) setTopProductsError(true);
+            } finally {
+                if (!cancelled) setTopProductsLoading(false);
+            }
+        }
+        void loadTopProducts();
+        return () => { cancelled = true; controller.abort(); };
+    }, [topProductsAttempt]);
+
+    if (loading) return <div role="status" className="text-center py-20">Loading dashboard...</div>;
+    if (dashboardError || !data) return (
+        <div className="space-y-6">
+            <h1 className="text-3xl font-bold text-[#10275c] font-sans">Dashboard</h1>
+            <div role="alert" className="rounded-lg border border-red-200 bg-white p-6 text-center">
+                <p className="text-red-700">Unable to load the dashboard. Please try again.</p>
+                <button type="button" onClick={() => setDashboardAttempt(attempt => attempt + 1)} className="mt-4 rounded-md bg-[#10275c] px-4 py-2 text-white">Retry dashboard</button>
+            </div>
+        </div>
+    );
 
     const money = (value: number | string) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(Number(value || 0));
     const paymentStats = [
@@ -155,7 +188,14 @@ export default function AdminDashboard() {
                     <span className="text-xs text-gray-500 font-medium">{data.period.label}</span>
                 </div>
                 <p className="px-4 py-3 text-xs text-gray-500 sm:px-6">Paid orders only; fully refunded orders are excluded. Revenue excludes delivery and includes discounts. Partial refunds are allocated proportionally; unit counts are not adjusted for partial refunds.</p>
-                <div className="overflow-x-auto">
+                {topProductsLoading ? (
+                    <p role="status" className="px-6 py-10 text-center text-sm text-gray-500">Loading top selling products...</p>
+                ) : topProductsError ? (
+                    <div role="alert" className="px-6 py-8 text-center">
+                        <p className="text-sm text-red-700">Unable to load top selling products.</p>
+                        <button type="button" onClick={() => setTopProductsAttempt(attempt => attempt + 1)} className="mt-3 rounded-md bg-[#10275c] px-4 py-2 text-sm text-white">Retry top selling products</button>
+                    </div>
+                ) : <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
@@ -180,7 +220,7 @@ export default function AdminDashboard() {
                             )}
                         </tbody>
                     </table>
-                </div>
+                </div>}
             </div>
         </div>
     );

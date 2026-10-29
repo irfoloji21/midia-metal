@@ -60,6 +60,7 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
     sitemap({
+      customSitemaps: ['https://midiammetal.com/sitemap-content.xml'],
       filter: (page) =>
         // Exclude admin, auth, and utility pages from sitemap
         !page.includes('/admin/') &&
@@ -68,6 +69,8 @@ export default defineConfig({
         !page.includes('/forgot-password') &&
         !page.includes('/reset-password') &&
         !page.includes('/account') &&
+        !page.includes('/cart') &&
+        !page.includes('/sitemap-content.xml') &&
         !page.includes('/checkout') &&
         !page.includes('/payment') &&
         !page.includes('/thank-you'),

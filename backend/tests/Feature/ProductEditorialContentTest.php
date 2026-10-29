@@ -13,6 +13,36 @@ class ProductEditorialContentTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_extended_dd7_description_remains_editable_after_admin_save(): void
+    {
+        Http::preventStrayRequests();
+        config(['services.frontend_content_deploy.enabled' => false]);
+        $this->actingAs(AdminUser::factory()->create(), 'sanctum');
+        $product = Product::create(['name' => 'DD7 example', 'slug' => 'dd7-example', 'price' => '£540.00', 'active' => false]);
+        $payload = [
+            'name' => $product->name, 'price' => $product->price,
+            'variants' => [['option' => 'Model', 'value' => 'LWDD7-5-EC', 'price' => '£540.00']],
+            'description' => file_get_contents(database_path('content/dd7-product-description.html')),
+        ];
+        $saved = $this->putJson('/api/admin/products/'.$product->id, $payload)->assertOk()->json('description');
+        $this->assertSame(7, substr_count($saved, 'class="product-section"'));
+        $this->assertSame(10, substr_count($saved, '<img '));
+        foreach (['class="img-row img-row--2"', 'class="img-row img-row--3"', 'class="product-table-wrap product-reference-table"'] as $layout) {
+            $this->assertStringContainsString($layout, $saved);
+        }
+
+        $payload['description'] = str_replace(
+            ['<h3>Understanding the airflow requirement</h3>', '<td>LONGWELL</td>', 'longwell-dd7-5-ec-front.webp'],
+            ['<h3>Updated airflow heading</h3>', '<td>Edited manufacturer</td>', 'replacement-fan.webp'],
+            $saved,
+        );
+        $edited = $this->putJson('/api/admin/products/'.$product->id, $payload)->assertOk()->json('description');
+        $this->getJson('/api/admin/products/'.$product->id)->assertOk()->assertJsonPath('description', $edited);
+        foreach (['Updated airflow heading', '<td>Edited manufacturer</td>', 'replacement-fan.webp', 'img-row--2', 'img-row--3', 'product-reference-table'] as $content) {
+            $this->assertStringContainsString($content, $edited);
+        }
+    }
+
     public function test_product_story_and_table_survive_admin_save_and_reopen(): void
     {
         Http::preventStrayRequests();

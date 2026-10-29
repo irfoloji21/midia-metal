@@ -67,7 +67,8 @@ try {
   ]);
 
   products = productsRes.data || [];
-  categories = Array.isArray(catsRes) ? catsRes : catsRes.data || [];
+  categories = (Array.isArray(catsRes) ? catsRes : catsRes.data || [])
+    .filter((category: any) => Number(category.products_count) > 0);
   tags = Array.isArray(tagsRes) ? tagsRes : [];
 } catch (e) {
   console.error(`[shop] Failed to fetch shop data from ${API}:`, e);

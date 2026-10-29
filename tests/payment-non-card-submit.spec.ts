@@ -29,13 +29,19 @@ for (const authenticated of [false, true]) {
       expect(orders[0]).toMatchObject({
         customer_name: 'Jane Smith', customer_email: 'jane@example.com', customer_phone: '07123456789',
         fulfilment_method: 'delivery', shipping_option_token: 'shiptok_123', payment_method: 'bank_transfer',
-        company_name: 'Test Fabrication Ltd', company_vat_number: 'GB123456789', notes: 'Ring the gate bell',
+        notes: 'Ring the gate bell',
         stripe_payment_intent_id: paymentSetup.payment_intent_id, payment_token: paymentSetup.payment_token,
         save_card: false, items: [{ product_id: 101, quantity: 2, selected_variants: cartItem.selected_variants }],
       });
       const bankSetups = setups.filter(setup => setup.payment_method === 'bank_transfer');
       expect(bankSetups).toHaveLength(1);
       expect(bankSetups[0].payment_attempt_id).toEqual(expect.any(String));
+      // The seeded draft and customer still contain legacy business data.
+      for (const payload of [...setups, ...orders]) {
+        expect(payload).not.toHaveProperty('is_business');
+        expect(payload).not.toHaveProperty('company_name');
+        expect(payload).not.toHaveProperty('company_vat_number');
+      }
       const state = await page.evaluate(() => ({
         checkout: sessionStorage.getItem('checkoutForm'), stripe: sessionStorage.getItem('stripeCheckout'),
         cart: localStorage.getItem('midia_cart'), confirmation: JSON.parse(sessionStorage.getItem('orderConfirmation')!),

@@ -9,6 +9,7 @@
  * company details stay current even when this island persists.
  */
 import { useSiteSettings } from '@/lib/use-site-settings';
+import { currentCopyright, socialProfileUrl } from '@/lib/footer-content';
 
 interface FooterIslandProps {
   initialSettings?: Record<string, string>;
@@ -18,11 +19,17 @@ export default function FooterIsland({ initialSettings }: FooterIslandProps) {
   const settings = useSiteSettings(initialSettings);
 
   const t = (key: string, def: string) => settings[key] || def;
+  const socialLinks = [
+    { icon: 'facebook', label: 'Facebook', href: t('social_facebook', '') },
+    { icon: 'twitter', label: 'Twitter', href: t('social_twitter', '') },
+    { icon: 'tiktok', label: 'TikTok', href: t('social_tiktok', '') },
+    { icon: 'instagram', label: 'Instagram', href: t('social_instagram', '') },
+  ].map(item => ({ ...item, href: socialProfileUrl(item.href) })).filter(item => item.href);
 
   return (
     <footer className="relative z-10 bg-[#031946] text-white">
       <div className="container mx-auto px-4 lg:px-8 py-16 md:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 md:gap-12">
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${socialLinks.length ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-10 md:gap-12`}>
           {/* Working Hours */}
           <div>
             <h4 className="font-sans text-xl font-semibold mb-6">
@@ -116,17 +123,12 @@ export default function FooterIsland({ initialSettings }: FooterIslandProps) {
           </div>
 
           {/* Get in Touch */}
-          <div>
+          {socialLinks.length > 0 && <div>
             <h4 className="font-sans text-xl font-semibold mb-6">
               {t('footer_label_get_in_touch', 'Get in Touch')}
             </h4>
             <div className="flex gap-4">
-              {[
-                { icon: 'facebook', label: 'Facebook', href: t('social_facebook', '#') },
-                { icon: 'twitter', label: 'Twitter', href: t('social_twitter', '#') },
-                { icon: 'tiktok', label: 'TikTok', href: t('social_tiktok', t('social_dribbble', '#')) },
-                { icon: 'instagram', label: 'Instagram', href: t('social_instagram', '#') },
-              ].map(({ icon, label, href }, i) => (
+              {socialLinks.map(({ icon, label, href }, i) => (
                 <a
                   key={i}
                   href={href}
@@ -140,7 +142,7 @@ export default function FooterIsland({ initialSettings }: FooterIslandProps) {
                 </a>
               ))}
             </div>
-          </div>
+          </div>}
         </div>
       </div>
 
@@ -148,7 +150,7 @@ export default function FooterIsland({ initialSettings }: FooterIslandProps) {
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 lg:px-8 py-6 flex justify-between items-center">
           <p className="text-white/65 text-xs tracking-wide">
-            {t('footer_text', 'midiaM \u00A9 2024. All Rights Reserved.')}
+            {currentCopyright(t('footer_text', 'midiaM \u00A9 2024. All Rights Reserved.'))}
           </p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

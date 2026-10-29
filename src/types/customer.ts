@@ -27,11 +27,6 @@ export interface Customer {
   shipping_postcode: string | null;
   shipping_country: string | null;
 
-  // Business
-  is_business: boolean;
-  company_name: string | null;
-  company_vat_number: string | null;
-
   // Stripe
   stripe_customer_id: string | null;
 

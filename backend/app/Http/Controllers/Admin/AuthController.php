@@ -20,7 +20,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|string',
         ]);
 
         $user = AdminUser::where('email', $request->email)->first();
@@ -90,9 +90,9 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'token' => 'required',
+            'token' => 'required|string',
             'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $status = Password::broker('admin_users')->reset(
@@ -103,6 +103,7 @@ class AuthController extends Controller
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();
+                $user->tokens()->delete();
 
                 event(new PasswordReset($user));
             }

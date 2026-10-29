@@ -30,16 +30,30 @@ try {
   await editor.scrollIntoViewIfNeeded();
   assert.equal(await editor.locator('.product-section').count(), 7);
   assert.equal(await editor.locator('.product-spec-slot').count(), 1);
-  assert.equal(await editor.locator('table tbody tr').count(), 9);
-  assert.equal(await editor.locator('img').count(), 5);
+  assert.equal(await editor.locator('.product-performance-table tbody tr').count(), 9);
+  assert.equal(await editor.locator('.product-reference-table tbody tr').count(), 7);
+  assert.equal(await editor.locator('.img-row--2 img').count(), 2);
+  assert.equal(await editor.locator('.img-row--3 img').count(), 3);
+  assert.equal(await editor.locator('img').count(), 10);
   await editor.locator('p').first().click();
   await page.keyboard.press('End');
   await page.keyboard.type(' Editor persistence check.');
+  const manufacturer = editor.locator('.product-reference-table td').first();
+  await manufacturer.click();
+  await page.keyboard.press('End');
+  await page.keyboard.type(' Table persistence check.');
+  await editor.locator('.img-row--3 img').first().click();
+  page.once('dialog', dialog => dialog.accept('Edited DD7 front view'));
+  await page.getByRole('button', { name: 'Image description', exact: true }).click();
   await page.getByRole('button', { name: 'Save Product', exact: true }).click();
   await edit();
   await editor.scrollIntoViewIfNeeded();
   assert.ok((await editor.innerHTML()).includes('Editor persistence check.'));
   assert.equal(await editor.locator('.product-spec-slot').count(), 1);
+  assert.ok((await editor.locator('.product-reference-table td').first().innerText()).includes('Table persistence check.'));
+  assert.equal(await editor.locator('.img-row--3 img').first().getAttribute('alt'), 'Edited DD7 front view');
+  assert.equal(await editor.locator('.img-row--2 img').count(), 2);
+  assert.equal(await editor.locator('.img-row--3 img').count(), 3);
   assert.equal(product.variants[0].value, 'LWDD7-5-EC');
   assert.deepEqual(product.specifications['Motor power'], '200 W');
   await page.addStyleTag({ content: 'astro-dev-toolbar { display:none!important; }' });
@@ -47,7 +61,7 @@ try {
   assert.equal(writes, 1);
   assert.deepEqual(errors, []);
   await fs.writeFile('reports/dd7-product/editor-verification.json', JSON.stringify({
-    saveReopenPassed: true, imageCount: 5, performanceRows: 9, specificationSlotPreserved: true,
+    saveReopenPassed: true, imageCount: 10, performanceRows: 9, referenceRows: 7, imageColumns: [2, 3], specificationSlotPreserved: true,
     modelOptionPreserved: true, liveAdminWrites: 0,
     method: 'Real admin UI with isolated API fixtures. Backend persistence separately tested with PHPUnit.',
     errors,

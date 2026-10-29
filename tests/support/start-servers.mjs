@@ -37,7 +37,7 @@ const extensions = execFileSync(php, ['-m'], { encoding: 'utf8', windowsHide: tr
 const phpArgs = [];
 if (process.platform === 'win32') {
   phpArgs.push('-d', `extension_dir=${path.join(path.dirname(phpPath), 'ext')}`);
-  for (const extension of ['pdo_sqlite', 'sqlite3', 'fileinfo']) {
+  for (const extension of ['pdo_sqlite', 'sqlite3', 'fileinfo', 'mbstring', 'gd']) {
     if (!extensions.split(/\r?\n/).includes(extension)) phpArgs.push('-d', `extension=${extension}`);
   }
 }

@@ -15,9 +15,6 @@ export interface Customer {
   city: string | null;
   postcode: string | null;
   country: string;
-  is_business: boolean;
-  company_name: string | null;
-  company_vat_number: string | null;
 }
 
 // --- Core state ---

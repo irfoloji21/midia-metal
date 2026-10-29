@@ -184,11 +184,7 @@ export default function AdminProducts() {
             const variantTableColumns = normalizeVariantTableColumns(product.variant_table_columns);
             const combinationOptionNames = Array.from(new Set([...combinationOptions, ...inferredCombinationOptions].filter(Boolean)));
             const normalizedFrontendLayout = normalizeFrontendVariantLayout(product.frontend_variant_layout);
-            const isLegacyLikeCombination = rawVariantMode === "combination"
-                && combinationOptionNames.length <= 1
-                && normalizedFrontendLayout !== "selection_table"
-                && variantTableColumns.combination.length === 0;
-            const variantMode = isLegacyLikeCombination ? "legacy" : rawVariantMode;
+            const variantMode = rawVariantMode;
             const legacyOptionName = legacyOptionNames[0]
                 || combinationOptionNames[0]
                 || String(product.variant_option ?? "").trim()
@@ -224,10 +220,11 @@ export default function AdminProducts() {
 
             return {
                 ...product,
+                pdf_download_enabled: product.pdf_download_enabled !== false,
                 product_code: product.product_code || "",
                 variant_mode: variantMode,
                 variant_options: variantMode === "combination" ? combinationOptionNames : [],
-                frontend_variant_layout: "default",
+                frontend_variant_layout: normalizedFrontendLayout,
                 selection_table_config: variantMode === "combination"
                     ? normalizeSelectionTableConfig(product.selection_table_config, combinationOptionNames, product.variants || [], selectionTableSourceKeys)
                     : null,
@@ -240,7 +237,7 @@ export default function AdminProducts() {
                 combination_variants_draft: combinationVariants,
                 legacy_variant_option_draft: legacyOptionName,
                 combination_variant_options_draft: combinationOptionNames,
-                combination_frontend_variant_layout_draft: "default",
+                combination_frontend_variant_layout_draft: normalizedFrontendLayout,
                 combination_selection_table_config_draft: normalizeSelectionTableConfig(product.selection_table_config, combinationOptionNames, product.variants || [], selectionTableSourceKeys),
                 variant_table_columns: variantTableColumns,
                 variant_option: legacyOptionName,
@@ -259,6 +256,7 @@ export default function AdminProducts() {
                 image: "",
                 gallery: [],
                 description: "",
+                pdf_download_enabled: true,
                 product_category_id: "",
                 tags: [],
                 badge: "",
@@ -1500,7 +1498,7 @@ export default function AdminProducts() {
                                         )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button type="button" onClick={() => openEdit(product)} className="text-indigo-600 hover:text-indigo-900 mr-4">
+                                        <button type="button" aria-label={`Edit ${product.name}`} title="Edit product" onClick={() => openEdit(product)} className="text-indigo-600 hover:text-indigo-900 mr-4">
                                             <Edit2 className="h-4 w-4" />
                                         </button>
                                         <button
@@ -1512,7 +1510,7 @@ export default function AdminProducts() {
                                         >
                                             <Copy className="h-4 w-4" />
                                         </button>
-                                        <button type="button" onClick={() => handleDelete(product.id)} className="text-red-600 hover:text-red-900">
+                                        <button type="button" aria-label={`Delete ${product.name}`} title="Delete product" onClick={() => handleDelete(product.id)} className="text-red-600 hover:text-red-900">
                                             <Trash2 className="h-4 w-4" />
                                         </button>
                                     </td>
@@ -1776,6 +1774,18 @@ export default function AdminProducts() {
                                             value={currentProduct.description || ""}
                                             onChange={(html) => setCurrentProduct((product: any) => ({ ...product, description: html }))}
                                         />
+                                        <label className="mt-4 flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+                                            <input
+                                                type="checkbox"
+                                                checked={currentProduct.pdf_download_enabled !== false}
+                                                onChange={(event) => setCurrentProduct({ ...currentProduct, pdf_download_enabled: event.target.checked })}
+                                                className="mt-1 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                            />
+                                            <span>
+                                                <span className="block text-sm font-medium text-gray-700">Show PDF download below the description</span>
+                                                <span className="block mt-1 text-xs text-gray-500">Customers can download the current product images, description and specifications as a PDF. Enabled by default.</span>
+                                            </span>
+                                        </label>
                                     </div>
                                     <div className="col-span-2 flex gap-6">
                                         <label className="flex items-center">

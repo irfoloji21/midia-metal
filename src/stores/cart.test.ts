@@ -1,8 +1,23 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { $cart, $cartIssues, refreshCartAvailability } from './cart';
+import { $cart, $cartIssues, addToCart, refreshCartAvailability } from './cart';
 import { apiFetch, ApiError } from '@/lib/api';
 vi.mock('@/lib/api', async importOriginal => ({ ...await importOriginal<typeof import('@/lib/api')>(), apiFetch: vi.fn() }));
 afterEach(() => { $cart.set([]); vi.clearAllMocks(); });
+
+it('does not report an addition when the basket already contains all available stock', () => {
+  const product = { id: 83, name: 'Stocked product', price: '10.00', image: '', track_stock: true, stock_quantity: 2 };
+  expect(addToCart(product, 2)).toBe(true);
+  expect(addToCart(product, 1)).toBe(false);
+  expect($cart.get()[0].qty).toBe(2);
+});
+
+it('reports a partial stock-limited addition only while the quantity actually increases', () => {
+  const product = { id: 83, name: 'Stocked product', price: '10.00', image: '', track_stock: true, stock_quantity: 3 };
+  addToCart(product, 2);
+  expect(addToCart(product, 2)).toBe(true);
+  expect($cart.get()[0].qty).toBe(3);
+  expect(addToCart(product, 2)).toBe(false);
+});
 
 it('refreshes zero stock and price while preserving the requested quantity', async () => {
   $cart.set([{ id: '1-Material-Steel', product_id: 1, name: 'Steel', image: '', price: '£12.50', qty: 2, available_stock: 5, selected_variants: { Material: { option: 'Material', value: 'Steel' } } }]);

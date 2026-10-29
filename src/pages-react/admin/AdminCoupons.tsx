@@ -112,7 +112,7 @@ export default function AdminCoupons() {
                                     <td className="px-4 py-3 text-sm text-gray-600 capitalize">{c.type}</td>
                                     <td className="px-4 py-3 text-sm text-gray-900">{c.type === "percentage" ? `${c.value}%` : `£${c.value}`}</td>
                                     <td className="px-4 py-3 text-sm text-gray-600">{c.min_order_amount > 0 ? `£${c.min_order_amount}` : "—"}</td>
-                                    <td className="px-4 py-3 text-sm text-gray-600">{c.max_uses ? `${c.used_count}/${c.max_uses}` : `${c.used_count}/∞`}</td>
+                                    <td className="px-4 py-3 text-sm text-gray-600">{c.max_uses ? `${c.used_count ?? 0}/${c.max_uses}` : `${c.used_count ?? 0}/∞`}</td>
                                     <td className="px-4 py-3 text-sm text-gray-600">{c.expires_at ? new Date(c.expires_at).toLocaleDateString() : "Never"}</td>
                                     <td className="px-4 py-3">
                                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${c.active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
@@ -120,8 +120,8 @@ export default function AdminCoupons() {
                                         </span>
                                     </td>
                                     <td className="px-4 py-3 flex gap-2">
-                                        <button onClick={() => openEdit(c)} className="text-indigo-600 hover:text-indigo-900"><Edit2 className="h-4 w-4" /></button>
-                                        <button onClick={() => handleDelete(c.id)} className="text-red-500 hover:text-red-700"><Trash2 className="h-4 w-4" /></button>
+                                        <button onClick={() => openEdit(c)} aria-label={`Edit coupon ${c.code}`} className="text-indigo-600 hover:text-indigo-900"><Edit2 className="h-4 w-4" /></button>
+                                        <button onClick={() => handleDelete(c.id)} aria-label={`Delete coupon ${c.code}`} className="text-red-500 hover:text-red-700"><Trash2 className="h-4 w-4" /></button>
                                     </td>
                                 </tr>
                             ))
@@ -138,7 +138,7 @@ export default function AdminCoupons() {
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-lg">
                         <div className="flex items-center justify-between p-6 border-b">
                             <h2 className="text-xl font-bold text-[#10275c]">{editing ? "Edit Coupon" : "New Coupon"}</h2>
-                            <button onClick={() => setShowForm(false)}><X className="h-6 w-6 text-gray-400" /></button>
+                            <button onClick={() => setShowForm(false)} aria-label="Close coupon form"><X className="h-6 w-6 text-gray-400" /></button>
                         </div>
                         <form onSubmit={handleSave} className="p-6 space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

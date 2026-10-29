@@ -11,11 +11,13 @@
  */
 
 import { getApiBase } from '@/lib/api-base';
+import { fetchPublicJson } from '@/lib/public-api';
 
 const API_BASE = getApiBase();
 
 /** Last successful response is used only if the settings API is unavailable. */
 let cachedSettings: Record<string, string> | null = null;
+type SettingItem = { key?: string; value?: unknown };
 
 /**
  * Fetch settings from the API and return as a key-value map.
@@ -23,9 +25,7 @@ let cachedSettings: Record<string, string> | null = null;
  */
 export async function fetchSettings(_options: { bypassCache?: boolean } = {}): Promise<Record<string, string>> {
   try {
-    const res = await fetch(`${API_BASE}/v1/settings`, { cache: 'no-store' });
-    if (!res.ok) return cachedSettings ?? {};
-    const data = await res.json();
+    const data = await fetchPublicJson<SettingItem[] | { data?: SettingItem[] } | null>(`${API_BASE}/v1/settings`);
     const items = Array.isArray(data) ? data : data?.data || [];
     const map: Record<string, string> = {};
     for (const item of items) {

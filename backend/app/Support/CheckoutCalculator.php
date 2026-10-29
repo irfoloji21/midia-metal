@@ -40,7 +40,8 @@ class CheckoutCalculator
             ]);
         }
 
-        $lineItems = collect($items)->map(function (array $item, int $index) use ($products) {
+        $requestedStock = [];
+        $lineItems = collect($items)->map(function (array $item, int $index) use ($products, &$requestedStock) {
             $productId = (int) ($item['product_id'] ?? 0);
             $quantity = max(1, (int) ($item['quantity'] ?? 1));
             /** @var Product|null $product */
@@ -68,6 +69,7 @@ class CheckoutCalculator
             }
 
             $variantDetails = $this->resolveVariants($product, $item['selected_variants'] ?? [], $quantity, $index);
+            $this->checkCombinedStock($product, $variantDetails, $quantity, $index, $requestedStock);
             $unitPrice = $this->resolveUnitPrice($product, $variantDetails);
 
             return [
@@ -131,6 +133,40 @@ class CheckoutCalculator
             'total' => $total,
             'coupon' => $coupon,
         ];
+    }
+
+    /** Check stock across all basket lines, including repeated product/variant selections. */
+    private function checkCombinedStock(Product $product, ?array $selections, int $quantity, int $index, array &$requestedStock): void
+    {
+        $variants = ProductVariantResolver::variants($product);
+        $buckets = [];
+        if ($variants === []) {
+            if ($product->track_stock && $product->stock_quantity !== null) {
+                $buckets['product'] = (int) $product->stock_quantity;
+            }
+        } else {
+            $combination = ProductVariantResolver::usesCombinationMode($product);
+            $matched = $combination ? ProductVariantResolver::resolveSelectedVariant($product, $selections) : null;
+            foreach ($variants as $variantIndex => $variant) {
+                $selected = $combination
+                    ? $variant === $matched
+                    : (isset($selections[$variant['option'] ?? ''])
+                        && (string) ($selections[$variant['option']]['value'] ?? '') === (string) ($variant['value'] ?? ''));
+                if ($selected && is_numeric($variant['stock'] ?? null)) {
+                    $buckets['variant-'.$variantIndex] = (int) $variant['stock'];
+                }
+            }
+        }
+
+        foreach ($buckets as $bucket => $available) {
+            $key = $product->id.':'.$bucket;
+            $requestedStock[$key] = ($requestedStock[$key] ?? 0) + $quantity;
+            if ($requestedStock[$key] > $available) {
+                throw ValidationException::withMessages([
+                    "items.$index.quantity" => ["Only {$available} unit(s) of {$product->name} are available across your basket."],
+                ]);
+            }
+        }
     }
 
     private function resolveVariants(Product $product, mixed $selectedVariants, int $quantity, int $index): ?array

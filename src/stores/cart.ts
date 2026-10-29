@@ -43,7 +43,6 @@ function loadCoupon(): AppliedCoupon | null {
 
 export const $cart = atom<CartItem[]>(loadCart());
 export const $coupon = atom<AppliedCoupon | null>(loadCoupon());
-export const $isBusiness = atom<boolean>(false);
 
 export const $cartIssues = computed($cart, items => items.flatMap(item => {
   if (item.availability_error) return [item.availability_error];
@@ -99,14 +98,90 @@ $coupon.subscribe((c) => {
 
 // --- Derived values ---
 export const $subtotal = computed($cart, (cart) =>
-  cart.reduce((acc, item) => {
+  Math.round(cart.reduce((acc, item) => {
     const priceStr = typeof item.price === 'string' ? item.price : item.price.toString();
     const price = parseFloat(priceStr.replace(/[£,]/g, '')) || 0;
     return acc + price * item.qty;
-  }, 0)
+  }, 0) * 100) / 100
 );
 
-export const $discount = computed($coupon, (c) => c?.discount ?? 0);
+type CouponValidation = {
+  key: string;
+  status: 'idle' | 'pending' | 'valid' | 'error' | 'invalid';
+  message: string;
+};
+
+// A saved discount belongs to the basket amount that the API validated. Never
+// trust it after a quantity/price change or a new page load.
+const $couponValidation = atom<CouponValidation>({ key: '', status: 'idle', message: '' });
+const couponKey = (code: string, subtotal: number) => JSON.stringify([code, subtotal]);
+export const $couponState = computed([$coupon, $subtotal, $couponValidation], (coupon, subtotal, validation) => {
+  if (!coupon) return { status: validation.status === 'invalid' ? 'invalid' : 'idle', blocked: false, discount: 0, message: validation.status === 'invalid' ? validation.message : '' };
+  if (validation.key !== couponKey(coupon.code, subtotal) || validation.status === 'idle') {
+    return { status: 'pending', blocked: true, discount: 0, message: '' };
+  }
+  return { status: validation.status, blocked: validation.status !== 'valid', discount: validation.status === 'valid' ? coupon.discount : 0, message: validation.message };
+});
+export const $discount = computed($couponState, state => state.discount);
+
+let couponRequestId = 0;
+let couponRequest: { id: number; key: string; controller: AbortController; promise: Promise<boolean> } | null = null;
+
+function cancelCouponRequest() {
+  couponRequestId++;
+  couponRequest?.controller.abort();
+  couponRequest = null;
+}
+
+/** Validate against the current basket. A late response must not restore an old discount. */
+export function refreshCoupon(force = false): Promise<boolean> {
+  const coupon = $coupon.get();
+  if (!coupon) return Promise.resolve(true);
+  const subtotal = $subtotal.get();
+  const key = couponKey(coupon.code, subtotal);
+  if (couponRequest?.key === key) return couponRequest.promise;
+  if (!force && $couponState.get().status === 'valid') return Promise.resolve(true);
+
+  cancelCouponRequest();
+  const id = couponRequestId;
+  const controller = new AbortController();
+  $couponValidation.set({ key, status: 'pending', message: '' });
+  let timeout: ReturnType<typeof setTimeout>;
+  const deadline = new Promise<never>((_resolve, reject) => {
+    controller.signal.addEventListener('abort', () => reject(new Error('Coupon check cancelled or timed out')), { once: true });
+    timeout = setTimeout(() => { controller.abort(); reject(new Error('Coupon check timed out')); }, 15000);
+  });
+  const isCurrent = () => id === couponRequestId && $coupon.get()?.code === coupon.code && $subtotal.get() === subtotal;
+  const promise = (async () => {
+    try {
+      const result = await Promise.race([apiFetch<AppliedCoupon>('/v1/coupons/apply', {
+        method: 'POST', signal: controller.signal,
+        body: JSON.stringify({ code: coupon.code, order_amount: subtotal }),
+      }), deadline]);
+      if (!isCurrent()) return false;
+      if (result.code !== coupon.code || !Number.isFinite(result.discount) || result.discount < 0 || Math.round(result.discount * 100) > Math.round(subtotal * 100)) {
+        throw new Error('Invalid coupon response');
+      }
+      $coupon.set(result);
+      $couponValidation.set({ key, status: 'valid', message: '' });
+      return true;
+    } catch (error) {
+      if (!isCurrent()) return false;
+      if (error instanceof ApiError && (error.status === 404 || error.status === 422)) {
+        $coupon.set(null);
+        $couponValidation.set({ key, status: 'invalid', message: `${coupon.code} was removed: ${error.message}. Please review the updated total.` });
+      } else {
+        $couponValidation.set({ key, status: 'error', message: 'We could not check your coupon. Please try again or remove it before continuing.' });
+      }
+      return false;
+    } finally {
+      clearTimeout(timeout);
+      if (couponRequest?.id === id) couponRequest = null;
+    }
+  })();
+  couponRequest = { id, key, controller, promise };
+  return promise;
+}
 
 export const $total = computed(
   [$cart, $subtotal, $discount],
@@ -176,7 +251,7 @@ export function addToCart(product: AddToCartProduct, quantity: number = 1) {
           : item
       )
     );
-    return true;
+    return nextQty > existing.qty;
   }
 
   // New item
@@ -231,32 +306,24 @@ export function updateQuantity(id: number | string, qty: number) {
 
 export function clearCart() {
   $cart.set([]);
+  cancelCouponRequest();
   $coupon.set(null);
+  $couponValidation.set({ key: '', status: 'idle', message: '' });
 }
 
 export async function applyCoupon(code: string) {
   if (!code.trim()) return;
-  try {
-    const subtotal = $subtotal.get();
-    const res = await apiFetch<AppliedCoupon>('/v1/coupons/apply', {
-      method: 'POST',
-      body: JSON.stringify({ code: code.trim().toUpperCase(), order_amount: subtotal }),
-    });
-    $coupon.set(res);
-    showToast(res.message, 'success');
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Invalid or expired coupon code';
-    showToast(msg);
-  }
+  cancelCouponRequest();
+  $couponValidation.set({ key: '', status: 'idle', message: '' });
+  $coupon.set({ code: code.trim().toUpperCase(), type: 'fixed', value: 0, discount: 0, message: '' });
+  if (await refreshCoupon(true)) showToast($coupon.get()?.message || 'Coupon applied', 'success');
 }
 
 export function removeCoupon() {
+  cancelCouponRequest();
   $coupon.set(null);
+  $couponValidation.set({ key: '', status: 'idle', message: '' });
   showToast('Coupon removed', 'success');
-}
-
-export function setIsBusiness(value: boolean) {
-  $isBusiness.set(value);
 }
 
 // --- Initialization ---

@@ -42,12 +42,15 @@ class ProductController extends Controller
             });
         }
 
-        return response()->json($query->orderBy('order')->orderBy('id')->paginate($perPage));
+        $products = $query->orderBy('order')->orderBy('id')->paginate($perPage);
+        $products->getCollection()->each->makeHidden(['description', 'gallery']);
+
+        return response()->json($products);
     }
 
     public function show($id)
     {
-        $product = Product::with(['category', 'reviews.customer'])->where('active', true)
+        $product = Product::with(['category', 'reviews.customer:id,name'])->where('active', true)
             ->where(fn ($q) => $q->where('id', $id)->orWhere('slug', $id))
             ->firstOrFail();
 
@@ -98,7 +101,7 @@ class ProductController extends Controller
             $related = $related->concat($extras);
         }
 
-        return response()->json($related);
+        return response()->json($related->each->makeHidden(['description', 'gallery']));
     }
 
     public function categories()
@@ -140,7 +143,7 @@ class ProductController extends Controller
                 ->where('active', true)
                 ->where('featured', true)
                 ->orderBy('order')
-                ->get()
+                ->get()->each->makeHidden(['description', 'gallery'])
         );
     }
 

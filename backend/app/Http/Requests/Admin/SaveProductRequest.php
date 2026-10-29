@@ -43,6 +43,7 @@ class SaveProductRequest extends FormRequest
             'image' => 'nullable|string',
             'gallery' => 'nullable|array',
             'description' => 'nullable|string',
+            'pdf_download_enabled' => 'boolean',
             'product_category_id' => 'nullable|integer|exists:product_categories,id',
             'tags' => 'nullable|array',
             'badge' => 'nullable|string',

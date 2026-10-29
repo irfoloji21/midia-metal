@@ -34,9 +34,9 @@ class CustomerPasswordResetController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'token' => 'required',
+            'token' => 'required|string',
             'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $status = Password::broker('customers')->reset(
@@ -47,6 +47,7 @@ class CustomerPasswordResetController extends Controller
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();
+                $user->tokens()->delete();
 
                 event(new PasswordReset($user));
             }

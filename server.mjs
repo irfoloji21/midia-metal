@@ -1,7 +1,7 @@
 /**
  * server.mjs — Entry point for Astro standalone Node server.
  *
- * Wraps Astro's generated `dist/server/entry.mjs` with gzip/brotli compression.
+ * Wraps Astro's generated `dist/server/entry.mjs` with HTTP compression.
  * API calls go directly to https://staging-api.midiawork.com — no proxy needed.
  *
  * Usage:
@@ -11,7 +11,6 @@ import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import compression from 'compression';
-import { handler as astroHandler } from './dist/server/entry.mjs';
 import { createServer } from 'node:http';
 
 // Load .env from the app root so PUBLIC_API_URL etc. are available to SSR
@@ -39,6 +38,11 @@ try {
 
 const PORT = process.env.PORT || 4321;
 const HOST = process.env.HOST || '0.0.0.0';
+
+// This wrapper owns the listener. Disable the adapter's automatic listener
+// before importing its entry, including when started without deployment env vars.
+process.env.ASTRO_NODE_AUTOSTART = 'disabled';
+const { handler: astroHandler } = await import('./dist/server/entry.mjs');
 
 const compress = compression({
   threshold: 1024,

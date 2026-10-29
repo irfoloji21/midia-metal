@@ -25,6 +25,7 @@ class Product extends Model
         'image',
         'gallery',
         'description',
+        'pdf_download_enabled',
         'product_category_id',
         'tags',
         'badge',
@@ -45,7 +46,10 @@ class Product extends Model
         'variant_table_columns',
     ];
 
+    protected $attributes = ['pdf_download_enabled' => true];
+
     protected $casts = [
+        'pdf_download_enabled' => 'boolean',
         'price_on_request' => 'boolean',
         'show_variant_in_title' => 'boolean',
         'variant_options' => 'array',

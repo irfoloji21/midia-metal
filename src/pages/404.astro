@@ -1,7 +1,10 @@
 ---
-export const prerender = true;
+// The Node adapter must render both direct /404 requests and missing-route fallbacks.
+export const prerender = false;
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
+
+Astro.response.status = 404;
 ---
 
 <BaseLayout

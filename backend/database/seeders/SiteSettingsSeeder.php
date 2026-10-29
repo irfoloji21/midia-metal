@@ -174,7 +174,6 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'shipping_rate', 'value' => '10.00', 'type' => 'text', 'group' => 'shipping-tax'],
             ['key' => 'shipping_type', 'value' => 'flat', 'type' => 'text', 'group' => 'shipping-tax'],
             ['key' => 'vat_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'shipping-tax'],
-            ['key' => 'vat_rate', 'value' => '20', 'type' => 'text', 'group' => 'shipping-tax'],
         ];
 
         $settingsByKey = [];

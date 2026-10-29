@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { toast } from 'sonner';
 import { apiFetch } from '@/lib/api';
-import { $cart, clearCart, setIsBusiness } from '@/stores/cart';
+import { $cart, clearCart } from '@/stores/cart';
 import { $customer, $isAuthLoading, $authError } from '@/stores/auth';
 import PaymentIsland from './PaymentIsland';
 
@@ -18,7 +18,6 @@ vi.mock('@stripe/react-stripe-js', () => ({
 
 beforeEach(() => {
   clearCart();
-  setIsBusiness(false);
   vi.resetAllMocks();
   sessionStorage.clear();
   vi.stubGlobal('crypto', { randomUUID: () => 'test-attempt' });

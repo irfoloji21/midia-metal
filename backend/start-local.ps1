@@ -5,7 +5,7 @@ $taskPhp = (Get-Command php -ErrorAction Stop).Source
 $taskExtensionDir = Join-Path (Split-Path $taskPhp) 'ext'
 $taskModules = @(& $taskPhp -m)
 $taskPhpArgs = @()
-foreach ($taskExtension in @('pdo_sqlite', 'sqlite3', 'mbstring', 'fileinfo', 'openssl', 'curl')) {
+foreach ($taskExtension in @('pdo_sqlite', 'sqlite3', 'mbstring', 'fileinfo', 'openssl', 'curl', 'gd')) {
     if ($taskModules -notcontains $taskExtension) {
         $taskDll = Join-Path $taskExtensionDir "php_$taskExtension.dll"
         if (!(Test-Path -LiteralPath $taskDll)) {

@@ -279,7 +279,7 @@ export default function SelectionTableSection({
     }
 
     setSelectedVariants(variantSelection);
-    addToCart(
+    const added = addToCart(
       {
         ...product,
         selected_variants: variantSelection,
@@ -287,7 +287,7 @@ export default function SelectionTableSection({
       },
       nextQty,
     );
-    toast.success("Added to basket!");
+    if (added) toast.success("Added to basket!");
   };
 
   const handleQuoteSubmit = async (event: FormEvent) => {

@@ -23,7 +23,10 @@ try {
     const story = page.locator('.product-story');
     await story.waitFor();
     assert.equal(await story.locator('.product-section').count(), 8);
-    assert.equal(await story.locator('table').count(), 2);
+    assert.equal(await story.locator('table').count(), 3);
+    assert.equal(await story.locator('.product-reference-table tbody tr').count(), 7);
+    assert.equal(await story.locator('.img-row--2 img').count(), 2);
+    assert.equal(await story.locator('.img-row--3 img').count(), 3);
     // The selected model option duplicates the same specification and must be deduplicated.
     assert.equal(await story.locator('table').first().locator('tbody tr').count(), 26);
     assert.equal(await story.locator('.product-performance-table tbody tr').count(), 9);
@@ -49,6 +52,22 @@ try {
     }));
     assert.equal(result.overflow, false, `Overflow at ${width}`);
     result.images.forEach(img => assert.ok(img.loaded && img.alt));
+    for (const columns of [2, 3]) {
+      const row = story.locator(`.img-row--${columns}`);
+      const boxes = await row.locator('img').evaluateAll(images => images.map(img => {
+        const { x, y, width, right } = img.getBoundingClientRect();
+        return { x, y, width, right };
+      }));
+      assert.ok(boxes.every(box => box.width > 0 && box.right <= width), `Image row bounds at ${width}`);
+      if (width > 540) {
+        assert.ok(boxes.every(box => Math.abs(box.y - boxes[0].y) < 2), `${columns} images are side by side at ${width}`);
+        assert.ok(boxes[1].x > boxes[0].x + boxes[0].width, 'Gutter separates images');
+      } else {
+        assert.ok(boxes[1].y > boxes[0].y, 'Images stack on mobile');
+      }
+      await row.screenshot({ path: `reports/dd7-product/row-${columns}-${width}.png` });
+    }
+    await story.locator('.product-reference-table').screenshot({ path: `reports/dd7-product/reference-table-${width}.png` });
     assert.equal(result.productSchema.brand.name, 'LONGWELL');
     assert.equal(result.productSchema.sku, 'LWDD7-5-EC');
     await page.getByRole('button', { name: 'View product image 2', exact: true }).click();
@@ -60,8 +79,8 @@ try {
     await page.getByRole('button', { name: 'Close product gallery' }).click();
     await lightbox.waitFor({ state: 'hidden' });
     await page.getByRole('button', { name: 'View product image 1', exact: true }).click();
-    const pdfUrl = await page.getByRole('link', { name: 'Download product data (PDF)' }).getAttribute('href');
-    const pdf = await page.request.get(new URL(pdfUrl, page.url()).href);
+    await page.getByRole('button', { name: 'Download product information (PDF)' }).waitFor();
+    const pdf = await page.request.get(new URL('/api/v1/products/59/pdf', page.url()).href);
     assert.equal(pdf.status(), 200);
     assert.match(pdf.headers()['content-type'], /pdf/);
     assert.ok((await pdf.body()).byteLength > 50000);

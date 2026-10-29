@@ -50,5 +50,8 @@ playwright-report/
 /reports/
 /output/
 
+# Runtime fonts and temporary images used by the product PDF renderer.
+/backend/storage/framework/product-pdf/
+
 # Unused package manager lockfiles
 bun.lockb

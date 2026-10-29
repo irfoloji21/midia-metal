@@ -19,7 +19,7 @@ class CouponController extends Controller
         $validated = $request->validated();
         $coupon = Coupon::create($validated);
 
-        return response()->json($coupon, 201);
+        return response()->json($coupon->refresh(), 201);
     }
 
     public function update(UpdateCouponRequest $request, Coupon $coupon)

@@ -101,9 +101,7 @@ const SHIPPING_TAX_KEYS = new Set([
     "shipping_flat_rate",
     "shipping_type",
     "vat_enabled",
-    "vat_rate",
     "tax_enabled",
-    "tax_rate",
 ]);
 
 const SHIPPING_FREIGHT_KEYS = new Set([
@@ -125,10 +123,13 @@ const FREIGHT_SURCHARGE_LABELS: Record<string, string> = {
 const LEGACY_DUPLICATE_KEYS: Record<string, string> = {
     shipping_flat_rate: "shipping_rate",
     tax_enabled: "vat_enabled",
-    tax_rate: "vat_rate",
 };
 
 const HIDDEN_SETTING_KEYS = new Set([
+    // Retired rate settings; VAT-inclusive calculation is fixed in the backend.
+    "vat_rate",
+    "tax_rate",
+
     // Legacy About sections removed from the public page.
     "about_exp_value",
     "about_exp_label",

@@ -90,9 +90,6 @@ class CustomerAuthController extends Controller
             'shipping_city' => 'nullable|string',
             'shipping_postcode' => 'nullable|string',
             'shipping_country' => 'nullable|string',
-            'is_business' => 'nullable|boolean',
-            'company_name' => 'nullable|string',
-            'company_vat_number' => 'nullable|string',
         ]);
 
         $customer->update($validated);

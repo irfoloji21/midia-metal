@@ -15,7 +15,7 @@ import { MapPin, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useStore } from "@nanostores/react";
-import { $cart, $subtotal, $coupon, $isBusiness, setIsBusiness } from "@/stores/cart";
+import { $cart, $subtotal, $coupon, $couponState, refreshCoupon } from "@/stores/cart";
 import { $customer } from "@/stores/auth";
 import type { CheckoutFormData } from "@/types/cart";
 import withErrorBoundary from "@/lib/withErrorBoundary";
@@ -23,6 +23,8 @@ import { formatMoneyValue, parseMoneyValue } from "@/lib/pricing";
 import { getCheckoutErrors, normalizeCheckoutForm, type CheckoutErrors } from "@/lib/checkout-validation";
 import { useCartAvailability } from '@/hooks/use-cart-availability';
 import CartAvailabilityNotice from '@/components/CartAvailabilityNotice';
+import { useCartCoupon } from '@/hooks/use-cart-coupon';
+import CartCouponNotice from '@/components/CartCouponNotice';
 
 // Astro-compatible CheckoutSteps (inline, no react-router)
 function CheckoutSteps({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
@@ -112,14 +114,13 @@ type ShippingOption = {
 
 function CheckoutIsland() {
   const availability = useCartAvailability();
+  const couponState = useCartCoupon();
   const defaultForm: CheckoutFormData = {
     firstName: "",
     lastName: "",
-    company: "",
     phone: "",
     email: "",
     notes: "",
-    companyVat: "",
     fulfillmentMethod: "delivery",
     selectedShippingOption: null,
     shippingOptionToken: "",
@@ -141,7 +142,6 @@ function CheckoutIsland() {
   const cart = useStore($cart);
   const subtotalRaw = useStore($subtotal);
   const coupon = useStore($coupon);
-  const isBusiness = useStore($isBusiness);
   const customer = useStore($customer);
   
   // Hydration fix: defer cart-dependent rendering until client-side
@@ -164,7 +164,8 @@ function CheckoutIsland() {
     if (!stored) return;
 
     try {
-      const parsed = JSON.parse(stored) as Partial<CheckoutFormData>;
+      const parsed = normalizeCheckoutForm(JSON.parse(stored));
+      sessionStorage.setItem("checkoutForm", JSON.stringify(parsed));
       setForm((prev) => ({
         ...prev,
         ...parsed,
@@ -173,7 +174,6 @@ function CheckoutIsland() {
         shippingOptionToken: parsed.shippingOptionToken || "",
       }));
       hasRestoredCheckoutForm.current = true;
-      if (typeof parsed.isBusiness === 'boolean') setIsBusiness(parsed.isBusiness);
     } catch {
       sessionStorage.removeItem("checkoutForm");
     }
@@ -197,10 +197,8 @@ function CheckoutIsland() {
         ...prev,
         firstName: parts[0] || "",
         lastName: parts.slice(1).join(" ") || "",
-        company: cust.company_name || "",
         phone: customer.phone || "",
         email: customer.email || "",
-        companyVat: cust.company_vat_number || "",
         shipping_address: shippingAddress,
         shipping_city: shippingCity,
         shipping_postcode: shippingPostcode,
@@ -211,9 +209,8 @@ function CheckoutIsland() {
         postcode: billingPostcode,
         country: billingCountry,
       }));
-      setIsBusiness(customer.is_business || false);
     }
-  }, [customer, setIsBusiness]);
+  }, [customer]);
 
   const update = <K extends keyof CheckoutFormData>(field: K, value: CheckoutFormData[K]) => {
     hasRestoredCheckoutForm.current = true;
@@ -319,13 +316,13 @@ function CheckoutIsland() {
 
   const selectedShippingOption = shippingOptions.find((option) => option.quote_token === form.shippingOptionToken) || null;
   const shippingForOrder = form.fulfillmentMethod === "click_collect" ? 0 : (selectedShippingOption?.rate ?? 0);
-  const discountAmount = coupon?.discount ?? 0;
+  const discountAmount = couponState.discount;
   const totalForOrder = cart.length > 0 ? Math.max(0, subtotalRaw + shippingForOrder - discountAmount) : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const normalized = normalizeCheckoutForm(form);
-    const errors = getCheckoutErrors(normalized, isBusiness);
+    const errors = getCheckoutErrors(normalized);
     setFieldErrors(errors);
     setForm(normalized);
     if (Object.keys(errors).length) {
@@ -333,7 +330,7 @@ function CheckoutIsland() {
       return;
     }
     if (cart.length === 0) { toast.error("Your cart is empty"); return; }
-    if (availability.blocked) return;
+    if (availability.blocked || $couponState.get().blocked) return;
     if (form.fulfillmentMethod === "delivery" && !form.shippingOptionToken) {
       toast.error("Please choose a delivery option.");
       return;
@@ -341,12 +338,12 @@ function CheckoutIsland() {
     setIsSubmitting(true);
 
     try {
+      if (!await refreshCoupon(true)) { setIsSubmitting(false); return; }
       // Store checkout form in sessionStorage (replaces React Router state passing)
       sessionStorage.setItem(
         "checkoutForm",
         JSON.stringify({
           ...normalized,
-          isBusiness,
           selectedShippingOption,
         })
       );
@@ -362,6 +359,7 @@ function CheckoutIsland() {
       <section className="container mx-auto px-4 lg:px-8 pt-16 md:pt-24 pb-4 md:pb-6">
         <CheckoutSteps currentStep={2} />
         <CartAvailabilityNotice state={availability} />
+        {isHydrated && <CartCouponNotice state={couponState} />}
       </section>
 
       <section className="container mx-auto px-4 lg:px-8 pb-20 md:pb-28">
@@ -395,25 +393,6 @@ function CheckoutIsland() {
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-center gap-2">
-                  <input type="checkbox" id="isBusiness" checked={isBusiness} onChange={(e) => setIsBusiness(e.target.checked)} className="w-4 h-4 accent-orange cursor-pointer" />
-                  <label htmlFor="isBusiness" className="text-[13px] font-semibold text-primary cursor-pointer">I am purchasing as a business</label>
-                </div>
-
-                {isBusiness && (
-                  <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label htmlFor="checkout-company" className="block text-[13px] font-semibold text-primary mb-2">Company Name *</label>
-                      <input {...validationProps("company")} type="text" required value={form.company} onChange={(e) => update("company", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
-                    {fieldError("company")}
-                    </div>
-                    <div>
-                      <label htmlFor="checkout-companyVat" className="block text-[13px] font-semibold text-primary mb-2">Company VAT Number (optional)</label>
-                      <input {...validationProps("companyVat")} type="text" value={form.companyVat} onChange={(e) => update("companyVat", e.target.value)} className="w-full h-12 border border-[#cad4e4] bg-[#eaf0f3] px-4 text-[14px] outline-none focus:border-orange" />
-                    {fieldError("companyVat")}
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* ── Fulfilment Method ── */}
@@ -661,7 +640,7 @@ function CheckoutIsland() {
                     {isHydrated && coupon && (
                       <div className="grid grid-cols-[42%_58%] border-b border-[#cad4e4]">
                         <span className="font-semibold text-sm md:text-lg text-green-700 bg-[#f4f5f7] p-4 md:p-6">Discount ({coupon.code})</span>
-                        <span className="text-sm md:text-base text-green-700 p-4 md:p-6">−£{coupon.discount.toFixed(2)}</span>
+                        <span className="text-sm md:text-base text-green-700 p-4 md:p-6">{couponState.blocked ? 'Awaiting coupon check' : `−£${discountAmount.toFixed(2)}`}</span>
                       </div>
                     )}
 
@@ -689,7 +668,7 @@ function CheckoutIsland() {
                     </div>
                     <div className="grid grid-cols-[42%_58%]">
                       <span className="font-semibold text-sm md:text-lg text-primary bg-[#f4f5f7] p-4 md:p-6">Total</span>
-                      <span className="font-semibold text-base md:text-2xl text-primary p-4 md:p-6">£{(isHydrated ? totalForOrder : 0).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="font-semibold text-base md:text-2xl text-primary p-4 md:p-6">{isHydrated && couponState.blocked ? 'Awaiting coupon check' : `£${(isHydrated ? totalForOrder : 0).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</span>
                     </div>
                   </div>
                   <p className="mt-3 text-[12px] text-[#6e7a92]">All displayed prices include VAT.</p>
@@ -700,7 +679,7 @@ function CheckoutIsland() {
 
               <button
                 type="submit"
-                disabled={availability.blocked || isSubmitting || !isHydrated || cart.length === 0 || (form.fulfillmentMethod === "delivery" && !form.shippingOptionToken)}
+                disabled={availability.blocked || couponState.blocked || isSubmitting || !isHydrated || cart.length === 0 || (form.fulfillmentMethod === "delivery" && !form.shippingOptionToken)}
                 className="w-full mt-8 h-16 bg-orange text-white inline-flex items-center justify-center text-sm font-semibold hover:bg-orange-hover disabled:opacity-50 transition-colors"
                 aria-label="Proceed to payment"
               >

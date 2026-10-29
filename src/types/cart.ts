@@ -34,7 +34,6 @@ export interface AppliedCoupon {
 
 /** Checkout form data persisted to sessionStorage between steps. */
 export interface CheckoutFormData {
-  isBusiness?: boolean;
   firstName: string;
   lastName: string;
   email: string;
@@ -54,10 +53,6 @@ export interface CheckoutFormData {
   postcode?: string;
   county?: string;
   country?: string;
-
-  // Business
-  company?: string;
-  companyVat?: string;
 
   // Fulfillment
   fulfillmentMethod: "delivery" | "click_collect";

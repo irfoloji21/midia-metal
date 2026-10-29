@@ -127,7 +127,7 @@ jobs:
           php-version: '8.3'
           coverage: none
           tools: composer:v2
-          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, ctype, fileinfo, json, openssl, tokenizer, xml
+          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, ctype, fileinfo, gd, json, openssl, tokenizer, xml
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -178,7 +178,7 @@ jobs:
           php-version: '8.3'
           coverage: none
           tools: composer:v2
-          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, ctype, fileinfo, json, openssl, tokenizer, xml
+          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, ctype, fileinfo, gd, json, openssl, tokenizer, xml
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4

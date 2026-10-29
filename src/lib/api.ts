@@ -9,7 +9,7 @@ export class ApiError extends Error {
 
 const isLocalApiUrl = (value: string) => value.startsWith("http://127.0.0.1:") || value.startsWith("http://localhost:");
 
-const getResolvedApiUrl = () => {
+export const getResolvedApiUrl = () => {
     if (typeof window === "undefined") {
         return API_URL;
     }

@@ -11,6 +11,7 @@ export const prerender = false;
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ProductDetailIsland from '@/islands/ProductDetailIsland';
 import { getApiBase } from '@/lib/api-base';
+import { fetchPublicJson, PublicApiError } from '@/lib/public-api';
 import { getStandardizedDisplayPrice, parseMoneyValue } from '@/lib/pricing';
 import { stripHtml, truncateText, buildBreadcrumbJsonLd, buildProductJsonLd } from '@/lib/seo';
 
@@ -24,27 +25,29 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
 // Fetch product detail + related products in parallel at request time
 let product: any = null;
 let related: any[] = [];
+let productUnavailable = false;
 
-const fetchWithTimeout = (url: string, ms = 10000) => {
-  const c = new AbortController();
-  const t = setTimeout(() => c.abort(), ms);
-  return fetch(url, { signal: c.signal }).finally(() => clearTimeout(t));
-};
-
-try {
-  const [productRes, relatedRes] = await Promise.all([
-    fetchWithTimeout(`${API}/products/${slug}`).then(r => r.ok ? r.json() : null),
-    fetchWithTimeout(`${API}/products/${slug}/related`).then(r => r.ok ? r.json() : []),
-  ]);
-  product = productRes;
-  related = (Array.isArray(relatedRes) ? relatedRes : []).slice(0, 3);
-} catch (e) {
-  console.error(`[shop/slug] Failed to fetch product data from ${API}:`, e);
+const [productResult, relatedResult] = await Promise.allSettled([
+  fetchPublicJson<any>(`${API}/products/${slug}`),
+  fetchPublicJson<any[]>(`${API}/products/${slug}/related`),
+]);
+if (productResult.status === 'fulfilled') {
+  if (productResult.value && typeof productResult.value === 'object' && !Array.isArray(productResult.value)) product = productResult.value;
+  else productUnavailable = true;
+} else if (!(productResult.reason instanceof PublicApiError && productResult.reason.status === 404)) {
+  productUnavailable = true;
+  console.error('[shop/slug] Product data is temporarily unavailable.');
 }
+if (relatedResult.status === 'fulfilled' && Array.isArray(relatedResult.value)) related = relatedResult.value.slice(0, 3);
 
 // 404 if product not found
-if (!product) {
+if (!product && !productUnavailable) {
   return Astro.redirect('/404');
+}
+if (productUnavailable) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Cache-Control', 'no-store');
+  Astro.response.headers.set('Retry-After', '30');
 }
 
 // Dynamic SEO from product data
@@ -58,7 +61,7 @@ const pageDescription = rawDescription
 
 // Product JSON-LD for rich snippets in Google Search
 const productUrl = `${siteUrl}/shop/${slug}`;
-const numericPrice = product.price_on_request ? null : parseMoneyValue(productPrice);
+const numericPrice = product?.price_on_request ? null : parseMoneyValue(productPrice);
 const productJsonLd = buildProductJsonLd({
   name: productName,
   description: rawDescription,
@@ -83,18 +86,28 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
 ---
 
 <BaseLayout
-  title={pageTitle}
+  title={productUnavailable ? 'Product temporarily unavailable' : pageTitle}
   description={pageDescription}
   image={product?.image}
   canonicalPath={`/shop/${slug}`}
-  structuredData={[productJsonLd, breadcrumbJsonLd]}
+  noindex={productUnavailable}
+  structuredData={productUnavailable ? [] : [productJsonLd, breadcrumbJsonLd]}
 >
   <div class="min-h-screen bg-[#eaf0f3]">
-    <ProductDetailIsland
+    {productUnavailable ? (
+      <section class="container mx-auto px-4 py-20 text-center max-w-2xl">
+        <h1 class="font-sans text-3xl font-semibold text-primary mb-5">This product is temporarily unavailable.</h1>
+        <p class="text-[#58657f] leading-7 mb-8">We could not load the product details. Please try again in a moment.</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href={Astro.url.pathname} class="bg-orange text-white px-7 py-3 rounded-md font-semibold hover:bg-orange-hover">Try again</a>
+          <a href="/shop" class="border border-primary text-primary px-7 py-3 rounded-md font-semibold">Browse products</a>
+        </div>
+      </section>
+    ) : <ProductDetailIsland
       id={slug!}
       initialProduct={product}
       initialRelated={related}
       client:load
-    />
+    />}
   </div>
 </BaseLayout>

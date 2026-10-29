@@ -18,6 +18,7 @@ import { useReviewEligibility } from "@/lib/use-review-eligibility";
 import { normalizeMediaUrl } from "@/lib/media";
 import ProductImage from "@/components/ProductImage";
 import { PRODUCT_IMAGE_BACKGROUND } from "@/lib/product-image";
+import ProductPdfDownload from "@/components/ProductPdfDownload";
 import { hasProductEditorial, hasProductSections, insertProductSpecifications } from "@/lib/product-editorial";
 import "@/product-editorial.css";
 import { useStore } from "@nanostores/react";
@@ -700,7 +701,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
       available_stock: availableStock,
     };
 
-    addToCart(cartProduct, qty);
+    if (!addToCart(cartProduct, qty)) return;
 
     if (mode === "buy_now") {
       toast.success("Added to basket. Proceeding to checkout.");
@@ -1102,6 +1103,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                 ) : (
                   <p className="text-[13px] md:text-[14px] text-[#6e7a92] leading-7">No description provided.</p>
                 )}
+                {product.pdf_download_enabled !== false && <ProductPdfDownload productId={product.id} />}
               </div>
             ) : (
               <div className="w-full">

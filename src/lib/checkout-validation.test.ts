@@ -14,7 +14,15 @@ describe('checkout validation', () => {
     expect(getCheckoutErrors({ ...form, shipping_postcode })).toEqual({});
     expect(normalizeCheckoutForm({ ...form, firstName: ' Jane ', shipping_postcode }).firstName).toBe('Jane');
   });
-  it('validates separate billing and business fields', () => {
-    expect(getCheckoutErrors({ ...form, billingSameAsShipping: false, address: ' ', city: ' ', postcode: 'invalid', company: ' ' }, true)).toMatchObject({ address: expect.any(String), city: expect.any(String), postcode: expect.any(String), company: expect.any(String) });
+  it('validates separate billing fields', () => {
+    expect(getCheckoutErrors({ ...form, billingSameAsShipping: false, address: ' ', city: ' ', postcode: 'invalid' })).toMatchObject({ address: expect.any(String), city: expect.any(String), postcode: expect.any(String) });
+  });
+  it('discards retired business fields without blocking an older checkout draft', () => {
+    const legacyDraft = { ...form, isBusiness: true, company: '', companyVat: 'GB123456789' };
+    const normalized = normalizeCheckoutForm(legacyDraft);
+    expect(getCheckoutErrors(normalized)).toEqual({});
+    expect(normalized).not.toHaveProperty('isBusiness');
+    expect(normalized).not.toHaveProperty('company');
+    expect(normalized).not.toHaveProperty('companyVat');
   });
 });

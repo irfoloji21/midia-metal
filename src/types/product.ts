@@ -109,6 +109,7 @@ export interface Product extends ShippingDimensions {
   gallery: string[];
   description: string;
   product_category_id: number | null;
+  pdf_download_enabled?: boolean;
   tags: string[];
   badge: string | null;
   featured: boolean;

@@ -31,12 +31,14 @@ Route::get('/health', function () {
 
 // Public API Routes (Frontend)
 Route::prefix('v1')->group(function () {
+    Route::get('/sitemap', Api\SitemapController::class);
     // Products
     Route::get('/products', [Api\ProductController::class, 'index']);
     Route::get('/products/featured', [Api\ProductController::class, 'featured']);
     Route::get('/products/tags', [Api\ProductController::class, 'tags']);
     Route::get('/products/{id}', [Api\ProductController::class, 'show']);
     Route::get('/products/{id}/related', [Api\ProductController::class, 'related']);
+    Route::get('/products/{id}/pdf', Api\ProductPdfController::class)->middleware('throttle:10,1');
     Route::get('/product-categories', [Api\ProductController::class, 'categories']);
     Route::get('/product-categories/{slug}', [Api\ProductController::class, 'categoryDetail']);
     Route::get('/hero-slides', [Api\ProductController::class, 'heroSlides']);

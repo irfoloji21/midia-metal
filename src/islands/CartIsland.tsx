@@ -21,6 +21,7 @@ import {
   $subtotal,
   $coupon,
   $total,
+  $couponState,
   removeFromCart,
   updateQuantity,
   applyCoupon,
@@ -30,6 +31,8 @@ import withErrorBoundary from '@/lib/withErrorBoundary';
 import { normalizeMediaUrl } from '@/lib/media';
 import { useCartAvailability } from '@/hooks/use-cart-availability';
 import CartAvailabilityNotice from '@/components/CartAvailabilityNotice';
+import { useCartCoupon } from '@/hooks/use-cart-coupon';
+import CartCouponNotice from '@/components/CartCouponNotice';
 
 // Astro-compatible CheckoutSteps (inline, no react-router)
 function CheckoutSteps({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
@@ -100,12 +103,13 @@ function CheckoutSteps({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
 
 function CartIsland() {
   const availability = useCartAvailability();
+  const couponState = useCartCoupon();
   const cart = useStore($cart);
   const subtotal = useStore($subtotal);
   const coupon = useStore($coupon);
   const total = useStore($total);
 
-  const [couponInput, setCouponInput] = useState(coupon?.code ?? '');
+  const [couponInput, setCouponInput] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   
   // Hydration fix: defer cart rendering until client-side to avoid SSR mismatch
@@ -127,6 +131,7 @@ function CartIsland() {
       <section className="container mx-auto px-4 lg:px-8 pt-16 md:pt-24 pb-4 md:pb-6">
         <CheckoutSteps currentStep={1} />
         <CartAvailabilityNotice state={availability} />
+        {isHydrated && <CartCouponNotice state={couponState} />}
       </section>
 
       <section className="container mx-auto px-4 lg:px-8 pb-20 md:pb-28">
@@ -268,9 +273,9 @@ function CartIsland() {
           <div className="w-full md:w-[530px] h-14 border border-[#cad4e4] flex items-center bg-[#eaf0f3]">
             <div className="flex items-center gap-2 pl-5 pr-3 flex-1 min-w-0">
               <Tag className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-              {coupon ? (
+              {isHydrated && coupon ? (
                 <span className="text-sm font-semibold text-green-700">
-                  {coupon.code} — {coupon.message}
+                  {coupon.code}{couponState.status === 'valid' ? ` — ${coupon.message}` : ''}
                 </span>
               ) : (
                 <input
@@ -283,7 +288,7 @@ function CartIsland() {
                 />
               )}
             </div>
-            {coupon ? (
+            {isHydrated && coupon ? (
               <button
                 onClick={removeCoupon}
                 className="h-full px-6 border-l border-[#cad4e4] text-red-500 text-sm font-semibold hover:bg-[#f5f7fa] transition-colors"
@@ -317,7 +322,7 @@ function CartIsland() {
                   Discount ({coupon.code})
                 </span>
                 <span className="text-sm md:text-lg text-green-700 p-4 md:p-6">
-                  −£{coupon.discount.toFixed(2)}
+                  {couponState.blocked ? 'Awaiting coupon check' : `−£${couponState.discount.toFixed(2)}`}
                 </span>
               </div>
             )}
@@ -333,13 +338,13 @@ function CartIsland() {
             </div>
             <div className="grid grid-cols-[38%_62%]">
               <span className="font-semibold text-sm md:text-lg text-primary bg-[#f4f5f7] p-4 md:p-6">Total</span>
-              <span className="font-semibold text-base md:text-2xl text-primary p-4 md:p-6">£{(isHydrated ? total : 0).toFixed(2)}</span>
+              <span className="font-semibold text-base md:text-2xl text-primary p-4 md:p-6">{isHydrated && couponState.blocked ? 'Awaiting coupon check' : `£${(isHydrated ? total : 0).toFixed(2)}`}</span>
             </div>
           </div>
           <a
             href="/checkout"
-            aria-disabled={availability.blocked}
-            onClick={(event) => { if (availability.blocked) event.preventDefault(); }}
+            aria-disabled={!isHydrated || availability.blocked || couponState.blocked}
+            onClick={(event) => { if (!isHydrated || availability.blocked || $couponState.get().blocked) event.preventDefault(); }}
             className="w-full mt-8 h-16 bg-orange text-white inline-flex items-center justify-center text-sm font-semibold hover:bg-orange-hover transition-colors"
           >
             Proceed to checkout

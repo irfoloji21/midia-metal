@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import { toast } from "sonner";
 import {
@@ -10,7 +10,7 @@ import { $customer, $isAuthLoading, $authError, logoutCustomer, updateCustomer, 
 import CustomerSessionError from "@/components/CustomerSessionError";
 import { $wishlist, removeFromWishlist } from "@/stores/wishlist";
 import { addToCart } from "@/stores/cart";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, ApiError } from "@/lib/api";
 import { normalizeMediaUrl } from "@/lib/media";
 import { getStandardizedDisplayPrice, getProductQuoteUrl } from "@/lib/pricing";
 import type { Product } from "@/types/product";
@@ -96,6 +96,11 @@ function AccountIsland() {
     const [quotes, setQuotes] = useState<any[]>([]);
     const [loadingOrders, setLoadingOrders] = useState(true);
     const [loadingQuotes, setLoadingQuotes] = useState(true);
+    const [loadErrors, setLoadErrors] = useState<Partial<Record<Tab, string>>>({});
+    const [loadVersion, setLoadVersion] = useState(0);
+    const [loggingOut, setLoggingOut] = useState(false);
+    const leavingAfterLogout = useRef(false);
+    const [removingCard, setRemovingCard] = useState<number | null>(null);
     const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
     const [requestDialogOrder, setRequestDialogOrder] = useState<any | null>(null);
     const [requestForm, setRequestForm] = useState({
@@ -122,9 +127,6 @@ function AccountIsland() {
         shipping_city: "",
         shipping_postcode: "",
         shipping_country: "United Kingdom",
-        is_business: false,
-        company_name: "",
-        company_vat_number: "",
     });
     const [savingProfile, setSavingProfile] = useState(false);
 
@@ -153,20 +155,7 @@ function AccountIsland() {
             return;
         }
 
-        if (!customer) { window.location.href = "/login"; return; }
-        // Always re-fetch orders when Orders tab is active so admin status changes are reflected
-        if (activeTab === "orders") {
-            setLoadingOrders(true);
-            fetchOrders();
-        }
-        if (activeTab === "quotes") {
-            setLoadingQuotes(true);
-            fetchQuotes();
-        }
-        if (activeTab === "payment-methods") {
-            setLoadingCards(true);
-            fetchCards();
-        }
+        if (!customer) { if (!leavingAfterLogout.current) window.location.href = "/login"; return; }
         if (customer) {
             setForm({
                 name: customer.name || "",
@@ -179,58 +168,67 @@ function AccountIsland() {
                 shipping_city: (customer as any).shipping_city || "",
                 shipping_postcode: (customer as any).shipping_postcode || "",
                 shipping_country: (customer as any).shipping_country || "United Kingdom",
-                is_business: customer.is_business || false,
-                company_name: customer.company_name || "",
-                company_vat_number: customer.company_vat_number || "",
             });
         }
     }, [customer, isLoading, authError, activeTab]);
 
-    const fetchOrders = async () => {
-        try {
-            const data = await apiFetch("/v1/customer/orders");
-            if (Array.isArray(data)) setOrders(data);
-        } catch { toast.error("Failed to load orders"); }
-        finally { setLoadingOrders(false); }
-    };
-
-    const fetchQuotes = async () => {
-        try {
-            const data = await apiFetch("/v1/customer/quotes");
-            if (Array.isArray(data)) setQuotes(data);
-        } catch { /* silently fail */ }
-        finally { setLoadingQuotes(false); }
-    };
-
-    const fetchCards = async () => {
-        try {
-            const data = await apiFetch("/v1/customer/payment-methods");
-            if (Array.isArray(data)) setSavedCards(data);
-        } catch { toast.error("Failed to load saved cards"); }
-        finally { setLoadingCards(false); }
-    };
+    useEffect(() => {
+        if (isLoading || authError || !customer) return undefined;
+        const resource = activeTab === 'orders'
+            ? { path: 'orders', label: 'orders', setLoading: setLoadingOrders, setData: setOrders }
+            : activeTab === 'quotes'
+                ? { path: 'quotes', label: 'quotes', setLoading: setLoadingQuotes, setData: setQuotes }
+                : activeTab === 'payment-methods'
+                    ? { path: 'payment-methods', label: 'saved cards', setLoading: setLoadingCards, setData: setSavedCards }
+                    : null;
+        if (!resource) return undefined;
+        const controller = new AbortController();
+        let cancelled = false;
+        resource.setLoading(true);
+        setLoadErrors(previous => ({ ...previous, [activeTab]: '' }));
+        void (async () => {
+            try {
+                const data = await apiFetch(`/v1/customer/${resource.path}`, { signal: controller.signal });
+                if (!Array.isArray(data)) throw new Error('Invalid account response');
+                if (!cancelled) resource.setData(data);
+            } catch (error) {
+                if (!cancelled) {
+                    if (error instanceof ApiError && error.status === 401) logoutCustomer();
+                    else setLoadErrors(previous => ({ ...previous, [activeTab]: `Could not load your ${resource.label}. Please try again.` }));
+                }
+            } finally {
+                if (!cancelled) resource.setLoading(false);
+            }
+        })();
+        return () => { cancelled = true; controller.abort(); };
+    }, [customer?.id, isLoading, authError, activeTab, loadVersion]);
 
     const deleteCard = async (id: number) => {
+        if (removingCard !== null) return;
         if (!confirm("Are you sure you want to remove this card?")) return;
+        setRemovingCard(id);
         try {
-            const response = await fetch(`/api/v1/customer/payment-methods/${id}`, {
-                method: "DELETE",
-                credentials: "include",
-                headers: { Accept: "application/json" }
-            });
-            if (response.ok) {
-                toast.success("Card removed successfully");
-                fetchCards();
-            } else {
-                toast.error("Failed to remove card");
-            }
-        } catch { toast.error("Error removing card"); }
+            await apiFetch(`/v1/customer/payment-methods/${id}`, { method: "DELETE" });
+            toast.success("Card removed successfully");
+            setSavedCards(cards => cards.filter(card => card.id !== id));
+            setLoadVersion(version => version + 1);
+        } catch { toast.error("Failed to remove card. Please try again."); }
+        finally { setRemovingCard(null); }
     };
 
     const handleLogout = async () => {
+        if (loggingOut) return;
+        setLoggingOut(true);
         try {
             await apiFetch("/v1/customer/logout", { method: "POST" });
-        } catch { }
+        } catch (error) {
+            if (!(error instanceof ApiError && error.status === 401)) {
+                toast.error("Could not log out. Please try again.");
+                setLoggingOut(false);
+                return;
+            }
+        }
+        leavingAfterLogout.current = true;
         logoutCustomer();
         window.location.href = "/";
     };
@@ -444,9 +442,10 @@ function AccountIsland() {
                         ))}
                         <button
                             onClick={handleLogout}
+                            disabled={loggingOut}
                             className="flex items-center gap-3 p-3 text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors mt-4 border-t border-[#cad4e4]"
                         >
-                            <LogOut className="w-5 h-5" /> Logout
+                            <LogOut className="w-5 h-5" /> {loggingOut ? 'Logging out…' : 'Logout'}
                         </button>
                     </div>
                 </div>
@@ -460,6 +459,11 @@ function AccountIsland() {
                             <h2 className="font-sans text-[28px] font-semibold text-primary mb-6">Order History</h2>
                             {loadingOrders ? (
                                 <p className="text-[#6e7a92]">Loading orders...</p>
+                            ) : loadErrors.orders ? (
+                                <div role="alert" className="border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                                    <p>{loadErrors.orders}</p>
+                                    <button type="button" onClick={() => setLoadVersion(version => version + 1)} className="mt-2 underline">Retry orders</button>
+                                </div>
                             ) : orders.length === 0 ? (
                                 <div className="text-center py-10 bg-[#f4f7f9] border border-[#cad4e4]">
                                     <Package className="w-12 h-12 mx-auto text-[#8f9bb2] mb-4" />
@@ -693,6 +697,11 @@ function AccountIsland() {
                             </div>
                             {loadingQuotes ? (
                                 <p className="text-[#6e7a92]">Loading quotes...</p>
+                            ) : loadErrors.quotes ? (
+                                <div role="alert" className="border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                                    <p>{loadErrors.quotes}</p>
+                                    <button type="button" onClick={() => setLoadVersion(version => version + 1)} className="mt-2 underline">Retry quotes</button>
+                                </div>
                             ) : quotes.length === 0 ? (
                                 <div className="text-center py-10 bg-[#f4f7f9] border border-[#cad4e4]">
                                     <MessageSquare className="w-12 h-12 mx-auto text-[#8f9bb2] mb-4" />
@@ -764,25 +773,6 @@ function AccountIsland() {
                                             <input type="text" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full h-12 border border-[#cad4e4] bg-[#f4f7f9] px-4 text-[14px] outline-none focus:border-orange" />
                                         </div>
                                     </div>
-                                </div>
-
-                                <div className="border-t border-[#cad4e4] pt-6">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <input type="checkbox" id="isBusinessProfile" checked={form.is_business} onChange={(e) => setForm({ ...form, is_business: e.target.checked })} className="w-4 h-4 accent-orange cursor-pointer" />
-                                        <label htmlFor="isBusinessProfile" className="text-[13px] font-semibold text-primary cursor-pointer">I am a business</label>
-                                    </div>
-                                    {form.is_business && (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                            <div>
-                                                <label className="block text-[13px] font-semibold text-primary mb-2">Company Name</label>
-                                                <input type="text" value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })} className="w-full h-12 border border-[#cad4e4] bg-[#f4f7f9] px-4 text-[14px] outline-none focus:border-orange" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[13px] font-semibold text-primary mb-2">Company VAT Number</label>
-                                                <input type="text" value={form.company_vat_number} onChange={(e) => setForm({ ...form, company_vat_number: e.target.value })} className="w-full h-12 border border-[#cad4e4] bg-[#f4f7f9] px-4 text-[14px] outline-none focus:border-orange" />
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
 
                                 <button type="submit" disabled={savingProfile} className="px-8 h-12 bg-orange text-white text-[14px] font-semibold hover:bg-orange-hover transition-colors disabled:opacity-50">
@@ -865,6 +855,11 @@ function AccountIsland() {
 
                             {loadingCards ? (
                                 <div className="text-[#6e7a92] text-sm">Loading cards...</div>
+                            ) : loadErrors['payment-methods'] ? (
+                                <div role="alert" className="border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                                    <p>{loadErrors['payment-methods']}</p>
+                                    <button type="button" onClick={() => setLoadVersion(version => version + 1)} className="mt-2 underline">Retry saved cards</button>
+                                </div>
                             ) : savedCards.length === 0 ? (
                                 <div className="border border-[#cad4e4] bg-[#f0f3f7] p-8 text-center">
                                     <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mx-auto mb-4 border border-[#cad4e4]">
@@ -894,6 +889,8 @@ function AccountIsland() {
                                             </div>
                                             <button
                                                 onClick={() => deleteCard(card.id)}
+                                                disabled={removingCard !== null}
+                                                aria-label={removingCard === card.id ? 'Removing card' : 'Remove card'}
                                                 className="text-[#6e7a92] hover:text-red-500 transition-colors bg-[#f0f3f7] hover:bg-red-50 p-2 rounded"
                                                 title="Remove card"
                                             >

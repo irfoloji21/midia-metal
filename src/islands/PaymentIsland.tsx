@@ -15,13 +15,15 @@ import { CreditCard, Building2, Lock, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useStore } from "@nanostores/react";
-import { $cart, $subtotal, $coupon, $isBusiness, clearCart, setIsBusiness } from "@/stores/cart";
+import { $cart, $subtotal, $coupon, $couponState, clearCart } from "@/stores/cart";
 import { $customer, $isAuthLoading, $authError } from "@/stores/auth";
 import CustomerSessionError from "@/components/CustomerSessionError";
 import { formatMoneyValue, parseMoneyValue } from "@/lib/pricing";
 import { getCheckoutErrors, normalizeCheckoutForm } from "@/lib/checkout-validation";
 import { useCartAvailability } from '@/hooks/use-cart-availability';
 import CartAvailabilityNotice from '@/components/CartAvailabilityNotice';
+import { useCartCoupon } from '@/hooks/use-cart-coupon';
+import CartCouponNotice from '@/components/CartCouponNotice';
 
 // Stripe
 import { loadStripe } from "@stripe/stripe-js";
@@ -39,6 +41,7 @@ interface PaymentSetup {
   client_secret: string;
   payment_intent_id: string;
   payment_token: string;
+  amount: number;
 }
 interface CheckoutSession {
   key: string;
@@ -212,8 +215,26 @@ function StripeCardForm({ totalFormatted, saveCard, setSaveCard, showSaveCheckbo
 }
 
 // ─── Main PaymentIsland ─────────────────────────────────────────────────────────
+function readCheckoutSession(): CheckoutSession | null {
+  const session = JSON.parse(sessionStorage.getItem("stripeCheckout") || "null") as CheckoutSession | null;
+  if (!session) return null;
+
+  // Preserve existing payment attempts when only the retired company fields differ.
+  // The remaining basket, customer, address and total must still match sessionKey.
+  const [payload, ...context] = JSON.parse(session.key);
+  const currentPayload = Object.fromEntries(Object.entries(payload)
+    .filter(([key]) => !['is_business', 'company_name', 'company_vat_number'].includes(key)));
+  const key = JSON.stringify([currentPayload, ...context]);
+  if (key !== session.key) {
+    session.key = key;
+    sessionStorage.setItem("stripeCheckout", JSON.stringify(session));
+  }
+  return session;
+}
+
 function PaymentIsland() {
   const availability = useCartAvailability();
+  const couponState = useCartCoupon();
   // Read checkout form from sessionStorage (replaces React Router location.state)
   const [checkoutForm, setCheckoutForm] = useState<any>(null);
 
@@ -226,10 +247,10 @@ function PaymentIsland() {
     if (stored) {
       try {
         const parsed = normalizeCheckoutForm(JSON.parse(stored));
-        if (typeof parsed.isBusiness === 'boolean') setIsBusiness(parsed.isBusiness);
-        if (Object.keys(getCheckoutErrors(parsed, $isBusiness.get())).length) throw new Error('Invalid checkout details');
+        if (Object.keys(getCheckoutErrors(parsed)).length) throw new Error('Invalid checkout details');
+        sessionStorage.setItem("checkoutForm", JSON.stringify(parsed));
         setCheckoutForm(parsed);
-        const previous = JSON.parse(sessionStorage.getItem("stripeCheckout") || "null") as CheckoutSession | null;
+        const previous = readCheckoutSession();
         if (previous) {
           const [payload] = JSON.parse(previous.key);
           setMethod(payload.payment_method === "bank_transfer" ? "bank" : "card");
@@ -248,7 +269,6 @@ function PaymentIsland() {
   const cart = useStore($cart);
   const subtotalRaw = useStore($subtotal);
   const coupon = useStore($coupon);
-  const isBusiness = useStore($isBusiness);
   const customer = useStore($customer);
 
   const [method, setMethod] = useState<"card" | "bank">("card");
@@ -267,7 +287,7 @@ function PaymentIsland() {
   const selectedShippingOption = checkoutForm?.selectedShippingOption ?? null;
   const shippingOptionToken = checkoutForm?.shippingOptionToken ?? "";
   const shippingForOrder = fulfilmentMethod === "click_collect" ? 0 : Number(selectedShippingOption?.rate ?? 0);
-  const discountAmount = coupon?.discount ?? 0;
+  const discountAmount = couponState.discount;
   const totalForOrder = cart.length > 0 ? Math.max(0, subtotalRaw + shippingForOrder - discountAmount) : 0;
   const totalFormatted = `£${totalForOrder.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -323,21 +343,25 @@ function PaymentIsland() {
       coupon_code: coupon?.code ?? null,
       fulfilment_method: fulfilmentMethod,
       shipping_option_token: shippingOptionToken || null,
-      is_business: isBusiness,
-      company_name: checkoutForm.company,
-      company_vat_number: checkoutForm.companyVat,
       save_card: method === "card" && !!customer && saveCard,
       items: cart.map(item => ({ product_id: Number(item.product_id), quantity: item.qty, selected_variants: item.selected_variants ?? null })),
       payment_method: method === "card" ? "card" : "bank_transfer",
     };
-  }, [checkoutForm, coupon?.code, fulfilmentMethod, shippingOptionToken, isBusiness, cart, method, customer?.id, saveCard]);
-  const sessionKey = JSON.stringify([orderPayload, customer?.id ?? null]);
+  }, [checkoutForm, coupon?.code, fulfilmentMethod, shippingOptionToken, cart, method, customer?.id, saveCard]);
+  const sessionKey = JSON.stringify([orderPayload, customer?.id ?? null, totalForOrder]);
 
   const getPaymentSetup = async (): Promise<PaymentSetup> => {
     if (!orderPayload) throw new Error("Missing checkout details.");
+    const assertCurrentTotal = () => {
+      const currentItems = $cart.get().map(item => ({ product_id: Number(item.product_id), quantity: item.qty, selected_variants: item.selected_variants ?? null }));
+      if ($couponState.get().blocked || JSON.stringify(currentItems) !== JSON.stringify(orderPayload.items) || $subtotal.get() !== subtotalRaw || $coupon.get()?.code !== coupon?.code || $couponState.get().discount !== discountAmount) {
+        throw new Error('Your basket or coupon has changed. Please review the updated total before paying.');
+      }
+    };
+    assertCurrentTotal();
     let session = paymentSession.current;
     if (!session || session.key !== sessionKey) {
-      try { session = JSON.parse(sessionStorage.getItem("stripeCheckout") || "null"); } catch { session = null; }
+      try { session = readCheckoutSession(); } catch { session = null; }
       if (!session || session.key !== sessionKey) session = { key: sessionKey, attempt: crypto.randomUUID() };
       paymentSession.current = session;
     }
@@ -349,20 +373,24 @@ function PaymentIsland() {
       });
       if (paymentSession.current === session) sessionStorage.setItem("stripeCheckout", JSON.stringify(session));
     }
+    assertCurrentTotal();
+    if (!Number.isFinite(session.setup.amount) || Math.round(session.setup.amount * 100) !== Math.round(totalForOrder * 100)) {
+      throw new Error('Your order total has changed. Please return to your basket and review it before paying.');
+    }
     return session.setup;
   };
 
   useEffect(() => {
     if (!authReady || !orderPayload) return undefined;
     try {
-      const saved = JSON.parse(sessionStorage.getItem("stripeCheckout") || "null") as CheckoutSession | null;
+      const saved = readCheckoutSession();
       if (saved?.key === sessionKey && saved.confirmed && saved.setup) {
         paymentSession.current = saved;
         setConfirmedPayment(saved.setup.payment_intent_id);
         return undefined;
       }
     } catch { /* An incomplete stored session is replaced on the next attempt. */ }
-    if (availability.blocked) { setClientSecret(null); return undefined; }
+    if (availability.blocked || couponState.blocked) { setClientSecret(null); return undefined; }
     setConfirmedPayment(null);
     if (method !== "card" || totalForOrder <= 0 || (fulfilmentMethod === "delivery" && !shippingOptionToken)) {
       setClientSecret(null); return undefined;
@@ -389,7 +417,7 @@ function PaymentIsland() {
       }
     }).finally(() => { if (!cancelled) setLoadingIntent(false); });
     return () => { cancelled = true; };
-  }, [sessionKey, authReady, availability.blocked]);
+  }, [sessionKey, authReady, availability.blocked, couponState.blocked]);
 
   const createOrder = async (paymentIntentId: string) => {
     const session = paymentSession.current;
@@ -419,6 +447,7 @@ function PaymentIsland() {
 
   const handleNonCardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (availability.blocked || $couponState.get().blocked) return;
     setIsSubmitting(true);
     try {
       const setup = await getPaymentSetup();
@@ -502,8 +531,9 @@ function PaymentIsland() {
             )}
             {/* Card: Stripe Elements */}
             {!confirmedPayment && <CartAvailabilityNotice state={availability} />}
+            {!confirmedPayment && <CartCouponNotice state={couponState} />}
             {paymentError && <p role="alert" className="mb-4 text-sm text-red-700">{paymentError}</p>}
-            {method === "card" && !confirmedPayment && !availability.blocked && (
+            {method === "card" && !confirmedPayment && !availability.blocked && !couponState.blocked && (
               <div className="border border-[#cad4e4] bg-[#f0f3f7] p-6 md:p-8">
                 <h3 className="font-sans text-[24px] md:text-[30px] leading-none font-semibold text-primary mb-6 flex items-center gap-3">
                   <Lock className="w-5 h-5 text-orange" /> Card Details
@@ -589,7 +619,7 @@ function PaymentIsland() {
               </div>
             )}
 
-            {method === "bank" && !confirmedPayment && !availability.blocked && (
+            {method === "bank" && !confirmedPayment && !availability.blocked && !couponState.blocked && (
               <form onSubmit={handleNonCardSubmit}>
                 <div className="border border-[#cad4e4] bg-[#f0f3f7] p-6 mb-6">
                   <h3 className="font-semibold text-primary mb-3">Bank Transfer via Stripe</h3>
@@ -651,12 +681,12 @@ function PaymentIsland() {
               {coupon && (
                 <div className="grid grid-cols-[42%_58%] border-b border-[#cad4e4]">
                   <span className="font-semibold text-sm md:text-lg text-green-700 bg-[#f4f5f7] p-4 md:p-6">Discount ({coupon.code})</span>
-                  <span className="text-sm md:text-base text-green-700 p-4 md:p-6">−£{coupon.discount.toFixed(2)}</span>
+                  <span className="text-sm md:text-base text-green-700 p-4 md:p-6">{couponState.blocked ? 'Awaiting coupon check' : `−£${discountAmount.toFixed(2)}`}</span>
                 </div>
               )}
               <div className="grid grid-cols-[42%_58%]">
                 <span className="font-semibold text-sm md:text-lg text-primary bg-[#f4f5f7] p-4 md:p-6">Total</span>
-                <span className="font-semibold text-base md:text-2xl text-primary p-4 md:p-6">{totalFormatted}</span>
+                <span className="font-semibold text-base md:text-2xl text-primary p-4 md:p-6">{couponState.blocked ? 'Awaiting coupon check' : totalFormatted}</span>
               </div>
             </div>
 

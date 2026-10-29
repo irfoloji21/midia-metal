@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ProductDetailIsland from './ProductDetailIsland';
 import CustomerSessionIsland from './CustomerSessionIsland';
 import { $customer, $isAuthLoading, logoutCustomer, type Customer } from '@/stores/auth';
+import { $cart, addToCart } from '@/stores/cart';
+import { toast } from 'sonner';
 
 const customer = { id: 2, name: 'Test Customer', email: 'test@example.com' } as Customer;
 const product = { id: 58, slug: 'baffle-filters-zm0Y', name: 'Stainless Steel Baffle Filters', price: '£1.00', description: 'Product description', image: '/filter.jpg', gallery: [], reviews: [], variants: [] };
@@ -13,6 +15,7 @@ let submitReply: () => Promise<Response>;
 let fetchMock: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
+  $cart.set([]);
   logoutCustomer();
   $isAuthLoading.set(true);
   sessionReply = async () => reply(customer);
@@ -29,7 +32,20 @@ beforeEach(() => {
   });
   vi.stubGlobal('fetch', fetchMock);
 });
-afterEach(() => { cleanup(); logoutCustomer(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); logoutCustomer(); $cart.set([]); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+
+it.each(['Add to basket', 'Buy now'])('does not announce a purchase when %s cannot add any more stock', async action => {
+  const fixture = { ...product, track_stock: true, stock_quantity: 2 };
+  fetchMock.mockImplementation(async (url: string) => reply(url.endsWith('/related') ? [] : fixture));
+  addToCart(fixture, 2);
+  const success = vi.spyOn(toast, 'success');
+  render(<ProductDetailIsland id={fixture.slug} initialProduct={fixture} />);
+  const button = await screen.findByRole('button', { name: action });
+  fireEvent.click(button);
+  await act(async () => {});
+  expect($cart.get()[0].qty).toBe(2);
+  expect(success).not.toHaveBeenCalled();
+});
 
 async function showReviews() {
   await screen.findByRole('button', { name: 'Reviews (0)' });
@@ -38,6 +54,16 @@ async function showReviews() {
 function renderPage() {
   return render(<><CustomerSessionIsland /><ProductDetailIsland id={product.slug} initialProduct={product} /></>);
 }
+
+it.each([undefined, true, false])('respects the per-product PDF visibility setting (%s)', async enabled => {
+  const fixture = { ...product, pdf_download_enabled: enabled };
+  fetchMock.mockImplementation(async (url: string) => reply(url.endsWith('/related') ? [] : fixture));
+  render(<ProductDetailIsland id={product.slug} initialProduct={fixture} />);
+  await screen.findByRole('button', { name: 'Reviews (0)' });
+  const button = screen.queryByRole('button', { name: 'Download product information (PDF)' });
+  if (enabled === false) expect(button).not.toBeInTheDocument();
+  else expect(button).toBeInTheDocument();
+});
 
 it('keeps selected combination specifications when a static label collides', async () => {
   const fixture = {

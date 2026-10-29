@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\SaveProductRequest;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Support\HtmlSanitizer;
+use App\Support\ProductDescription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -68,6 +69,7 @@ class ProductController extends Controller
         );
         $validated['variant_table_columns'] = $this->normalizeVariantTableColumns($validated['variant_table_columns'] ?? null);
 
+        $validated['description'] = ProductDescription::optimize($validated['description']);
         $product = Product::create($validated);
 
         return response()->json($product->load('category'), 201);
@@ -116,6 +118,7 @@ class ProductController extends Controller
         );
         $validated['variant_table_columns'] = $this->normalizeVariantTableColumns($validated['variant_table_columns'] ?? null);
 
+        $validated['description'] = ProductDescription::optimize($validated['description']);
         $product->update($validated);
 
         return response()->json($product->load('category'));

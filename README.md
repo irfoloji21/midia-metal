@@ -18,7 +18,7 @@ Commercial kitchen equipment, ventilation systems, and stainless steel products 
 
 - **Node.js** >= 18 (tested with v22)
 - **npm** >= 9
-- **PHP** >= 8.2 with extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `bcmath`
+- **PHP** >= 8.2 with extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `bcmath`, `gd` (including WebP support for product PDFs)
 - **Composer** >= 2
 - **MySQL** >= 8.0
 
@@ -148,6 +148,14 @@ npx playwright test
 
 ## Architecture
 
+### Product PDF downloads
+
+Products default to `pdf_download_enabled: true`, including existing products after migration. Admins can disable the option below the description editor. `GET /api/v1/products/{id-or-slug}/pdf` creates a fresh PDF from the current active product, gallery, rich description, specifications and visible option details. Disabled or inactive products return 404; responses are downloads with `no-store` caching and a 10-per-minute rate limit.
+
+Run `composer install` and `php artisan migrate` when deploying this change. Enable PHP GD with JPEG/PNG/WebP support and keep `storage/framework` writable for the PDF renderer. The PDF embeds the product's main image, gallery, and description images. Bundled images are read from backend and frontend `public/images` directories; `PRODUCT_PDF_FRONTEND_IMAGES_PATH` can override the frontend images directory. Separate deployments fall back to the configured HTTPS `FRONTEND_URL` for missing bundled images. If externally hosted images are used, add their trusted HTTPS hostnames to `PRODUCT_PDF_REMOTE_IMAGE_HOSTS` (comma-separated); other remote resources are not fetched. Unavailable description images retain their descriptive text. The DD7 migration removes its old static PDF links without replacing the rest of its edited description.
+
+The first page includes a locally generated QR code linking to the current product. Each download sends the browser's current origin, including its port, in `X-Site-Origin`; the backend accepts configured CORS/site origins and falls back to `FRONTEND_URL` for direct downloads. The QR and description links use that origin, so API proxy addresses are not printed. Keep `FRONTEND_URL` and allowed CORS origins aligned with deployed site domains. A QR generated on localhost points to localhost; downloads from the live domain point to that domain.
+
 ### Astro + React Islands
 
 The site uses Astro's **static output mode** with **React islands** for interactivity:
@@ -246,6 +254,21 @@ React SPA at `/admin/*` with React Router navigation. Uses cookie-based auth (Sa
 Routes: dashboard, products, orders, customers, blog, services, portfolio, categories, coupons, quotes, reviews, FAQ, messages, settings.
 
 ## Troubleshooting
+
+### Existing Word product descriptions
+
+New product saves extract embedded raster images into public `product-content/` files without recompressing them. Word headings retain their appearance under the page title, and image layout tables stack on phones.
+
+For existing records, run from `backend/`:
+
+```bash
+php artisan products:optimize-descriptions --id=81          # preview only
+php artisan products:optimize-descriptions --id=81 --write  # back up and update this record
+```
+
+Omit `--id` to process all matching descriptions. Original descriptions and timestamps are saved in private `storage/app/private/description-backups/` JSON files before each database change. The command preserves product prices, stock, other fields and timestamps, skips concurrent edits, and does not trigger publishing hooks. Keep these backups for rollback; restore only the matching record's description after checking that it has not subsequently been edited. Ensure the public storage link and backend `APP_URL` are configured before running.
+
+The sitemap index includes `/sitemap-content.xml`, which reads current active products, categories, services, projects and posts from the API. Cart, account and checkout pages are excluded.
 
 ### Vite cache issues (blank pages, 504 errors)
 ```bash
