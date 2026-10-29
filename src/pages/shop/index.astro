@@ -91,7 +91,7 @@ filteredProducts = filteredProducts.filter((product: any) => {
 });
 
 filteredProducts = filteredProducts.slice().sort((a: any, b: any) => {
-  if (sortBy === 'price-low' || sortBy === 'price-high') {
+  if (priceFilter.active || sortBy === 'price-low' || sortBy === 'price-high') {
     const requestOrder = Number(Boolean(a.price_on_request)) - Number(Boolean(b.price_on_request));
     if (requestOrder) return requestOrder;
     if (a.price_on_request && b.price_on_request) return 0;

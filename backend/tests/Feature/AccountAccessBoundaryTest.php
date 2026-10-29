@@ -9,6 +9,7 @@ use App\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class AccountAccessBoundaryTest extends TestCase
@@ -110,6 +111,65 @@ class AccountAccessBoundaryTest extends TestCase
         $admin = AdminUser::factory()->create();
         $this->postJson('/api/admin/login', ['email' => $admin->email, 'password' => ['invalid']])
             ->assertUnprocessable()->assertJsonValidationErrors('password');
+    }
+
+    #[DataProvider('invalidAdminLoginCredentials')]
+    public function test_admin_login_rejects_invalid_credentials_without_replacing_sessions(
+        array $credentials,
+        array $expectedErrors,
+        bool $withExistingSession,
+    ): void {
+        $admin = AdminUser::factory()->create([
+            'email' => 'admin-login-fixture@example.test',
+            'password' => 'AuditFixturePassword123!',
+        ]);
+        $existingSession = $admin->createToken('existing-admin-session', ['admin'], now()->addHour());
+        $existingToken = $existingSession->accessToken;
+
+        if ($withExistingSession) {
+            $this->withCredentials()->withUnencryptedCookie('admin_token', $existingSession->plainTextToken);
+            $this->getJson('/api/admin/me')->assertOk()->assertJsonPath('id', $admin->id);
+            $this->app['auth']->forgetGuards();
+        }
+
+        $this->postJson('/api/admin/login', $credentials)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors($expectedErrors)
+            ->assertJsonMissingPath('user')
+            ->assertJsonMissingPath('token')
+            ->assertCookieMissing('admin_token');
+
+        $this->assertDatabaseCount('personal_access_tokens', 1);
+        $this->assertDatabaseHas('personal_access_tokens', [
+            'id' => $existingToken->id,
+            'tokenable_id' => $admin->id,
+            'token' => $existingToken->token,
+        ]);
+
+        $this->app['auth']->forgetGuards();
+        if ($withExistingSession) {
+            $this->getJson('/api/admin/me')->assertOk()->assertJsonPath('id', $admin->id);
+        } else {
+            $this->getJson('/api/admin/me')->assertUnauthorized();
+        }
+    }
+
+    public static function invalidAdminLoginCredentials(): array
+    {
+        $cases = [
+            'missing fields' => [[], ['email', 'password']],
+            'empty email' => [['email' => '', 'password' => 'AuditFixturePassword123!'], ['email']],
+            'empty password' => [['email' => 'admin-login-fixture@example.test', 'password' => ''], ['password']],
+            'wrong password' => [['email' => 'admin-login-fixture@example.test', 'password' => 'WrongFixturePassword123!'], ['email']],
+            'unknown email' => [['email' => 'missing-admin@example.test', 'password' => 'AuditFixturePassword123!'], ['email']],
+        ];
+        $datasets = [];
+        foreach ($cases as $name => [$credentials, $expectedErrors]) {
+            $datasets[$name.' without session'] = [$credentials, $expectedErrors, false];
+            $datasets[$name.' with valid admin cookie'] = [$credentials, $expectedErrors, true];
+        }
+
+        return $datasets;
     }
 
     public function test_failed_password_reset_preserves_existing_sessions(): void

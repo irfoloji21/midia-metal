@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { loginCustomer } from "@/stores/auth";
 import { apiFetch } from "@/lib/api";
@@ -13,13 +13,20 @@ export default function RegisterIsland() {
         phone: "",
     });
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<{ message: string } | null>(null);
+    const errorRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (error) errorRef.current?.focus();
+    }, [error]);
 
     const update = (field: string, value: string) => setForm({ ...form, [field]: value });
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError(null);
         if (form.password !== form.password_confirmation) {
-            toast.error("Passwords do not match");
+            setError({ message: "Passwords do not match" });
             return;
         }
         setLoading(true);
@@ -33,7 +40,7 @@ export default function RegisterIsland() {
             toast.success("Account created successfully!");
             window.location.href = "/account";
         } catch (err: unknown) {
-            toast.error(err instanceof Error ? err.message : "Registration failed");
+            setError({ message: err instanceof Error ? err.message : "Registration failed" });
         } finally {
             setLoading(false);
         }
@@ -45,6 +52,11 @@ export default function RegisterIsland() {
                 <div className="max-w-md mx-auto bg-white p-8 border border-[#cad4e4]">
                     <h2 className="font-sans text-[32px] md:text-[42px] leading-none font-semibold text-primary mb-7">Create Account</h2>
                     <form onSubmit={handleRegister} className="space-y-5">
+                        {error && (
+                            <div ref={errorRef} role="alert" tabIndex={-1} className="border border-red-300 bg-red-50 p-4 text-sm text-red-800 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-red-600">
+                                {error.message}
+                            </div>
+                        )}
                         <div>
                             <label htmlFor="register-name" className="block text-[13px] font-semibold text-primary mb-2">Full Name *</label>
                             <input

@@ -15,7 +15,7 @@ describe('shop price filters', () => {
     expect(matchesShopPrice(49.99, false, filter)).toBe(false);
     expect(matchesShopPrice(50, false, filter)).toBe(true);
     expect(matchesShopPrice(12345, false, filter)).toBe(true);
-    expect(matchesShopPrice(0, true, filter)).toBe(false);
+    expect(matchesShopPrice(0, true, filter)).toBe(true);
   });
 
   it('applies an explicit maximum and includes the boundary', () => {
@@ -23,7 +23,7 @@ describe('shop price filters', () => {
     expect(filter).toEqual({ error: '', min: 0, max: 100, active: true, label: 'Price: Up to £100' });
     expect(matchesShopPrice(100, false, filter)).toBe(true);
     expect(matchesShopPrice(100.01, false, filter)).toBe(false);
-    expect(matchesShopPrice(0, true, filter)).toBe(false);
+    expect(matchesShopPrice(0, true, filter)).toBe(true);
   });
 
   it('treats an explicit zero maximum as a real upper bound', () => {
@@ -31,7 +31,7 @@ describe('shop price filters', () => {
     expect(filter).toEqual({ error: '', min: 0, max: 0, active: true, label: 'Price: Up to £0' });
     expect(matchesShopPrice(0, false, filter)).toBe(true);
     expect(matchesShopPrice(0.01, false, filter)).toBe(false);
-    expect(matchesShopPrice(0, true, filter)).toBe(false);
+    expect(matchesShopPrice(0, true, filter)).toBe(true);
   });
 
   it('uses both bounds for a custom decimal range', () => {
@@ -41,6 +41,7 @@ describe('shop price filters', () => {
     expect(matchesShopPrice(50.5, false, filter)).toBe(true);
     expect(matchesShopPrice(100.75, false, filter)).toBe(true);
     expect(matchesShopPrice(100.76, false, filter)).toBe(false);
+    expect(matchesShopPrice(0, true, filter)).toBe(true);
   });
 
   it.each([['-1', ''], ['', '-1'], ['100', '50'], ['abc', ''], ['', 'Infinity'], ['NaN', '100']])(

@@ -26,6 +26,6 @@ export function resolveShopPriceFilter(minimum: string, maximum: string): ShopPr
 
 export function matchesShopPrice(price: number, priceOnRequest: boolean, filter: ShopPriceFilter): boolean {
   if (filter.error) return true;
-  if (priceOnRequest) return !filter.active;
+  if (priceOnRequest) return true;
   return price >= filter.min && price <= filter.max;
 }

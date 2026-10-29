@@ -57,26 +57,40 @@ describe('customer registration interaction', () => {
         render(<RegisterIsland />);
         fillForm('Different-test-password!');
         fireEvent.click(screen.getByRole('button', { name: 'Register' }));
-        expect(toast.error).toHaveBeenCalledWith('Passwords do not match');
+        expect(screen.getByRole('alert')).toHaveTextContent('Passwords do not match');
+        expect(screen.getByRole('alert')).toHaveFocus();
+        screen.getByRole('button', { name: 'Register' }).focus();
+        fireEvent.click(screen.getByRole('button', { name: 'Register' }));
+        expect(screen.getByRole('alert')).toHaveFocus();
         expect(apiFetch).not.toHaveBeenCalled();
         fireEvent.change(screen.getByLabelText('Confirm *'), { target: { value: registration.password } });
         fireEvent.click(screen.getByRole('button', { name: 'Register' }));
-        await waitFor(() => expect(toast.error).toHaveBeenCalledWith('The email has already been taken.'));
+        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('The email has already been taken.'));
+        expect(screen.getByRole('alert')).toBeVisible();
+        expect(screen.getByRole('alert')).toHaveFocus();
+        expect(screen.getByLabelText('Email address *')).toHaveValue(registration.email);
+        expect(toast.error).not.toHaveBeenCalled();
         expect(screen.getByRole('button', { name: 'Register' })).toBeEnabled();
         expect(loginCustomer).not.toHaveBeenCalled();
         expect(window.location.href).toBe('/register');
     });
 
-    it('keeps entered values and allows retry after a server failure', async () => {
-        vi.mocked(apiFetch).mockRejectedValueOnce(new Error('Bad gateway'))
-            .mockResolvedValueOnce({ customer: { id: 322, name: registration.name, email: registration.email } });
+    it.each(['Bad gateway', 'Failed to fetch'])('keeps entered values and allows retry after %s', async message => {
+        let completeRetry!: (value: unknown) => void;
+        vi.mocked(apiFetch).mockRejectedValueOnce(new Error(message))
+            .mockImplementationOnce(() => new Promise(resolve => { completeRetry = resolve; }));
         render(<RegisterIsland />);
         fillForm();
         fireEvent.click(screen.getByRole('button', { name: 'Register' }));
-        await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Bad gateway'));
+        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
+        expect(screen.getByRole('alert')).toBeVisible();
+        expect(screen.getByRole('alert')).toHaveFocus();
         expect(screen.getByLabelText('Email address *')).toHaveValue(registration.email);
         expect(screen.getByLabelText('Password *')).toHaveValue(registration.password);
         fireEvent.click(screen.getByRole('button', { name: 'Register' }));
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Registering...' })).toBeDisabled();
+        await act(async () => completeRetry({ customer: { id: 322, name: registration.name, email: registration.email } }));
         await waitFor(() => expect(window.location.href).toBe('/account'));
         expect(apiFetch).toHaveBeenCalledTimes(2);
     });
