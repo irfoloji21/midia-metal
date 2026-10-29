@@ -356,6 +356,10 @@ class ProductController extends Controller
             }
         }
 
+        if (in_array($columns['dimension_unit'] ?? null, ['mm', 'cm', 'm'], true)) {
+            $normalized['dimension_unit'] = $columns['dimension_unit'];
+        }
+
         return $normalized;
     }
 

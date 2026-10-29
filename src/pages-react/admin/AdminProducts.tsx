@@ -7,6 +7,8 @@ import ImageUpload from "@/components/admin/ImageUpload";
 import ProductImage from "@/components/ProductImage";
 import SectionTemplateEditor from "@/components/admin/SectionTemplateEditor";
 import VariantColumnManager from "@/components/admin/VariantColumnManager";
+import DimensionInput from "@/components/admin/DimensionInput";
+import { DIMENSION_UNITS, DIMENSION_FIELD_LABELS, getDimensionUnit, dimensionColumnLabel } from "@/lib/dimensions";
 import { SortableTableHeader, sortRows, useTableSort } from "@/components/admin/SortableTableHeader";
 import {
     getSelectionTableSourceValues,
@@ -1042,6 +1044,7 @@ export default function AdminProducts() {
     const variantTableColumns = currentProduct
         ? normalizeVariantTableColumns(currentProduct.variant_table_columns)
         : cloneVariantTableColumns(DEFAULT_VARIANT_TABLE_COLUMNS);
+    const dimensionUnit = getDimensionUnit(variantTableColumns.dimension_unit);
     const combinationOptionNames = normalizeVariantOptionList(currentProduct?.variant_options);
     const selectionTableSourceKeys = [
         ...combinationOptionNames,
@@ -1156,39 +1159,15 @@ export default function AdminProducts() {
                     />
                 );
             case "shipping_length_cm":
-                return (
-                    <input
-                        type="number"
-                        min={1}
-                        step="0.01"
-                        value={variant.shipping_length_cm ?? ""}
-                        onChange={(event) => updateSizeVariantField(index, "shipping_length_cm", normalizeShippingNumber(event.target.value))}
-                        className={`w-16 ${baseInputClass}`}
-                        placeholder="base"
-                    />
-                );
             case "shipping_width_cm":
-                return (
-                    <input
-                        type="number"
-                        min={1}
-                        step="0.01"
-                        value={variant.shipping_width_cm ?? ""}
-                        onChange={(event) => updateSizeVariantField(index, "shipping_width_cm", normalizeShippingNumber(event.target.value))}
-                        className={`w-16 ${baseInputClass}`}
-                        placeholder="base"
-                    />
-                );
             case "shipping_height_cm":
                 return (
-                    <input
-                        type="number"
-                        min={1}
-                        step="0.01"
-                        value={variant.shipping_height_cm ?? ""}
-                        onChange={(event) => updateSizeVariantField(index, "shipping_height_cm", normalizeShippingNumber(event.target.value))}
-                        className={`w-16 ${baseInputClass}`}
-                        placeholder="base"
+                    <DimensionInput
+                        valueCm={variant[columnKey]}
+                        unit={dimensionUnit}
+                        label={DIMENSION_FIELD_LABELS[columnKey]}
+                        onChangeCm={(value) => updateSizeVariantField(index, columnKey, value)}
+                        className={`w-20 ${baseInputClass}`}
                     />
                 );
             case "shipping_class":
@@ -1282,39 +1261,15 @@ export default function AdminProducts() {
                     />
                 );
             case "shipping_length_cm":
-                return (
-                    <input
-                        type="number"
-                        min={1}
-                        step="0.01"
-                        value={newSizeVariant.shipping_length_cm}
-                        onChange={(event) => setNewSizeVariant((prev) => ({ ...prev, shipping_length_cm: event.target.value }))}
-                        className={`w-16 ${baseInputClass}`}
-                        placeholder="base"
-                    />
-                );
             case "shipping_width_cm":
-                return (
-                    <input
-                        type="number"
-                        min={1}
-                        step="0.01"
-                        value={newSizeVariant.shipping_width_cm}
-                        onChange={(event) => setNewSizeVariant((prev) => ({ ...prev, shipping_width_cm: event.target.value }))}
-                        className={`w-16 ${baseInputClass}`}
-                        placeholder="base"
-                    />
-                );
             case "shipping_height_cm":
                 return (
-                    <input
-                        type="number"
-                        min={1}
-                        step="0.01"
-                        value={newSizeVariant.shipping_height_cm}
-                        onChange={(event) => setNewSizeVariant((prev) => ({ ...prev, shipping_height_cm: event.target.value }))}
-                        className={`w-16 ${baseInputClass}`}
-                        placeholder="base"
+                    <DimensionInput
+                        valueCm={newSizeVariant[columnKey]}
+                        unit={dimensionUnit}
+                        label={DIMENSION_FIELD_LABELS[columnKey]}
+                        onChangeCm={(value) => setNewSizeVariant((prev) => ({ ...prev, [columnKey]: value === null ? "" : String(value) }))}
+                        className={`w-20 ${baseInputClass}`}
                     />
                 );
             case "shipping_class":
@@ -1971,6 +1926,28 @@ export default function AdminProducts() {
                                             <p className="text-xs text-gray-500">
                                                 Choose the simplest structure that matches how the product is sold, then fill in price, stock, and delivery overrides only where they genuinely differ.
                                             </p>
+                                            <div className="mt-4 flex flex-wrap items-center gap-3">
+                                                <label htmlFor="product-dimension-unit" className="text-sm font-medium text-gray-700">Measurement unit</label>
+                                                <select
+                                                    id="product-dimension-unit"
+                                                    value={dimensionUnit}
+                                                    onChange={(event) => {
+                                                        const unit = getDimensionUnit(event.target.value);
+                                                        setCurrentProduct((prev: any) => ({
+                                                            ...prev,
+                                                            variant_table_columns: {
+                                                                ...normalizeVariantTableColumns(prev.variant_table_columns),
+                                                                dimension_unit: unit,
+                                                            },
+                                                        }));
+                                                    }}
+                                                    aria-describedby="product-dimension-unit-help"
+                                                    className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-orange focus:outline-none"
+                                                >
+                                                    {DIMENSION_UNITS.map((unit) => <option key={unit} value={unit}>{unit}</option>)}
+                                                </select>
+                                                <p id="product-dimension-unit-help" className="text-xs text-gray-500">Length, Width and Height for this product. Values convert automatically when you change the unit.</p>
+                                            </div>
                                         </div>
 
                                         <div className="mt-4 px-4">
@@ -2100,9 +2077,9 @@ export default function AdminProducts() {
                                                                                         <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Price</th>
                                                                                         <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Stock</th>
                                                                                         <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Weight (kg)</th>
-                                                                                        <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Length (cm)</th>
-                                                                                        <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Width (cm)</th>
-                                                                                        <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Height (cm)</th>
+                                                                                        <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">{`Length (${dimensionUnit})`}</th>
+                                                                                        <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">{`Width (${dimensionUnit})`}</th>
+                                                                                        <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">{`Height (${dimensionUnit})`}</th>
                                                                                         <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Delivery Type</th>
                                                                                         <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Own Parcel</th>
                                                                                         <th className="px-2 py-2 text-right"></th>
@@ -2126,9 +2103,9 @@ export default function AdminProducts() {
                                                                                             <td className="px-2 py-2"><input type="text" disabled={Boolean(currentProduct?.price_on_request)} value={variant.price ?? ""} onChange={(event) => updateCombinationVariantField(index, "price", event.target.value)} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" placeholder={currentProduct.price || "£0.00"} /></td>
                                                                                             <td className="px-2 py-2"><input type="number" min={0} value={variant.stock ?? ""} onChange={(event) => updateCombinationVariantField(index, "stock", normalizeVariantStock(event.target.value))} className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" /></td>
                                                                                             <td className="px-2 py-2"><input type="number" min={0.01} step="0.001" value={variant.shipping_weight_kg ?? ""} onChange={(event) => updateCombinationVariantField(index, "shipping_weight_kg", normalizeShippingNumber(event.target.value))} className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" placeholder="base" /></td>
-                                                                                            <td className="px-2 py-2"><input type="number" min={1} step="0.01" value={variant.shipping_length_cm ?? ""} onChange={(event) => updateCombinationVariantField(index, "shipping_length_cm", normalizeShippingNumber(event.target.value))} className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" placeholder="base" /></td>
-                                                                                            <td className="px-2 py-2"><input type="number" min={1} step="0.01" value={variant.shipping_width_cm ?? ""} onChange={(event) => updateCombinationVariantField(index, "shipping_width_cm", normalizeShippingNumber(event.target.value))} className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" placeholder="base" /></td>
-                                                                                            <td className="px-2 py-2"><input type="number" min={1} step="0.01" value={variant.shipping_height_cm ?? ""} onChange={(event) => updateCombinationVariantField(index, "shipping_height_cm", normalizeShippingNumber(event.target.value))} className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" placeholder="base" /></td>
+                                                                                            <td className="px-2 py-2"><DimensionInput valueCm={variant.shipping_length_cm} unit={dimensionUnit} label="Length" onChangeCm={(value) => updateCombinationVariantField(index, "shipping_length_cm", value)} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" /></td>
+                                                                                            <td className="px-2 py-2"><DimensionInput valueCm={variant.shipping_width_cm} unit={dimensionUnit} label="Width" onChangeCm={(value) => updateCombinationVariantField(index, "shipping_width_cm", value)} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" /></td>
+                                                                                            <td className="px-2 py-2"><DimensionInput valueCm={variant.shipping_height_cm} unit={dimensionUnit} label="Height" onChangeCm={(value) => updateCombinationVariantField(index, "shipping_height_cm", value)} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" /></td>
                                                                                             <td className="px-2 py-2"><select value={variant.shipping_class ?? ""} onChange={(event) => updateCombinationVariantField(index, "shipping_class", event.target.value)} className="w-24 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none"><option value="">Use base</option>{SHIPPING_CLASS_OPTIONS.map((option) => (<option key={option.value} value={option.value}>{option.label}</option>))}</select></td>
                                                                                             <td className="px-2 py-2"><label className="flex items-center gap-2 text-xs text-gray-600"><input type="checkbox" checked={Boolean(variant.ships_separately)} onChange={(event) => updateCombinationVariantField(index, "ships_separately", event.target.checked)} className="rounded border-gray-300 text-[#eb5c10] focus:ring-[#eb5c10]" /><span>Yes</span></label></td>
                                                                                             <td className="px-2 py-2 text-right"><div className="flex items-center justify-end gap-1"><button type="button" onClick={() => cloneVariantAtIndex(index)} className="inline-flex items-center gap-1 rounded border border-gray-200 px-2 py-1 text-[11px] font-medium text-gray-600 hover:bg-gray-50"><Copy className="w-3.5 h-3.5" />Clone</button><button type="button" onClick={() => removeVariantAtIndex(index)} className="inline-flex items-center gap-1 rounded border border-red-200 px-2 py-1 text-[11px] font-medium text-red-500 hover:bg-red-50"><Trash2 className="w-3.5 h-3.5" />Remove</button></div></td>
@@ -2160,9 +2137,9 @@ export default function AdminProducts() {
                                                                     <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Price</th>
                                                                     <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Stock</th>
                                                                     <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Weight (kg)</th>
-                                                                    <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Length (cm)</th>
-                                                                    <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Width (cm)</th>
-                                                                    <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Height (cm)</th>
+                                                                    <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">{`Length (${dimensionUnit})`}</th>
+                                                                    <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">{`Width (${dimensionUnit})`}</th>
+                                                                    <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">{`Height (${dimensionUnit})`}</th>
                                                                     <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Delivery Type</th>
                                                                     <th className="px-2 py-2 text-left text-[10px] font-bold uppercase text-gray-500">Own Parcel</th>
                                                                     <th className="px-2 py-2 text-right"></th>
@@ -2223,37 +2200,13 @@ export default function AdminProducts() {
                                                                         />
                                                                     </td>
                                                                     <td className="px-2 py-2">
-                                                                        <input
-                                                                            type="number"
-                                                                            min={1}
-                                                                            step="0.01"
-                                                                            value={newCombinationVariant.shipping_length_cm}
-                                                                            onChange={(event) => setNewCombinationVariant((prev) => ({ ...prev, shipping_length_cm: event.target.value }))}
-                                                                            className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none"
-                                                                            placeholder="base"
-                                                                        />
+                                                                        <DimensionInput valueCm={newCombinationVariant.shipping_length_cm} unit={dimensionUnit} label="Length" onChangeCm={(value) => setNewCombinationVariant((prev) => ({ ...prev, shipping_length_cm: value === null ? "" : String(value) }))} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" />
                                                                     </td>
                                                                     <td className="px-2 py-2">
-                                                                        <input
-                                                                            type="number"
-                                                                            min={1}
-                                                                            step="0.01"
-                                                                            value={newCombinationVariant.shipping_width_cm}
-                                                                            onChange={(event) => setNewCombinationVariant((prev) => ({ ...prev, shipping_width_cm: event.target.value }))}
-                                                                            className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none"
-                                                                            placeholder="base"
-                                                                        />
+                                                                        <DimensionInput valueCm={newCombinationVariant.shipping_width_cm} unit={dimensionUnit} label="Width" onChangeCm={(value) => setNewCombinationVariant((prev) => ({ ...prev, shipping_width_cm: value === null ? "" : String(value) }))} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" />
                                                                     </td>
                                                                     <td className="px-2 py-2">
-                                                                        <input
-                                                                            type="number"
-                                                                            min={1}
-                                                                            step="0.01"
-                                                                            value={newCombinationVariant.shipping_height_cm}
-                                                                            onChange={(event) => setNewCombinationVariant((prev) => ({ ...prev, shipping_height_cm: event.target.value }))}
-                                                                            className="w-16 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none"
-                                                                            placeholder="base"
-                                                                        />
+                                                                        <DimensionInput valueCm={newCombinationVariant.shipping_height_cm} unit={dimensionUnit} label="Height" onChangeCm={(value) => setNewCombinationVariant((prev) => ({ ...prev, shipping_height_cm: value === null ? "" : String(value) }))} className="w-20 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-[#eb5c10] focus:outline-none" />
                                                                     </td>
                                                                     <td className="px-2 py-2">
                                                                         <select
@@ -2301,7 +2254,7 @@ export default function AdminProducts() {
                                                                 <tr>
                                                                     {visibleSizeColumns.map((column) => (
                                                                         <th key={column.key} className="px-2 py-2 text-left text-[10px] font-bold text-gray-500 uppercase">
-                                                                            {column.label}
+                                                                            {dimensionColumnLabel(column.key, column.label, dimensionUnit)}
                                                                         </th>
                                                                     ))}
                                                                     <th className="px-2 py-2 text-right"></th>

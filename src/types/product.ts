@@ -1,4 +1,6 @@
 // ---------------------------------------------------------------------------
+
+import type { DimensionUnit } from '@/lib/dimensions';
 // Product domain types — canonical source for the frontend
 // Matches backend: Product model, ProductCategory, ProductReview
 // ---------------------------------------------------------------------------
@@ -21,7 +23,9 @@ export interface VariantTableColumn {
 }
 
 /** Map of section → columns for the variant table. */
-export type VariantTableColumns = Record<VariantTableSection, VariantTableColumn[]>;
+export type VariantTableColumns = Record<VariantTableSection, VariantTableColumn[]> & {
+  dimension_unit?: DimensionUnit;
+};
 
 // -- Variant shapes ----------------------------------------------------------
 

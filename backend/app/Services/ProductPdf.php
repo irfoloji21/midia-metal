@@ -175,6 +175,16 @@ class ProductPdf
 
     private function variants(Product $product): array
     {
+        $columnConfig = $product->variant_table_columns ?? [];
+        $columns = [];
+        foreach (['size', 'general', 'combination'] as $section) {
+            foreach (is_array($columnConfig[$section] ?? null) ? $columnConfig[$section] : [] as $column) {
+                if (is_array($column)) {
+                    $columns[] = $column;
+                }
+            }
+        }
+
         $rows = [];
         foreach (($product->variants ?? []) as $variant) {
             $attributes = $variant['attributes'] ?? [($variant['option'] ?? '') => ($variant['value'] ?? '')];
@@ -184,7 +194,7 @@ class ProductPdf
                     $details[] = $key.': '.$value;
                 }
             }
-            foreach (array_merge(...array_values($product->variant_table_columns ?: ['general' => []])) as $column) {
+            foreach ($columns as $column) {
                 if (! ($column['frontendVisible'] ?? false) || ! ($column['visible'] ?? true)) {
                     continue;
                 }

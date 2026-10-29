@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 /**
  * Shared validation for both store and update product operations.
@@ -25,6 +26,13 @@ class SaveProductRequest extends FormRequest
             $productCode = trim((string) $this->input('product_code', ''));
             $this->merge(['product_code' => $productCode !== '' ? $productCode : null]);
         }
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        // ProductController normalizes column sections. Keep their existing JSON,
+        // including empty arrays, while validating the optional unit metadata.
+        $validator->excludeUnvalidatedArrayKeys = false;
     }
 
     /** @return array<string, mixed> */
@@ -63,6 +71,7 @@ class SaveProductRequest extends FormRequest
             'specifications' => 'nullable|array',
             'variants' => $this->boolean('price_on_request') ? 'nullable|array' : 'required|array|min:1',
             'variant_table_columns' => 'nullable|array',
+            'variant_table_columns.dimension_unit' => 'sometimes|required|string|in:mm,cm,m',
         ];
     }
 }

@@ -4,6 +4,7 @@
 // ---------------------------------------------------------------------------
 
 import type { VariantTableSection, VariantTableColumn, VariantTableColumns, VariantSuggestion } from "@/types/product";
+import { getDimensionUnit } from "@/lib/dimensions";
 
 // -- Variant field normalization ---------------------------------------------
 
@@ -323,6 +324,7 @@ export const buildCustomColumnKey = (label: string, existingKeys: string[]) => {
 export const isCustomColumnKey = (key: string) => key.startsWith("custom:");
 
 export const cloneVariantTableColumns = (columns: VariantTableColumns): VariantTableColumns => ({
+    ...(columns.dimension_unit === undefined ? {} : { dimension_unit: getDimensionUnit(columns.dimension_unit) }),
     size: columns.size.map((column) => ({ ...column })),
     general: columns.general.map((column) => ({ ...column })),
     combination: (columns.combination || []).map((column) => ({ ...column })),
@@ -333,7 +335,7 @@ export const normalizeVariantTableColumns = (value: unknown): VariantTableColumn
         return cloneVariantTableColumns(DEFAULT_VARIANT_TABLE_COLUMNS);
     }
 
-    const provided = value as Partial<Record<VariantTableSection, VariantTableColumn[]>>;
+    const provided = value as Partial<VariantTableColumns>;
 
     const normalizeSectionColumns = (
         section: VariantTableSection,
@@ -374,6 +376,7 @@ export const normalizeVariantTableColumns = (value: unknown): VariantTableColumn
     };
 
     return {
+        ...(provided.dimension_unit === undefined ? {} : { dimension_unit: getDimensionUnit(provided.dimension_unit) }),
         size: normalizeSectionColumns("size", DEFAULT_VARIANT_TABLE_COLUMNS.size, provided.size),
         general: normalizeSectionColumns("general", DEFAULT_VARIANT_TABLE_COLUMNS.general, provided.general),
         combination: normalizeSectionColumns("combination", DEFAULT_VARIANT_TABLE_COLUMNS.combination, provided.combination),
