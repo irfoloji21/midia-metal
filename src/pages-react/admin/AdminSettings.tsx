@@ -100,8 +100,6 @@ const SHIPPING_TAX_KEYS = new Set([
     "shipping_rate",
     "shipping_flat_rate",
     "shipping_type",
-    "vat_enabled",
-    "tax_enabled",
 ]);
 
 const SHIPPING_FREIGHT_KEYS = new Set([
@@ -122,15 +120,18 @@ const FREIGHT_SURCHARGE_LABELS: Record<string, string> = {
 
 const LEGACY_DUPLICATE_KEYS: Record<string, string> = {
     shipping_flat_rate: "shipping_rate",
-    tax_enabled: "vat_enabled",
 };
 
 const HIDDEN_SETTING_KEYS = new Set([
-    // Retired rate settings; VAT-inclusive calculation is fixed in the backend.
+    // Retired VAT controls; VAT-inclusive calculation is fixed in the backend.
+    "vat_enabled",
+    "tax_enabled",
     "vat_rate",
     "tax_rate",
 
     // Legacy About sections removed from the public page.
+    "about_hero_title",
+    "about_image",
     "about_exp_value",
     "about_exp_label",
     "about_proj_value",
@@ -141,6 +142,11 @@ const HIDDEN_SETTING_KEYS = new Set([
     "about_support_label",
     "about_value_4_title",
     "about_value_4_desc",
+
+    // Replaced by the Services hero title.
+    "services_hero_label",
+    // Retired Services copy with no public page consumer.
+    "services_coverage_desc",
 
     "shipping_rate",
     "shipping_flat_rate",
@@ -223,10 +229,6 @@ const normalizeSettingsForDisplay = (settings: SettingRecord[]) => {
             if (SHIPPING_FREIGHT_KEYS.has(nextSetting.key)) {
                 nextSetting.group = "shipping-freight";
                 nextSetting.type = "number";
-            }
-
-            if (nextSetting.key === "vat_enabled" || (nextSetting.key === "tax_enabled" && !keys.has("vat_enabled"))) {
-                nextSetting.type = "boolean";
             }
 
             return nextSetting;

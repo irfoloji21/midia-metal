@@ -29,7 +29,6 @@ class WebsiteCopyRefreshSeeder extends Seeder
                 'contact_form_error_message' => 'Your enquiry could not be sent. Please try again or contact us by phone or email.',
                 'contact_meta_description' => 'Contact Midia M Metal for kitchen equipment, bespoke fabrication, ventilation systems, canopies and wall cladding. Our factory is in London.',
                 'footer_info_cookies' => 'Cookie Policy',
-                'services_coverage_desc' => '',
             ];
 
             foreach ($copy as $key => $value) {

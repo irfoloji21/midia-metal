@@ -19,6 +19,7 @@ const rows = [
   ['footer_text', '© {{site_name}}', 'footer'], ['footer_info_cookies', 'Cookie Policy', 'footer'],
   ['contact_page_title', 'Contact', 'contact'], ['services_hero_phone', 'old number', 'services'],
   ['vat_rate', '20', 'shipping-tax'], ['tax_rate', '15', 'shipping-tax'],
+  ['vat_enabled', '1', 'shipping-tax'], ['tax_enabled', '1', 'shipping-tax'],
 ].map(([key, value, group], id) => ({ id, key, value, group, type: key === 'site_logo' ? 'image' : 'text' }));
 
 beforeEach(() => {
@@ -37,7 +38,7 @@ describe('General settings management', () => {
     await screen.findByRole('button', { name: 'Company & contact details' });
     expect(screen.queryByRole('button', { name: /^header$|^footer$/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'shipping tax' })).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/^(vat|tax) rate$/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^(vat|tax) (rate|enabled)$/i)).not.toBeInTheDocument();
     expect(screen.getAllByRole('button', { expanded: false })).toHaveLength(7);
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     open('Company & contact details');

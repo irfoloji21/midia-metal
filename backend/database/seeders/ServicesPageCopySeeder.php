@@ -12,7 +12,7 @@ class ServicesPageCopySeeder extends Seeder
     public function run(): void
     {
         $copy = [
-            'services_hero_label' => 'Our Services',
+            'services_hero_title' => 'Our Services',
             'services_hero_subtitle' => 'Commercial kitchen fabrication & installation.',
             'services_hero_tagline' => 'Stainless steel fabrication, welding and ventilation.',
             'services_hero_desc' => 'Midia M Metal manufactures and installs stainless steel equipment for commercial kitchens. Our services include ventilation systems, extraction canopy installation, wall cladding and bespoke fabrication.',
@@ -32,7 +32,6 @@ class ServicesPageCopySeeder extends Seeder
             'services_feature_2_desc' => 'Our team provides workshop fabrication and on-site installation for canopies, ductwork and stainless steel fittings.',
             'services_feature_3_title' => 'Stainless steel wall cladding',
             'services_feature_3_desc' => 'We fabricate and fit wall panels to the dimensions and layout of your kitchen.',
-            'services_coverage_desc' => '',
             'services_meta_title' => 'Commercial Kitchen Services | Midia M Metal',
             'services_meta_description' => 'Commercial kitchen fabrication, ventilation systems, canopy installation and stainless steel wall cladding. Our factory is in London.',
         ];

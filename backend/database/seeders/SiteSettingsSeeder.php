@@ -56,7 +56,6 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'about_subtitle', 'value' => 'Midia M Metal specializes in stainless steel fabrication and ventilation systems.', 'type' => 'textarea', 'group' => 'about'],
             ['key' => 'about_content_1', 'value' => 'Midia M Metal manufactures and supplies stainless steel equipment for commercial kitchens. Our factory is in London.', 'type' => 'textarea', 'group' => 'about'],
             ['key' => 'about_content_2', 'value' => 'Our in-house team carries out bespoke fabrication and on-site installation. We work from drawings and measurements to produce equipment suited to the available space and its intended use.', 'type' => 'textarea', 'group' => 'about'],
-            ['key' => 'about_image', 'value' => '', 'type' => 'image', 'group' => 'about'],
             ['key' => 'about_exp_value', 'value' => '15+', 'type' => 'text', 'group' => 'about'],
             ['key' => 'about_exp_label', 'value' => 'Years of Experience', 'type' => 'text', 'group' => 'about'],
             ['key' => 'about_proj_value', 'value' => '1,200+', 'type' => 'text', 'group' => 'about'],
@@ -64,7 +63,6 @@ class SiteSettingsSeeder extends Seeder
 
             // Services Section (General or Home)
             ['key' => 'services_hero_title', 'value' => 'Our Services', 'type' => 'text', 'group' => 'services'],
-            ['key' => 'services_hero_label', 'value' => 'YOUR COMFORT', 'type' => 'text', 'group' => 'services'],
             ['key' => 'services_hero_subtitle', 'value' => 'Stainless steel welding', 'type' => 'text', 'group' => 'services'],
             ['key' => 'services_hero_tagline', 'value' => 'Professional craftsmanship for demanding projects.', 'type' => 'textarea', 'group' => 'services'],
             ['key' => 'services_hero_desc', 'value' => 'Professional metal solutions for modern architectural needs.', 'type' => 'textarea', 'group' => 'services'],
@@ -101,7 +99,6 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'services_feature_3_desc', 'value' => 'Tailored designs that meet your specific project requirements.', 'type' => 'textarea', 'group' => 'services'],
 
             // About Page
-            ['key' => 'about_hero_title', 'value' => 'About Us', 'type' => 'text', 'group' => 'about'],
             ['key' => 'about_who_label', 'value' => 'Who We Are', 'type' => 'text', 'group' => 'about'],
             ['key' => 'about_image_1', 'value' => '/images/workshop.jpg', 'type' => 'image', 'group' => 'about'],
             ['key' => 'about_image_2', 'value' => '/images/welding.jpg', 'type' => 'image', 'group' => 'about'],
@@ -173,7 +170,6 @@ class SiteSettingsSeeder extends Seeder
 
             ['key' => 'shipping_rate', 'value' => '10.00', 'type' => 'text', 'group' => 'shipping-tax'],
             ['key' => 'shipping_type', 'value' => 'flat', 'type' => 'text', 'group' => 'shipping-tax'],
-            ['key' => 'vat_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'shipping-tax'],
         ];
 
         $settingsByKey = [];
