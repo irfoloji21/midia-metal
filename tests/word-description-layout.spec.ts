@@ -18,25 +18,32 @@ test('saved Word descriptions retain formatting and keep wide data tables inside
   await expect(page.getByRole('heading', { name: 'Fan overview', level: 2 })).toBeVisible();
   await expect(page.locator('.word-paste strong')).toHaveText('compact blower');
   await expect(page.locator('.word-paste table')).toHaveCount(2);
-  const mobile = await page.locator('.word-paste').evaluate(element => {
-    const cells = element.querySelectorAll('.word-table--layout td');
-    const text = cells[0].getBoundingClientRect(), image = cells[2].getBoundingClientRect();
-    const data = element.querySelector('.word-table--bordered')!;
-    return { left: text.x, width: text.width, imageBelowText: image.y >= text.bottom, pageWidth: document.documentElement.scrollWidth,
-      tableScrolls: data.scrollWidth > data.clientWidth, tableViewport: data.clientWidth };
-  });
-  expect(mobile.left).toBeGreaterThanOrEqual(0);
-  expect(mobile.width).toBeGreaterThan(300);
-  expect(mobile.width).toBeLessThanOrEqual(390);
-  expect(mobile.imageBelowText).toBe(true);
-  expect(mobile.pageWidth).toBeLessThanOrEqual(390);
-  expect(mobile.tableViewport).toBeLessThanOrEqual(390);
-  expect(mobile.tableScrolls).toBe(true);
+  await page.locator('.word-table--layout').scrollIntoViewIfNeeded();
+  // Hydration can replace the description while its fresh product request resolves.
+  // Reacquire the live DOM and retry the complete layout contract, not a stale snapshot.
+  await expect(async () => {
+    const mobile = await page.locator('.word-paste').evaluate(element => {
+      const cells = element.querySelectorAll('.word-table--layout td');
+      const text = cells[0].getBoundingClientRect(), image = cells[2].getBoundingClientRect();
+      const data = element.querySelector('.word-table--bordered')!;
+      return { left: text.x, width: text.width, imageBelowText: image.y >= text.bottom, pageWidth: document.documentElement.scrollWidth,
+        tableScrolls: data.scrollWidth > data.clientWidth, tableViewport: data.clientWidth };
+    });
+    expect(mobile.left).toBeGreaterThanOrEqual(0);
+    expect(mobile.width).toBeGreaterThan(300);
+    expect(mobile.width).toBeLessThanOrEqual(390);
+    expect(mobile.imageBelowText).toBe(true);
+    expect(mobile.pageWidth).toBeLessThanOrEqual(390);
+    expect(mobile.tableViewport).toBeLessThanOrEqual(390);
+    expect(mobile.tableScrolls).toBe(true);
+  }).toPass({ timeout: 10000 });
   await page.setViewportSize({ width: 1440, height: 900 });
-  const desktop = await page.locator('.word-table--layout td').evaluateAll(cells => {
-    const text = cells[0].getBoundingClientRect(), image = cells[2].getBoundingClientRect();
-    return { imageRightOfText: image.x >= text.right, sameRow: Math.abs(image.y - text.y) < 2 };
-  });
-  expect(desktop.imageRightOfText).toBe(true);
-  expect(desktop.sameRow).toBe(true);
+  await expect(async () => {
+    const desktop = await page.locator('.word-table--layout td').evaluateAll(cells => {
+      const text = cells[0].getBoundingClientRect(), image = cells[2].getBoundingClientRect();
+      return { imageRightOfText: image.x >= text.right, sameRow: Math.abs(image.y - text.y) < 2 };
+    });
+    expect(desktop.imageRightOfText).toBe(true);
+    expect(desktop.sameRow).toBe(true);
+  }).toPass({ timeout: 10000 });
 });

@@ -22,8 +22,10 @@ test('customer can log in and retain the session after reload', async ({ page })
 
 test('customer can log out and cannot revisit the protected account', async ({ page }) => {
   await login(page);
+  const response = page.waitForResponse(response => response.url().endsWith('/api/v1/customer/logout') && response.request().method() === 'POST');
   await page.getByRole('button', { name: 'Logout' }).click();
-  await expect(page).toHaveURL(/\/login$/);
+  expect((await response).ok()).toBe(true);
+  await expect(page).toHaveURL('/');
   await page.goto('/account');
   await expect(page).toHaveURL(/\/login$/);
 });

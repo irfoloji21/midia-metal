@@ -2,7 +2,7 @@
 
 `.github/workflows/content-deploy.yml` runs on pushes to `content`. Pull requests targeting `content` run checks only. Deploy requires the frontend build, backend tests and Playwright tests to pass. As in the existing staging workflow, frontend lint runs and reports separately; it is not a deployment prerequisite.
 
-The workflow uses the existing `HOSTINGER_SSH_PRIVATE_KEY` repository secret. Its dedicated configuration is loaded with `--config .github/deploy/content/astro.config.mjs`; the existing staging workflows and default application configuration are unchanged.
+The workflow uses the dedicated `CONTENT_HOSTINGER_SSH_PRIVATE_KEY` repository secret. Its dedicated configuration is loaded with `--config .github/deploy/content/astro.config.mjs`; the existing staging workflows and default application configuration are unchanged.
 
 ## Targets
 

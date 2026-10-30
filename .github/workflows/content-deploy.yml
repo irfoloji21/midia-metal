@@ -217,7 +217,7 @@ jobs:
       - name: Start SSH agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.CONTENT_HOSTINGER_SSH_PRIVATE_KEY }}
 
       - name: Add server to known_hosts
         run: |
