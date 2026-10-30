@@ -87,6 +87,28 @@ async function saveProduct() {
 }
 
 describe('product measurement units', () => {
+  it.each<Mode>(['legacy', 'combination'])('saves and reopens sub-millimetre %s dimensions without changing prices or stock', async mode => {
+    const fixture = product(mode);
+    await mountProducts([fixture]);
+    changeUnit('mm');
+    for (const axis of ['Length', 'Width', 'Height'] as const) {
+      fireEvent.change(existingDimension(axis, 'mm'), { target: { value: '0.1' } });
+      expect(existingDimension(axis, 'mm')).toBeValid();
+    }
+    for (const [unit, value] of [['cm', 0.01], ['m', 0.0001], ['mm', 0.1]] as const) {
+      changeUnit(unit);
+      for (const axis of ['Length', 'Width', 'Height'] as const) expect(existingDimension(axis, unit)).toHaveValue(value);
+    }
+    const saved = await saveProduct();
+    expect(saved.variants[0]).toMatchObject({ shipping_length_cm: 0.01, shipping_width_cm: 0.01, shipping_height_cm: 0.01, stock: 7, custom_fields: { part_number: 'KEEP-100' } });
+    expect(Number(String(saved.variants[0].price).replace('£', ''))).toBe(12.5);
+    expect(saved).toMatchObject({ stock_quantity: 7, old_price: '£20.00', freight_delivery_price: 35 });
+    if (mode === 'legacy') expect(saved.variants[0].value).toBe('Size : H 0.1 x W 0.1 x D 0.1mm (0.0039" x 0.0039" x 0.0039")');
+    await editProduct(fixture.name);
+    expect(unitSelect()).toHaveValue('mm');
+    for (const axis of ['Length', 'Width', 'Height'] as const) expect(existingDimension(axis, 'mm')).toHaveValue(0.1);
+  });
+
   it.each<Mode>(['legacy', 'combination'])('defaults old %s products to cm and changes only unit metadata when switching existing rows', async mode => {
     const fixture = product(mode);
     await mountProducts([fixture]);

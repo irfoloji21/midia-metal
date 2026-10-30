@@ -106,6 +106,10 @@ describe("shouldAutoGenerateVariantValue", () => {
 });
 
 describe("buildVariantValueFromDimensions", () => {
+  it("keeps sub-millimetre sizes in generated labels", () => {
+    expect(buildVariantValueFromDimensions("Size", 0.01, 0.02, 0.99)).toBe('Size : H 0.2 x W 0.1 x D 9.9mm (0.0079" x 0.0039" x 0.3898")');
+  });
+
   it("builds dimension string for size-like options", () => {
     const result = buildVariantValueFromDimensions("Size", 49.5, 24.5, 4.8);
     expect(result).toContain("Size :");

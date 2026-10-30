@@ -28,10 +28,18 @@ export function toCentimetres(value: unknown, unit: DimensionUnit): number | nul
 
 export function dimensionInputLimits(unit: DimensionUnit) {
     return {
-        min: fromCentimetres(1, unit)!,
+        min: fromCentimetres(0.01, unit)!,
         max: fromCentimetres(999.99, unit)!,
         step: fromCentimetres(0.01, unit)!,
     };
+}
+
+// Keep established size labels stable; newly supported sub-centimetre sizes
+// need decimal millimetres and inches instead of rounding down to zero.
+export function sizeLabelMeasurements(valueCm: number) {
+    const millimetres = valueCm < 1 ? Number((valueCm * 10).toFixed(1)) : Math.round(valueCm * 10);
+    const inches = valueCm < 1 ? Number((valueCm / 2.54).toFixed(4)) : Math.round(millimetres / 25);
+    return { millimetres, inches };
 }
 
 export const DIMENSION_FIELD_LABELS: Record<string, string> = {

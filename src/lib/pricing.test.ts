@@ -187,6 +187,25 @@ describe("getStandardizedDisplayPrice", () => {
 });
 
 describe("getStandardizedDisplayTitle", () => {
+  it('converts only product-detail legacy title text while keeping shared callers and selections unchanged', () => {
+    const variant = { option: 'Size', value: 'Size : H 500 x W 1000 x D 200mm (20" x 40" x 8")', price: '£10.00', shipping_length_cm: 100, shipping_width_cm: 50, shipping_height_cm: 20 };
+    const product = { name: 'Panel', show_variant_in_title: true, variants: [variant] };
+    const selection = { Size: { option: 'Size', value: variant.value } };
+    expect(getStandardizedDisplayTitle(product, selection, 'm')).toBe('Panel - Size : H 0.5 x W 1 x D 0.2m (20" x 40" x 8")');
+    expect(getStandardizedDisplayTitle(product, null, 'cm')).toBe('Panel - Size : H 50 x W 100 x D 20cm (20" x 40" x 8")');
+    expect(getStandardizedDisplayTitle(product, selection)).toBe(`Panel - ${variant.value}`);
+    expect(selection.Size.value).toBe(variant.value);
+  });
+
+  it('uses the selected unit for derived combination titles and preserves explicit Size attributes', () => {
+    const variant = { attributes: { Finish: 'Brushed' }, price: '£10.00', shipping_length_cm: 100, shipping_width_cm: 50, shipping_height_cm: 20 };
+    const product = { name: 'Panel', show_variant_in_title: true, variant_mode: 'combination', variant_options: ['Finish'], variants: [variant] };
+    expect(getStandardizedDisplayTitle(product, null, 'm')).toBe('Panel - Brushed / H 0.5 x W 1 x D 0.2m (20" x 40" x 8")');
+    expect(getStandardizedDisplayTitle(product)).toBe('Panel - Brushed / H 500 x W 1000 x D 200mm (20" x 40" x 8")');
+    const custom = { ...product, variant_options: ['Size'], variants: [{ ...variant, attributes: { Size: 'Custom 500mm' } }] };
+    expect(getStandardizedDisplayTitle(custom, null, 'm')).toBe('Panel - Custom 500mm');
+  });
+
   it("returns empty string for null product", () => {
     expect(getStandardizedDisplayTitle(null)).toBe("");
   });

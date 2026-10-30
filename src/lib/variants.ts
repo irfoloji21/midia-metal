@@ -1,3 +1,5 @@
+import { fromCentimetres, sizeLabelMeasurements, type DimensionUnit } from '@/lib/dimensions';
+
 export type VariantSelection = {
   option: string;
   value: string;
@@ -37,23 +39,34 @@ export const getVariantAttributes = (variant: VariantRecord | null | undefined):
   );
 };
 
-export const buildVariantSizeSummary = (variant: VariantRecord | null | undefined): string => {
+export const buildVariantSizeSummary = (variant: VariantRecord | null | undefined, unit?: DimensionUnit): string => {
   const length = Number(variant?.shipping_length_cm ?? 0);
   const width = Number(variant?.shipping_width_cm ?? 0);
   const height = Number(variant?.shipping_height_cm ?? 0);
 
-  if (length <= 0 || width <= 0 || height <= 0) {
+  if (![length, width, height].every(value => Number.isFinite(value) && value > 0)) {
     return "";
   }
 
-  const widthMm = Math.round(length * 10);
-  const heightMm = Math.round(width * 10);
-  const depthMm = Math.round(height * 10);
-  const widthInches = Math.round(widthMm / 25);
-  const heightInches = Math.round(heightMm / 25);
-  const depthInches = Math.round(depthMm / 25);
+  const { millimetres: widthMm, inches: widthInches } = sizeLabelMeasurements(length);
+  const { millimetres: heightMm, inches: heightInches } = sizeLabelMeasurements(width);
+  const { millimetres: depthMm, inches: depthInches } = sizeLabelMeasurements(height);
 
-  return `H ${heightMm} x W ${widthMm} x D ${depthMm}mm (${heightInches}" x ${widthInches}" x ${depthInches}")`;
+  const displayedLength = unit ? fromCentimetres(length, unit) : widthMm;
+  const displayedWidth = unit ? fromCentimetres(width, unit) : heightMm;
+  const displayedHeight = unit ? fromCentimetres(height, unit) : depthMm;
+  return `H ${displayedWidth} x W ${displayedLength} x D ${displayedHeight}${unit ?? 'mm'} (${heightInches}" x ${widthInches}" x ${depthInches}")`;
+};
+
+/** Display generated size labels in another unit without changing selection values. */
+export const formatVariantDimensionValue = (variant: VariantRecord | null | undefined, unit?: DimensionUnit): string => {
+  const value = normalizeText(variant?.value);
+  if (!unit) return String(variant?.value ?? '');
+  if (!value) return value;
+  const originalSummary = buildVariantSizeSummary(variant);
+  // Only the exact generated label is convertible; custom text stays literal.
+  if (!originalSummary || value !== `Size : ${originalSummary}`) return value;
+  return `Size : ${buildVariantSizeSummary(variant, unit)}`;
 };
 
 export const isCombinationVariant = (variant: VariantRecord | null | undefined): boolean =>

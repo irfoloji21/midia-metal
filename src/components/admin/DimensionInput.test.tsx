@@ -30,9 +30,20 @@ it('allows decimal entry, saves centimetres and keeps an empty override empty', 
     fireEvent.change(input, { target: { value: '0.115' } });
     expect(changed).toHaveBeenLastCalledWith(11.5);
     expect(input).toBeValid();
-    fireEvent.change(input, { target: { value: '0.001' } });
+    fireEvent.change(input, { target: { value: '0.00001' } });
     expect(input).toBeInvalid();
     fireEvent.change(input, { target: { value: '' } });
     expect(changed).toHaveBeenLastCalledWith(null);
     expect(input).toHaveValue(null);
+});
+
+it.each([['mm', '0.1'], ['cm', '0.01'], ['m', '0.0001']] as const)('accepts 0.1 mm expressed in %s and rejects zero', (unit, value) => {
+    const changed = vi.fn();
+    render(<DimensionInput valueCm={null} unit={unit} label="Length" onChangeCm={changed} />);
+    const input = screen.getByRole('spinbutton', { name: `Length (${unit})` });
+    fireEvent.change(input, { target: { value } });
+    expect(input).toBeValid();
+    expect(changed).toHaveBeenLastCalledWith(0.01);
+    fireEvent.change(input, { target: { value: '0' } });
+    expect(input).toBeInvalid();
 });

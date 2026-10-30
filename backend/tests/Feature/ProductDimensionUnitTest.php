@@ -124,6 +124,101 @@ class ProductDimensionUnitTest extends TestCase
         return $cases;
     }
 
+    #[DataProvider('variantModes')]
+    public function test_point_one_millimetre_dimensions_survive_create_update_and_reopen_without_lowering_parcel_safeguards(string $mode): void
+    {
+        config(['services.shipping.packaging.padding_cm' => 1]);
+        $payload = $this->payload($mode);
+        $payload['variant_table_columns']['dimension_unit'] = 'mm';
+        $dimensions = ['shipping_length_cm', 'shipping_width_cm', 'shipping_height_cm'];
+        foreach ($dimensions as $field) {
+            $payload[$field] = 0.01;
+            $payload['variants'][0][$field] = 0.01;
+        }
+        $created = $this->postJson('/api/admin/products', $payload)->assertCreated();
+        $id = $created->json('id');
+        foreach ($dimensions as $field) {
+            $this->assertSame(0.01, $created->json($field));
+            $this->assertSame(0.01, $created->json('variants.0.'.$field));
+        }
+        $before = Product::findOrFail($id)->toArray();
+
+        // Replacing an existing larger value must preserve the minimum too.
+        foreach ([0.5, 0.01] as $centimetres) {
+            foreach ($dimensions as $field) {
+                $payload[$field] = $centimetres;
+                $payload['variants'][0][$field] = $centimetres;
+            }
+            $this->putJson('/api/admin/products/'.$id, $payload)->assertOk();
+            $reopened = $this->getJson('/api/admin/products/'.$id)->assertOk()
+                ->assertJsonPath('variant_table_columns.dimension_unit', 'mm')
+                ->assertJsonPath('price', '£25.00')->assertJsonPath('stock_quantity', 7);
+            foreach ($dimensions as $field) {
+                $this->assertSame($centimetres, $reopened->json($field));
+                $this->assertSame($centimetres, $reopened->json('variants.0.'.$field));
+            }
+        }
+        $after = Product::findOrFail($id)->toArray();
+        unset($before['updated_at'], $after['updated_at']);
+        $this->assertSame($before, $after, 'Dimension edits must not alter prices, stock, labels or other product settings.');
+
+        $selection = $mode === 'combination'
+            ? ['Finish' => ['option' => 'Finish', 'value' => 'Brushed']]
+            : ['Size' => ['option' => 'Size', 'value' => 'Existing size label']];
+        $delivery = app(ParcelBuilder::class)->buildForCheckoutItems([
+            ['product_id' => $id, 'quantity' => 1, 'selected_variants' => $selection],
+        ]);
+        $this->assertCount(1, $delivery['parcels']);
+        foreach (['length', 'width', 'height'] as $field) {
+            // Carrier packaging still uses a 1cm minimum plus 1cm padding each side.
+            $this->assertSame(3.0, $delivery['parcels'][0][$field]);
+        }
+        foreach ($dimensions as $field) {
+            $this->assertSame(0.01, Product::findOrFail($id)->{$field});
+        }
+    }
+
+    public static function variantModes(): array
+    {
+        return ['legacy' => ['legacy'], 'combination' => ['combination']];
+    }
+
+    #[DataProvider('invalidDimensions')]
+    public function test_zero_negative_and_subminimum_dimensions_are_not_stored(string $mode, float $value): void
+    {
+        $payload = $this->payload($mode);
+        $dimensions = ['shipping_length_cm', 'shipping_width_cm', 'shipping_height_cm'];
+        foreach ($dimensions as $field) {
+            $payload[$field] = $value;
+            $payload['variants'][0][$field] = $value;
+        }
+        $this->postJson('/api/admin/products', $payload)->assertUnprocessable()
+            ->assertJsonValidationErrors($dimensions);
+        $this->assertDatabaseCount('products', 0);
+
+        // Existing variant normalization treats invalid optional dimensions as absent.
+        foreach ($dimensions as $field) {
+            unset($payload[$field]);
+        }
+        $created = $this->postJson('/api/admin/products', $payload)->assertCreated()
+            ->assertJsonPath('price', '£25.00')->assertJsonPath('stock_quantity', 7);
+        foreach ($dimensions as $field) {
+            $created->assertJsonPath('variants.0.'.$field, null);
+        }
+    }
+
+    public static function invalidDimensions(): array
+    {
+        $cases = [];
+        foreach (['legacy', 'combination'] as $mode) {
+            foreach (['zero' => 0.0, 'negative' => -0.01, 'below minimum' => 0.009] as $name => $value) {
+                $cases[$mode.' '.$name] = [$mode, $value];
+            }
+        }
+
+        return $cases;
+    }
+
     public function test_omitted_unit_keeps_the_existing_column_json_shape(): void
     {
         $payload = $this->payload();
@@ -172,6 +267,7 @@ class ProductDimensionUnitTest extends TestCase
     {
         $payload = $this->payload();
         $payload['variant_table_columns']['dimension_unit'] = 'mm';
+        $payload['variants'][0]['shipping_height_cm'] = 0.01;
         $created = $this->postJson('/api/admin/products', $payload)->assertCreated();
         $details = [];
         View::composer('pdf.product', function ($view) use (&$details) {
@@ -185,7 +281,7 @@ class ProductDimensionUnitTest extends TestCase
         $text = implode("\n", $details);
         $this->assertStringContainsString('Length (cm): 100', $text);
         $this->assertStringContainsString('Width (cm): 25.13', $text);
-        $this->assertStringContainsString('Height (cm): 10', $text);
+        $this->assertStringContainsString('Height (cm): 0.01', $text);
         $this->assertStringNotContainsString('dimension_unit', $text);
         Http::assertNothingSent();
     }

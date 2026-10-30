@@ -182,9 +182,9 @@ class ProductController extends Controller
             }
 
             $shippingWeight = $this->normalizeVariantNumeric($variant['shipping_weight_kg'] ?? null, 0.01, 999.999, 3);
-            $shippingLength = $this->normalizeVariantNumeric($variant['shipping_length_cm'] ?? null, 1, 999.99, 2);
-            $shippingWidth = $this->normalizeVariantNumeric($variant['shipping_width_cm'] ?? null, 1, 999.99, 2);
-            $shippingHeight = $this->normalizeVariantNumeric($variant['shipping_height_cm'] ?? null, 1, 999.99, 2);
+            $shippingLength = $this->normalizeVariantNumeric($variant['shipping_length_cm'] ?? null, 0.01, 999.99, 2);
+            $shippingWidth = $this->normalizeVariantNumeric($variant['shipping_width_cm'] ?? null, 0.01, 999.99, 2);
+            $shippingHeight = $this->normalizeVariantNumeric($variant['shipping_height_cm'] ?? null, 0.01, 999.99, 2);
             $shippingClass = trim((string) ($variant['shipping_class'] ?? ''));
             if (! in_array($shippingClass, ['standard', 'freight'], true)) {
                 $shippingClass = null;
@@ -262,9 +262,9 @@ class ProductController extends Controller
             }
 
             $shippingWeight = $this->normalizeVariantNumeric($variant['shipping_weight_kg'] ?? null, 0.01, 999.999, 3);
-            $shippingLength = $this->normalizeVariantNumeric($variant['shipping_length_cm'] ?? null, 1, 999.99, 2);
-            $shippingWidth = $this->normalizeVariantNumeric($variant['shipping_width_cm'] ?? null, 1, 999.99, 2);
-            $shippingHeight = $this->normalizeVariantNumeric($variant['shipping_height_cm'] ?? null, 1, 999.99, 2);
+            $shippingLength = $this->normalizeVariantNumeric($variant['shipping_length_cm'] ?? null, 0.01, 999.99, 2);
+            $shippingWidth = $this->normalizeVariantNumeric($variant['shipping_width_cm'] ?? null, 0.01, 999.99, 2);
+            $shippingHeight = $this->normalizeVariantNumeric($variant['shipping_height_cm'] ?? null, 0.01, 999.99, 2);
             $shippingClass = trim((string) ($variant['shipping_class'] ?? ''));
             if (! in_array($shippingClass, ['standard', 'freight'], true)) {
                 $shippingClass = null;

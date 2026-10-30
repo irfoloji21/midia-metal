@@ -1,4 +1,5 @@
-import { buildVariantSizeSummary, findMatchingCombinationVariant, getProductVariantMode, getVariantAttributes, getVariantOptionNames, resolveSelectedVariantRecord } from "@/lib/variants";
+import { buildVariantSizeSummary, formatVariantDimensionValue, findMatchingCombinationVariant, getProductVariantMode, getVariantAttributes, getVariantOptionNames, resolveSelectedVariantRecord } from "@/lib/variants";
+import type { DimensionUnit } from "@/lib/dimensions";
 
 export const PRICE_ON_REQUEST_LABEL = "Contact us for price";
 
@@ -109,7 +110,7 @@ export const getStandardizedDisplayPrice = (product: any): string => {
   return base !== null ? `£${base.toFixed(2)}` : String(product.price || "");
 };
 
-export const getStandardizedDisplayTitle = (product: any, activeVariantMap?: Record<string, any> | null): string => {
+export const getStandardizedDisplayTitle = (product: any, activeVariantMap?: Record<string, any> | null, dimensionUnit?: DimensionUnit): string => {
   if (!product) return "";
   
   let appendText = "";
@@ -146,7 +147,7 @@ export const getStandardizedDisplayTitle = (product: any, activeVariantMap?: Rec
         .map((option) => selectedAttributes[option]);
       const hasExplicitSizeValue = Object.entries(getVariantAttributes(sourceVariant))
         .some(([option, value]) => isSizeOption(option) && Boolean(value));
-      const sizeSummary = hasExplicitSizeValue ? "" : buildVariantSizeSummary(sourceVariant);
+      const sizeSummary = hasExplicitSizeValue ? "" : buildVariantSizeSummary(sourceVariant, dimensionUnit);
       if (sizeSummary) {
         attributeValues.push(sizeSummary);
       }
@@ -156,7 +157,8 @@ export const getStandardizedDisplayTitle = (product: any, activeVariantMap?: Rec
     } else if (activeVariantMap && Object.keys(activeVariantMap).length > 0) {
       const sizeVariant = Object.values(activeVariantMap).find((v: any) => isSizeOption(v.option));
       if (sizeVariant && sizeVariant.value) {
-        appendText = ` - ${sizeVariant.value}`;
+        const sourceVariant = product.variants?.find((variant: any) => variant.option === sizeVariant.option && variant.value === sizeVariant.value) ?? sizeVariant;
+        appendText = ` - ${formatVariantDimensionValue(sourceVariant, dimensionUnit)}`;
       }
     } else if (product.variants && Array.isArray(product.variants) && product.variants.length > 0) {
       const sizeVariants = product.variants.filter((v: any) => isSizeOption(v.option));
@@ -169,10 +171,10 @@ export const getStandardizedDisplayTitle = (product: any, activeVariantMap?: Rec
             return currPrice < minPrice ? curr : min;
           }, validVariants[0]);
           if (cheapest && cheapest.value) {
-            appendText = ` - ${cheapest.value}`;
+            appendText = ` - ${formatVariantDimensionValue(cheapest, dimensionUnit)}`;
           }
         } else if (sizeVariants[0] && sizeVariants[0].value) {
-          appendText = ` - ${sizeVariants[0].value}`;
+          appendText = ` - ${formatVariantDimensionValue(sizeVariants[0], dimensionUnit)}`;
         }
       }
     }

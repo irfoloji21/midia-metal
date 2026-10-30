@@ -11,7 +11,42 @@ import {
   getCompatibleCombinationVariants,
   getVariantOptionValues,
   isCompleteVariantSelection,
+  buildVariantSizeSummary,
+  formatVariantDimensionValue,
 } from "@/lib/variants";
+
+describe('small variant size summaries', () => {
+  it.each([
+    ['mm', 'H 500 x W 1000 x D 0.1mm'],
+    ['cm', 'H 50 x W 100 x D 0.01cm'],
+    ['m', 'H 0.5 x W 1 x D 0.0001m'],
+  ] as const)('formats public summaries in %s without changing the original variant', (unit, metric) => {
+    const variant = Object.freeze({ option: 'Size', value: 'Size : H 500 x W 1000 x D 0.1mm (20" x 40" x 0.0039")', shipping_length_cm: 100, shipping_width_cm: 50, shipping_height_cm: 0.01 });
+    expect(buildVariantSizeSummary(variant, unit)).toBe(`${metric} (20" x 40" x 0.0039")`);
+    expect(formatVariantDimensionValue(variant, unit)).toBe(`Size : ${metric} (20" x 40" x 0.0039")`);
+    expect(variant.value).toBe('Size : H 500 x W 1000 x D 0.1mm (20" x 40" x 0.0039")');
+    expect(formatVariantDimensionValue(variant)).toBe(variant.value);
+  });
+
+  it('does not reinterpret custom, incomplete or mismatched size labels', () => {
+    const dimensions = { shipping_length_cm: 100, shipping_width_cm: 50, shipping_height_cm: 20 };
+    for (const value of ['Custom size 1000mm', 'Size : 1000mm', 'Size : H 1 x W 1 x D 1mm (1" x 1" x 1")']) {
+      expect(formatVariantDimensionValue({ ...dimensions, value }, 'm')).toBe(value);
+    }
+    const value = 'Size : H 500 x W 1000 x D 200mm (20" x 40" x 8")';
+    expect(formatVariantDimensionValue({ value }, 'm')).toBe(value);
+  });
+
+  it('shows decimal millimetres and nonzero inches for new small dimensions', () => {
+    expect(buildVariantSizeSummary({ shipping_length_cm: 0.01, shipping_width_cm: 0.02, shipping_height_cm: 0.99 }))
+      .toBe('H 0.2 x W 0.1 x D 9.9mm (0.0079" x 0.0039" x 0.3898")');
+  });
+
+  it('preserves existing size summaries', () => {
+    expect(buildVariantSizeSummary({ shipping_length_cm: 100, shipping_width_cm: 50, shipping_height_cm: 20 }))
+      .toBe('H 500 x W 1000 x D 200mm (20" x 40" x 8")');
+  });
+});
 
 describe("normalizeVariantOptionName", () => {
   it("trims whitespace", () => {

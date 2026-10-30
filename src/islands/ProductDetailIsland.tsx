@@ -31,8 +31,10 @@ import Breadcrumb from "@/components/Breadcrumb";
 import SelectionTableSection from "@/components/product/SelectionTableSection";
 import { formatMoneyValue, resolveSelectedVariantUnitPrice, getStandardizedDisplayPrice, getStandardizedDisplayTitle, shouldShowOldPrice, PRICE_ON_REQUEST_LABEL, getProductQuoteUrl } from "@/lib/pricing";
 import { getAvailableStock, MAX_ORDER_QUANTITY } from "@/lib/stock";
+import { DIMENSION_FIELD_LABELS, fromCentimetres, getDimensionUnit } from "@/lib/dimensions";
 import {
   buildVariantSizeSummary,
+  formatVariantDimensionValue,
   findMatchingCombinationVariant,
   getVariantAttributes,
   getProductVariantMode,
@@ -75,7 +77,9 @@ const formatNumber = (value: number): string => {
   return Number.isInteger(rounded) ? String(rounded) : String(rounded);
 };
 
-const cmToInches = (value: number): string => formatNumber(value / 2.54);
+const cmToInches = (value: number): string => value < 1
+  ? String(Number((value / 2.54).toFixed(4)))
+  : formatNumber(value / 2.54);
 
 const formatSpecValue = (value: unknown): string => String(value ?? "").trim();
 const formatVariantOptionLabel = (value: unknown): string => String(value ?? "").trim().replace(/([a-z])([A-Z0-9])/g, "$1 $2");
@@ -266,6 +270,12 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
   const allImages = product ? [product.image, ...(product.gallery || [])].filter(Boolean).map((img: unknown) => normalizeMediaUrl(img)) : [];
   const variantMode = getProductVariantMode(product);
   const isCombinationMode = variantMode === "combination";
+  const dimensionUnit = getDimensionUnit(product?.variant_table_columns?.dimension_unit);
+  const displayedVariantValue = (option: string, value: unknown): string => {
+    if (isCombinationMode) return formatSpecValue(value);
+    const source = product?.variants?.find((variant: any) => variant.option === option && variant.value === value);
+    return formatVariantDimensionValue(source ?? { value }, dimensionUnit);
+  };
   const variantOptions = getVariantOptionNames(product);
   const variantGroups = variantOptions.map((option, optionIndex) => {
     const selectionScope = isCombinationMode
@@ -294,7 +304,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
     .filter((group) => group.variants.length === 1)
     .map((group) => {
       const onlyValue = group.variants[0]?.value ?? "";
-      return [group.label, stripVariantLabelPrefix(onlyValue, group.label)] as [string, string];
+      return [group.label, stripVariantLabelPrefix(displayedVariantValue(group.option, onlyValue), group.label)] as [string, string];
     })
     .filter(([, value]) => Boolean(String(value ?? "").trim()));
   const variantTableColumns = normalizeVariantTableColumns(product?.variant_table_columns);
@@ -392,7 +402,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
           ?? (allowProductShippingFallback ? product?.shipping_length_cm : null)
           ?? 0,
         );
-        return length > 0 ? `${formatNumber(length)} cm (${cmToInches(length)} in)` : "";
+        return length > 0 ? `${fromCentimetres(length, dimensionUnit)} ${dimensionUnit} (${cmToInches(length)} in)` : "";
       }
       case "shipping_width_cm": {
         const width = Number(
@@ -400,7 +410,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
           ?? (allowProductShippingFallback ? product?.shipping_width_cm : null)
           ?? 0,
         );
-        return width > 0 ? `${formatNumber(width)} cm (${cmToInches(width)} in)` : "";
+        return width > 0 ? `${fromCentimetres(width, dimensionUnit)} ${dimensionUnit} (${cmToInches(width)} in)` : "";
       }
       case "shipping_height_cm": {
         const height = Number(
@@ -408,12 +418,12 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
           ?? (allowProductShippingFallback ? product?.shipping_height_cm : null)
           ?? 0,
         );
-        return height > 0 ? `${formatNumber(height)} cm (${cmToInches(height)} in)` : "";
+        return height > 0 ? `${fromCentimetres(height, dimensionUnit)} ${dimensionUnit} (${cmToInches(height)} in)` : "";
       }
       case "option":
         return formatSpecValue(variant?.option);
       case "value":
-        return formatSpecValue(variant?.value);
+        return displayedVariantValue(String(variant?.option ?? ''), variant?.value);
       default: {
         if (!columnKey.startsWith("custom:")) {
           return "";
@@ -442,7 +452,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
       ? "Size"
       : formatVariantOptionLabel(option);
 
-    return [label, formatSpecValue(selectedValue)] as [string, string];
+    return [label, displayedVariantValue(option, selectedValue)] as [string, string];
   }).filter((entry): entry is [string, string] => Boolean(entry));
   const resolvedVariantSummaryEntries: Array<[string, string]> = (() => {
     if (!resolvedSelectedVariant) {
@@ -460,7 +470,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
     const option = formatSpecValue(resolvedSelectedVariant.option);
     const value = formatSpecValue(resolvedSelectedVariant.value);
 
-    return option && value ? [[formatVariantOptionLabel(option), value]] : [];
+    return option && value ? [[formatVariantOptionLabel(option), displayedVariantValue(option, value)]] : [];
   })();
   const selectedCombinationMetadataEntries: Array<[string, string]> = (() => {
     if (!isCombinationMode) {
@@ -483,7 +493,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
     const showDerivedDimensions = variantTableColumns.size.some((column) => (
       column.frontendVisible && ["shipping_length_cm", "shipping_width_cm", "shipping_height_cm"].includes(column.key)
     ));
-    const derivedSize = showDerivedDimensions ? buildVariantSizeSummary(sourceVariant) : "";
+    const derivedSize = showDerivedDimensions ? buildVariantSizeSummary(sourceVariant, dimensionUnit) : "";
 
     return derivedSize ? [["Size", derivedSize]] : [];
   })();
@@ -497,7 +507,10 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
       : selectedShippingVariant;
     const value = formatVariantColumnValue(column.key, sourceVariant);
 
-    return value ? [[column.label, value] as [string, string]] : [];
+    const label = DIMENSION_FIELD_LABELS[column.key]
+      ? `${column.label.replace(/\s*\((?:mm|cm|m)\)\s*$/i, '').trim()} (${dimensionUnit})`
+      : column.label;
+    return value ? [[label, value] as [string, string]] : [];
   });
   const combinationFrontendSpecEntries: Array<[string, string]> = (
     selectedCombinationVariant
@@ -838,7 +851,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
 
           <div className="min-w-0 pt-2">
             <div className="flex items-start justify-between gap-4">
-              <h1 className="min-w-0 flex-1 [overflow-wrap:anywhere] font-sans text-[30px] md:text-[40px] leading-[1] font-semibold text-[#10275c]">{getStandardizedDisplayTitle(product, selectedVariants)}</h1>
+              <h1 className="min-w-0 flex-1 [overflow-wrap:anywhere] font-sans text-[30px] md:text-[40px] leading-[1] font-semibold text-[#10275c]">{getStandardizedDisplayTitle(product, selectedVariants, dimensionUnit)}</h1>
               <button
                 onClick={() => {
                   if (isInWishlist(product.id)) {
@@ -982,7 +995,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
               {!isSelectionTableMode && hasSelectableVariantChoices && product.variants && product.variants.length > 0 && (
                 variantGroups.filter(({ variants }) => variants.length > 1).map(({ option, label, variants }) => {
                   const selectedValue = selectedVariants[option]?.value || variants[0]?.value || "";
-                  const singleValueText = stripVariantLabelPrefix(selectedValue, label);
+                  const singleValueText = stripVariantLabelPrefix(displayedVariantValue(option, selectedValue), label);
                   const hasSingleValue = variants.length === 1;
 
                   return (
@@ -1004,7 +1017,7 @@ function ProductDetailIsland({ id, initialProduct, initialRelated }: { id: strin
                               <option value="">Select {label}</option>
                               {variants.map((variant: any, idx: number) => (
                                 <option key={idx} value={variant.value}>
-                                  {variant.value}
+                                  {displayedVariantValue(option, variant.value)}
                                 </option>
                               ))}
                             </select>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dimensionColumnLabel, dimensionInputLimits, fromCentimetres, getDimensionUnit, toCentimetres } from './dimensions';
+import { dimensionColumnLabel, dimensionInputLimits, fromCentimetres, getDimensionUnit, sizeLabelMeasurements, toCentimetres } from './dimensions';
 import { cloneVariantTableColumns, normalizeVariantTableColumns } from './adminProductUtils';
 
 describe('product measurement units', () => {
@@ -11,7 +11,7 @@ describe('product measurement units', () => {
     });
 
     it.each(['mm', 'cm', 'm'] as const)('preserves decimals and blank overrides in %s', unit => {
-        for (const value of [1, 1.15, 49.5, 999.99]) {
+        for (const value of [0.01, 0.02, 0.99, 1, 1.15, 49.5, 999.99]) {
             expect(toCentimetres(fromCentimetres(value, unit), unit)).toBe(value);
         }
         for (const value of [null, undefined, '', ' ']) {
@@ -21,9 +21,17 @@ describe('product measurement units', () => {
     });
 
     it('uses the same physical limits and precision for every unit', () => {
-        expect(dimensionInputLimits('mm')).toEqual({ min: 10, max: 9999.9, step: 0.1 });
-        expect(dimensionInputLimits('cm')).toEqual({ min: 1, max: 999.99, step: 0.01 });
-        expect(dimensionInputLimits('m')).toEqual({ min: 0.01, max: 9.9999, step: 0.0001 });
+        expect(dimensionInputLimits('mm')).toEqual({ min: 0.1, max: 9999.9, step: 0.1 });
+        expect(dimensionInputLimits('cm')).toEqual({ min: 0.01, max: 999.99, step: 0.01 });
+        expect(dimensionInputLimits('m')).toEqual({ min: 0.0001, max: 9.9999, step: 0.0001 });
+    });
+
+    it('keeps small size labels nonzero without changing established centimetre-sized labels', () => {
+        expect(sizeLabelMeasurements(0.01)).toEqual({ millimetres: 0.1, inches: 0.0039 });
+        expect(sizeLabelMeasurements(0.99)).toEqual({ millimetres: 9.9, inches: 0.3898 });
+        for (const value of [1, 1.15, 49.5, 100, 999.99]) {
+            expect(sizeLabelMeasurements(value)).toEqual({ millimetres: Math.round(value * 10), inches: Math.round(Math.round(value * 10) / 25) });
+        }
     });
 
     it('preserves unit metadata through column changes and cloning without adding it to legacy configs', () => {

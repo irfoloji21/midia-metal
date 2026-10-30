@@ -4,7 +4,7 @@
 // ---------------------------------------------------------------------------
 
 import type { VariantTableSection, VariantTableColumn, VariantTableColumns, VariantSuggestion } from "@/types/product";
-import { getDimensionUnit } from "@/lib/dimensions";
+import { getDimensionUnit, sizeLabelMeasurements } from "@/lib/dimensions";
 
 // -- Variant field normalization ---------------------------------------------
 
@@ -53,13 +53,9 @@ export const buildVariantValueFromDimensions = (
         return "";
     }
 
-    const widthMm = Math.round(length * 10);
-    const heightMm = Math.round(width * 10);
-    const depthMm = Math.round(height * 10);
-
-    const widthInches = Math.round(widthMm / 25);
-    const heightInches = Math.round(heightMm / 25);
-    const depthInches = Math.round(depthMm / 25);
+    const { millimetres: widthMm, inches: widthInches } = sizeLabelMeasurements(length);
+    const { millimetres: heightMm, inches: heightInches } = sizeLabelMeasurements(width);
+    const { millimetres: depthMm, inches: depthInches } = sizeLabelMeasurements(height);
 
     return `Size : H ${heightMm} x W ${widthMm} x D ${depthMm}mm (${heightInches}" x ${widthInches}" x ${depthInches}")`;
 };
