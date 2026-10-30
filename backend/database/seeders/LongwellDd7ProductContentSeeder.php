@@ -40,7 +40,7 @@ class LongwellDd7ProductContentSeeder extends Seeder
         }
         $before = json_decode(Storage::disk('local')->get($backupPath), true, 512, JSON_THROW_ON_ERROR);
         foreach ($fields as $field => $value) {
-            if ($product->$field !== ($before[$field] ?? null) && $product->$field !== $value) {
+            if ($product->$field !== ($before[$field] ?? null) && $value !== $product->$field) {
                 throw new \RuntimeException('Product has newer edits in '.$field.'; import stopped.');
             }
         }

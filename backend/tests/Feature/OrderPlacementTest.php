@@ -5,9 +5,12 @@ namespace Tests\Feature;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\SiteSetting;
+use App\Services\StripeGateway;
 use App\Shipping\ShippingQuoteStore;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Tests\Fakes\StripeGatewayFake;
 use Tests\TestCase;
 
 class OrderPlacementTest extends TestCase
@@ -19,12 +22,13 @@ class OrderPlacementTest extends TestCase
         parent::setUp();
         Mail::fake();
         config(['services.stripe.webhook_secret' => 'whsec_test_only']);
-        $this->app->instance(\App\Services\StripeGateway::class, new \Tests\Fakes\StripeGatewayFake);
+        $this->app->instance(StripeGateway::class, new StripeGatewayFake);
     }
 
     private function postStripeOrder(array $payload)
     {
-        $setup = $this->postJson('/api/v1/payment/intent', $payload + ['payment_attempt_id' => (string) \Illuminate\Support\Str::uuid()])->assertOk()->json();
+        $setup = $this->postJson('/api/v1/payment/intent', $payload + ['payment_attempt_id' => (string) Str::uuid()])->assertOk()->json();
+
         return $this->postJson('/api/v1/orders', $payload + [
             'stripe_payment_intent_id' => $setup['payment_intent_id'], 'payment_token' => $setup['payment_token'],
         ]);

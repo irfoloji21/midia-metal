@@ -61,7 +61,7 @@ describe('Service detail content layout', () => {
     '<p>service-section layout-block content-section</p>',
     '<pre>&lt;div class="layout-block"&gt;Example&lt;/div&gt;</pre>',
     '<!-- <div class="layout-block"></div> --><p>Notes</p>',
-    '<script type="application/json">{"example":"<div class=\"layout-block\">"}</script><p>Notes</p>',
+    '<script type="application/json">{"example":"<div class="layout-block">"}</script><p>Notes</p>',
   ])('does not change layout because of marker text or unrelated attributes', content => {
     expect(serviceContentLayout(content)).toBe('legacy');
   });

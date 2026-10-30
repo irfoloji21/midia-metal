@@ -44,6 +44,7 @@ function safeTextStyle(style: string): string {
 
 function safeUrl(value: string, image = false): string | null {
   const url = value.trim();
+  // eslint-disable-next-line no-control-regex -- Intentionally reject ASCII controls in URLs.
   if (!url || /[\u0000-\u0020\u007f\\]/.test(url)) return null;
   if (/^\/(?!\/)/.test(url)) return url;
   if (!image && /^(?:#[^\s]*|mailto:[^\s]+|tel:[^\s]+)$/i.test(url)) return url;

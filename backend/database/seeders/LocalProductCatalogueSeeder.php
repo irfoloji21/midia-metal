@@ -63,10 +63,12 @@ class LocalProductCatalogueSeeder extends Seeder
                     // Do not recreate deleted records or overwrite later admin copy edits.
                     if (! $product || trim((string) $product->description) !== '') {
                         $counts['skipped']++;
+
                         continue;
                     }
                     $product->update($content);
                     $counts['updated']++;
+
                     continue;
                 }
 

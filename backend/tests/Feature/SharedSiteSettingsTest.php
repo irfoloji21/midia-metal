@@ -87,7 +87,9 @@ class SharedSiteSettingsTest extends TestCase
         $this->assertSame('© {{site_name}}', $admin['footer_text']['value']);
         $response = $this->getJson('/api/v1/settings')->assertOk()->assertHeader('Cache-Control', 'no-store, private');
         $public = collect($response->json())->keyBy('key');
-        foreach ($updates as $key => $value) $this->assertSame($value, $public[$key]['value']);
+        foreach ($updates as $key => $value) {
+            $this->assertSame($value, $public[$key]['value']);
+        }
         $this->assertSame('© Metal & Parts', $public['footer_text']['value']);
         $this->assertSame('<p>Metal &amp; Parts: <a href="mailto:new@example.com">new@example.com</a></p>', $public['privacy_policy_content']['value']);
         $this->assertFalse($public->has('company_email'));

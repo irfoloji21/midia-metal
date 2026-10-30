@@ -13,7 +13,7 @@ class PortfolioDescription
 
         // Read actual attributes, so data-class and text inside another attribute
         // cannot turn a legacy plain description into trusted rich content.
-        $document = new \DOMDocument();
+        $document = new \DOMDocument;
         $previous = libxml_use_internal_errors(true);
         try {
             $document->loadHTML('<?xml encoding="UTF-8">'.$description, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING);

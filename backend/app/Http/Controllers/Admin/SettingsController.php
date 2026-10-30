@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\HeroSlide;
 use App\Models\SiteSetting;
-use App\Support\HtmlSanitizer;
 use App\Services\SharedSiteSettings;
+use App\Support\HtmlSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

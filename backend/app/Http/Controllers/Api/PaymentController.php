@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\CustomerPaymentMethod;
+use App\Services\PaymentVerificationException;
 use App\Services\StripeCheckoutContext;
 use App\Services\StripeGateway;
-use App\Services\PaymentVerificationException;
 use App\Support\CheckoutCalculator;
 use Illuminate\Http\Request;
 use Stripe\PaymentMethod as StripePaymentMethod;
@@ -133,11 +133,13 @@ class PaymentController extends Controller
             if (! hash_equals($fingerprint, $intent->metadata->checkout_fingerprint ?? '')) {
                 return response()->json(['message' => 'Payment does not belong to this checkout.'], 403);
             }
+
             return response()->json(['status' => $intent->status]);
         } catch (PaymentVerificationException $e) {
             return response()->json(['message' => $e->getMessage()], 403);
         } catch (\Exception $e) {
             report($e);
+
             return response()->json(['message' => 'Unable to check payment status. Please try again.'], 503);
         }
     }

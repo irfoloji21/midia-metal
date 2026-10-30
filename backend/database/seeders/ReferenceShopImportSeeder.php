@@ -66,6 +66,7 @@ class ReferenceShopImportSeeder extends Seeder
                 $product = Product::updateOrCreate(['slug' => $entry['slug']], $attributes);
                 $counts[$product->wasRecentlyCreated ? 'created' : 'updated']++;
             }
+
             return $counts;
         });
 

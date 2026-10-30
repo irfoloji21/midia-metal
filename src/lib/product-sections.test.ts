@@ -45,7 +45,7 @@ describe('product description section detection', () => {
     '<p>layout-block content-section</p>',
     '<pre>&lt;div class="layout-block"&gt;Example&lt;/div&gt;</pre>',
     '<!-- <div class="content-section"></div> --><p>Existing copy</p>',
-    '<script type="application/json">{"example":"<div class=\"content-section\">"}</script>',
+    '<script type="application/json">{"example":"<div class="content-section">"}</script>',
     '<style>.content-section { color: red; }</style>',
     '<template><div class="content-section"><p>Hidden template</p></div></template>',
     '<noscript><div class="layout-block"><p>Fallback content</p></div></noscript>',

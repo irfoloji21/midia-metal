@@ -27,7 +27,7 @@ class HomepageCopySeeder extends Seeder
             'home_fabrication_section_title' => 'Metalwork built to specification',
             'home_welding_label' => 'Custom Metalwork',
             'home_welding_title' => 'Stainless steel fabrication & welding',
-            'home_welding_desc' => "We manufacture worktops, cupboards, sink units, grills, extraction canopies and ductwork for commercial kitchens. Each item is fabricated to the agreed dimensions, material and finish.",
+            'home_welding_desc' => 'We manufacture worktops, cupboards, sink units, grills, extraction canopies and ductwork for commercial kitchens. Each item is fabricated to the agreed dimensions, material and finish.',
             'home_welding_primary_cta' => 'Request a Quote',
             'home_welding_secondary_cta' => 'View Fabrication Services',
             'home_welding_card_label' => 'Project Preparation',
